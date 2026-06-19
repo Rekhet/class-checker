@@ -283,6 +283,29 @@ async function loadTerms() {
     seen.add(t.term);
     termSel.append(el("option", { value: t.term }, SEMESTER_LABEL[t.term] || t.term));
   });
+  applySearchDefaults();
+}
+
+// config.js: map a friendly term default (1학기 / spring / code) to a term code
+const TERM_ALIASES = {
+  "1학기": "U000200001U000300001", "spring": "U000200001U000300001", "1": "U000200001U000300001",
+  "2학기": "U000200002U000300001", "fall": "U000200002U000300001", "2": "U000200002U000300001",
+  "여름": "U000200001U000300002", "여름학기": "U000200001U000300002", "summer": "U000200001U000300002",
+  "겨울": "U000200002U000300002", "겨울학기": "U000200002U000300002", "winter": "U000200002U000300002",
+};
+function resolveTermDefault(v) {
+  v = (v || "").toString().trim();
+  if (!v) return "";
+  if (SEMESTER_LABEL[v]) return v;                 // already a raw code
+  return TERM_ALIASES[v.toLowerCase()] || "";
+}
+// apply config defaults to the year/term selects (only if that option exists)
+function applySearchDefaults() {
+  const yEl = $("#year"), tEl = $("#term");
+  const y = (window.SEARCH_DEFAULT_YEAR || "").toString().trim();
+  if (y && yEl && [...yEl.options].some((o) => o.value === y)) yEl.value = y;
+  const t = resolveTermDefault(window.SEARCH_DEFAULT_TERM);
+  if (t && tEl && [...tEl.options].some((o) => o.value === t)) tEl.value = t;
 }
 
 async function loadDepartments() {
