@@ -73,9 +73,18 @@ async function rowsForScope(f) {
   for (const t of ts) out.push(...await termRows(t.year, t.term));
   return out;
 }
+// subsequence match: query chars appear in order in the name, so a shorthand like
+// "심수기" matches "심층신경망의 수학적 기초". (Plain substring is a special case.)
+function subseqMatch(hay, needle) {
+  hay = (hay || "").toLowerCase(); needle = needle.toLowerCase();
+  if (!needle) return true;
+  let i = 0;
+  for (const ch of hay) if (ch === needle[i] && ++i === needle.length) return true;
+  return false;
+}
 function matchRow(c, f) {
   const has = (hay, needle) => (hay || "").toLowerCase().includes(needle.toLowerCase());
-  if (f.name && !has(c.name, f.name)) return false;
+  if (f.name && !subseqMatch(c.name, f.name)) return false;
   if (f.professor && !has(c.professor, f.professor)) return false;
   if (f.department && !has(c.department, f.department)) return false;
   if (f.grades?.length && !f.grades.includes(c.grade)) return false;
@@ -89,8 +98,36 @@ function matchRow(c, f) {
   }
   return true;
 }
+// busy meeting intervals from the current timetable (skip removed; keep key to
+// exclude a class from clashing with itself)
+function timetableBusy() {
+  const busy = [];
+  for (const c of timetable) {
+    if (c.removed) continue;
+    const key = classKey(c);
+    for (const s of (c.slots || [])) {
+      if (s.day_index == null || !s.start_time || !s.end_time) continue;
+      busy.push({ key, d: s.day_index, a: toMin(s.start_time), b: toMin(s.end_time) });
+    }
+  }
+  return busy;
+}
+function overlapsBusy(c, busy) {
+  const key = classKey(c);
+  for (const s of (c.slots || [])) {
+    if (s.day_index == null || !s.start_time || !s.end_time) continue;
+    const a = toMin(s.start_time), b = toMin(s.end_time);
+    for (const x of busy)
+      if (x.key !== key && x.d === s.day_index && a < x.b && x.a < b) return true;
+  }
+  return false;
+}
 async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
-  const rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
+  let rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
+  if (f.noOverlap) {                       // exclude classes that clash with the timetable
+    const busy = timetableBusy();
+    rows = rows.filter((c) => !overlapsBusy(c, busy));
+  }
   rows.sort((a, b) => (a.name || "").localeCompare(b.name || "")
     || (a.lt_no || "").localeCompare(b.lt_no || ""));
   return { total: rows.length, classes: limit == null ? rows : rows.slice(offset, offset + limit) };
@@ -190,6 +227,10 @@ function buildFilters() {
   form.append(makeDropdown("과정", "Level", "lvl"));
   form.append(makeDropdown("이수구분", "Type", "cls"));
   form.append(makeDropdown("학년", "Grade", "grd"));
+  // time-overlap mode: drop classes that clash with the current timetable
+  const ov = el("input", { type: "checkbox", id: "noOverlap" });
+  form.append(makeField("시간 겹침", "Overlap",
+    el("label", { className: "ov-toggle" }, ov, " 겹치는 강좌 제외")));
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
 }
 
@@ -348,6 +389,7 @@ function currentFilters() {
     name: val("name"), professor: val("professor"), department: val("department"),
     classifications: checks("clsMenu"), levels: checks("lvlMenu"), grades: checks("grdMenu"),
     day: num("day"), period: num("period"),
+    noOverlap: $("#noOverlap")?.checked || false,
   };
 }
 
@@ -390,6 +432,7 @@ function filterSummary(f) {
   (f.grades || []).forEach((x) => p.push(gradeLabel(x).split(" ")[0]));
   if (f.day != null) p.push(DAYS[f.day]);
   if (f.period != null) p.push(`${f.period}교시`);
+  if (f.noOverlap) p.push("겹침제외");
   return p.length ? p.join(" · ") : "전체";
 }
 

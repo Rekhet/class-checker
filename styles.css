@@ -85,6 +85,8 @@ main {
   outline: none; border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(55, 109, 200, .15);
 }
+.ov-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: 13px; color: var(--ink); padding: 8px 0; }
 
 /* 이수구분 (classification) checkbox dropdown */
 .cls-dd { position: relative; }
