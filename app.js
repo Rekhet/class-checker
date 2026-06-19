@@ -1237,12 +1237,16 @@ function init() {
   $("#ttGcal").addEventListener("click", exportToGoogleCalendar);
   $("#ttAddManual").addEventListener("click", () => $("#manualForm").classList.toggle("hidden"));
   $("#manualForm").addEventListener("submit", addManual);
-  // default ICS range: today through ~16 weeks (a typical semester)
+  // default ICS range: config.js values, else today through ~16 weeks
   const iso = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
   const today = new Date();
-  $("#icsStart").value = iso(today);
   const semEnd = new Date(today); semEnd.setDate(semEnd.getDate() + 112);
-  $("#icsEnd").value = iso(semEnd);
+  const setDate = (el, val, fallback) => {
+    el.value = (val || "").toString().trim();   // a malformed value is rejected -> ""
+    if (!el.value) el.value = fallback;
+  };
+  setDate($("#icsStart"), window.ICS_DEFAULT_START, iso(today));
+  setDate($("#icsEnd"), window.ICS_DEFAULT_END, iso(semEnd));
   // 과정/이수구분 are <details> dropdowns: close any open one whose box wasn't
   // clicked, so an outside click collapses them and only one stays open at a time.
   document.addEventListener("click", (e) => {

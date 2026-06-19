@@ -14,3 +14,7 @@ window.GOOGLE_CLIENT_ID = "1357339441-37gp3tq7v7bajmldkicteajonpe6jpk0.apps.goog
 //         or the raw 20-char term code). Applied only if that option exists.
 window.SEARCH_DEFAULT_YEAR = "2026";
 window.SEARCH_DEFAULT_TERM = "fall";
+
+// Default calendar (.ics) export range. "YYYY-MM-DD" each; empty = today / +16 weeks.
+window.ICS_DEFAULT_START = "2026-09-01";
+window.ICS_DEFAULT_END = "2026-12-21";
