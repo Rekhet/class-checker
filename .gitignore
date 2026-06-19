@@ -1,0 +1,22 @@
+# Secrets
+google_oauth_secret.json
+prod.env
+prod-admin.env
+*.env
+!*.env.example
+
+# Local databases / catalog dumps (large + may contain a full data snapshot).
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/turso.db
+
+# Python / tooling
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Editor / OS
+.DS_Store
+*.swp
