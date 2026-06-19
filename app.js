@@ -9,7 +9,8 @@ const toMin = (hhmm) => {
   const [h, m] = String(hhmm || "0:0").split(":").map(Number);
   return h * 60 + m;
 };
-const TT_KEY = "snu_tt_v1";
+const TT_KEY = "snu_tt_v1";          // legacy single-timetable storage (migrated)
+const SHEETS_KEY = "snu_sheets_v1";  // multiple named timetables
 // SNU term codes (cmmnCd) are year-independent, so year and semester are chosen
 // separately everywhere; this maps a term code to its semester-only label.
 const SEMESTER_LABEL = {
@@ -23,7 +24,8 @@ const ADMIN_TERMS = Object.entries(SEMESTER_LABEL)
 const PALETTE = ["#376dc8", "#2e9e6b", "#c87a37", "#8b5cf6", "#c8485a",
   "#0d9488", "#d4a017", "#5b48b0", "#1f7a8c", "#b5446e"];
 
-let timetable = loadTT();
+let sheets = [], active = 0;
+let timetable = initSheets();   // sets sheets/active; timetable = active sheet's classes
 
 // ---------- utils ----------
 const $ = (s) => document.querySelector(s);
@@ -73,8 +75,7 @@ async function rowsForScope(f) {
   for (const t of ts) out.push(...await termRows(t.year, t.term));
   return out;
 }
-// subsequence match: query chars appear in order in the name, so a shorthand like
-// "심수기" matches "심층신경망의 수학적 기초". (Plain substring is a special case.)
+// subsequence: query chars appear in order in the haystack
 function subseqMatch(hay, needle) {
   hay = (hay || "").toLowerCase(); needle = needle.toLowerCase();
   if (!needle) return true;
@@ -82,9 +83,26 @@ function subseqMatch(hay, needle) {
   for (const ch of hay) if (ch === needle[i] && ++i === needle.length) return true;
   return false;
 }
+// first char of each whitespace word: "심층신경망의 수학적 기초" -> "심수기"
+function wordInitials(name) {
+  return (name || "").toLowerCase().split(/\s+/).filter(Boolean).map((w) => w[0]).join("");
+}
+// relevance of a name vs a (possibly shorthand) query. 0 = no match; higher = better.
+// Lets a shorthand like "심수기" rank the intended class above loose subsequence noise.
+function nameScore(name, q) {
+  const n = (name || "").toLowerCase(); q = (q || "").toLowerCase();
+  if (!q) return 1;
+  if (n.includes(q)) return n.startsWith(q) ? 6 : 5;     // substring (prefix best)
+  const ini = wordInitials(name);
+  if (ini === q) return 4;                                // exact word-initials
+  if (ini.startsWith(q)) return 3;
+  if (subseqMatch(ini, q)) return 2;                      // initials subsequence (skips prefixes)
+  if (subseqMatch(n, q)) return 1;                        // loose full-name subsequence
+  return 0;
+}
 function matchRow(c, f) {
   const has = (hay, needle) => (hay || "").toLowerCase().includes(needle.toLowerCase());
-  if (f.name && !subseqMatch(c.name, f.name)) return false;
+  if (f.name && nameScore(c.name, f.name) === 0) return false;
   if (f.professor && !has(c.professor, f.professor)) return false;
   if (f.department && !has(c.department, f.department)) return false;
   if (f.grades?.length && !f.grades.includes(c.grade)) return false;
@@ -123,13 +141,15 @@ function overlapsBusy(c, busy) {
   return false;
 }
 async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
-  let rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
-  if (f.noOverlap) {                       // exclude classes that clash with the timetable
-    const busy = timetableBusy();
-    rows = rows.filter((c) => !overlapsBusy(c, busy));
+  const rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
+  if (f.name) {   // rank by name relevance so a shorthand surfaces the best match first
+    rows.sort((a, b) => nameScore(b.name, f.name) - nameScore(a.name, f.name)
+      || (a.name || "").localeCompare(b.name || "")
+      || (a.lt_no || "").localeCompare(b.lt_no || ""));
+  } else {
+    rows.sort((a, b) => (a.name || "").localeCompare(b.name || "")
+      || (a.lt_no || "").localeCompare(b.lt_no || ""));
   }
-  rows.sort((a, b) => (a.name || "").localeCompare(b.name || "")
-    || (a.lt_no || "").localeCompare(b.lt_no || ""));
   return { total: rows.length, classes: limit == null ? rows : rows.slice(offset, offset + limit) };
 }
 async function lookupLocal(keys) {
@@ -227,10 +247,6 @@ function buildFilters() {
   form.append(makeDropdown("과정", "Level", "lvl"));
   form.append(makeDropdown("이수구분", "Type", "cls"));
   form.append(makeDropdown("학년", "Grade", "grd"));
-  // time-overlap mode: drop classes that clash with the current timetable
-  const ov = el("input", { type: "checkbox", id: "noOverlap" });
-  form.append(makeField("시간 겹침", "Overlap",
-    el("label", { className: "ov-toggle" }, ov, " 겹치는 강좌 제외")));
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
 }
 
@@ -389,7 +405,6 @@ function currentFilters() {
     name: val("name"), professor: val("professor"), department: val("department"),
     classifications: checks("clsMenu"), levels: checks("lvlMenu"), grades: checks("grdMenu"),
     day: num("day"), period: num("period"),
-    noOverlap: $("#noOverlap")?.checked || false,
   };
 }
 
@@ -432,7 +447,6 @@ function filterSummary(f) {
   (f.grades || []).forEach((x) => p.push(gradeLabel(x).split(" ")[0]));
   if (f.day != null) p.push(DAYS[f.day]);
   if (f.period != null) p.push(`${f.period}교시`);
-  if (f.noOverlap) p.push("겹침제외");
   return p.length ? p.join(" · ") : "전체";
 }
 
@@ -530,15 +544,82 @@ function slotSummary(slots) {
   return out;
 }
 
-// ---------- timetable ----------
-function loadTT() {
-  try { return JSON.parse(localStorage.getItem(TT_KEY)) || []; }
-  catch { return []; }
+// ---------- timetable sheets ----------
+function initSheets() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SHEETS_KEY));
+    if (raw && Array.isArray(raw.sheets) && raw.sheets.length) {
+      sheets = raw.sheets.map((s) => ({ name: s.name || "시간표", classes: s.classes || [] }));
+      active = Math.min(Math.max(0, raw.active | 0), sheets.length - 1);
+      return sheets[active].classes;
+    }
+  } catch { /* fall through to migrate */ }
+  let legacy = [];
+  try { legacy = JSON.parse(localStorage.getItem(TT_KEY)) || []; } catch { /* none */ }
+  sheets = [{ name: "시간표 1", classes: legacy }];
+  active = 0;
+  return sheets[active].classes;
 }
-function saveTT() { localStorage.setItem(TT_KEY, JSON.stringify(timetable)); }
+function saveTT() {
+  sheets[active].classes = timetable;   // keep the active sheet in sync
+  localStorage.setItem(SHEETS_KEY, JSON.stringify({ version: 1, sheets, active }));
+}
+function switchSheet(i) {
+  if (i === active || i < 0 || i >= sheets.length) return;
+  saveTT();
+  active = i; timetable = sheets[active].classes;
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+}
+function addSheet() {
+  saveTT();
+  sheets.push({ name: `시간표 ${sheets.length + 1}`, classes: [] });
+  active = sheets.length - 1; timetable = sheets[active].classes;
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+}
+function deleteSheet(i) {
+  if (sheets.length <= 1) { alert("마지막 시간표는 삭제할 수 없습니다."); return; }
+  if (!confirm(`'${sheets[i].name}' 시간표를 삭제할까요?`)) return;
+  sheets.splice(i, 1);
+  if (active >= sheets.length) active = sheets.length - 1;
+  else if (i < active) active--;
+  timetable = sheets[active].classes;
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+}
+function renameSheet(i) {
+  const name = (prompt("시간표 이름:", sheets[i].name) || "").trim();
+  if (!name) return;
+  sheets[i].name = name; saveTT(); renderSheets();
+}
+function renderSheets() {
+  const box = $("#ttSheets"); if (!box) return;
+  box.replaceChildren();
+  sheets.forEach((s, i) => {
+    const tab = el("button", {
+      type: "button", className: "tt-sheet" + (i === active ? " active" : ""),
+      title: i === active ? "클릭하여 이름 변경" : "클릭하여 전환 (더블클릭: 이름 변경)",
+      // click the active tab to rename it; click another to switch
+      onclick: () => (i === active ? renameSheet(i) : switchSheet(i)),
+      ondblclick: () => renameSheet(i),
+    }, s.name);
+    if (i === active) tab.append(el("span", {   // pen: rename hint on the active tab
+      className: "sheet-pen", title: "이름 변경",
+    }, "✎"));
+    if (sheets.length > 1) tab.append(el("span", {
+      className: "sheet-x", title: "삭제",
+      onclick: (e) => { e.stopPropagation(); deleteSheet(i); },
+    }, "×"));
+    box.append(tab);
+  });
+  box.append(el("button", { type: "button", className: "tt-sheet add",
+    title: "시간표 추가", onclick: addSheet }, "+"));
+}
 
 function addToTT(c) {
   if (timetable.some((x) => classKey(x) === classKey(c))) return;
+  if ($("#blockOverlap")?.checked && overlapsBusy(c, timetableBusy())) {
+    alert("이미 추가된 강좌와 시간이 겹쳐 추가하지 않았습니다.");
+    return;
+  }
   timetable.push({
     year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
     professor: c.professor, credits: c.credits, slots: c.slots || [],
@@ -1110,6 +1191,7 @@ function init() {
       pollTimer = setInterval(pollRefresh, 1500);
     }
   });
+  renderSheets();
   renderTT();
   reconcileTT();
   $("#searchForm").addEventListener("submit", doSearch);
