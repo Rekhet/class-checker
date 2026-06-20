@@ -28,6 +28,15 @@ h2 { font-size: 15px; margin: 0 0 12px; }
 .status { font-size: 12px; color: var(--muted); }
 .dev-status { margin: 0 16px 10px; }
 
+/* top nav + pages */
+.topnav { display: flex; gap: 4px; }
+.nav-link { font-size: 13px; color: var(--muted); padding: 6px 12px; border-radius: 7px;
+  text-decoration: none; cursor: pointer; user-select: none; }
+.nav-link:hover { background: var(--bg); }
+.nav-link.active { background: var(--brand); color: #fff; }
+.page { display: none; }
+.page.active { display: block; }
+
 main {
   display: grid; grid-template-columns: minmax(420px, 1fr) minmax(520px, 1.2fr);
   gap: 16px; padding: 16px; align-items: start;
@@ -224,6 +233,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .ttx-block.conflict { outline: 2px solid var(--danger); outline-offset: -2px; }
 .ttx-block.changed { outline: 2px solid var(--warn); outline-offset: -2px; }
 .ttx-block.removed { opacity: .5; text-decoration: line-through; }
+.ttx-block.preview { background: #9aa2af; color: #fff; opacity: .62;
+  filter: grayscale(1); border: 1px dashed #fff; pointer-events: none; z-index: 1; }
 .tt-tba { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 10px; }
 .tt-tba .tba-h { width: 100%; font-size: 11px; color: var(--muted); }
 .tt-tba .tba-chip {

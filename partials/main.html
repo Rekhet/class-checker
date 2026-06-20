@@ -1,8 +1,12 @@
-<!-- Core dashboard: topbar + search + timetable. Always loaded (incl. production). -->
+<!-- Core dashboard: topbar + search + timetable. Always loaded (incl. production).
+     Content is wrapped in <div class="page"> blocks; a top nav switches between
+     pages (built in JS from every .page found, so dev.html adds its own). -->
 <header class="topbar">
   <h1>SNU Class Checker</h1>
+  <nav class="topnav" id="topnav"></nav>
 </header>
 
+<div class="page" data-page="timetable" data-title="시간표">
 <main>
   <section class="panel search">
     <h2 class="search-toggle" id="searchToggle">강좌 검색 <span class="sub">Search</span><span class="search-summary" id="searchSummary"></span><span class="fold-ind">▾</span></h2>
@@ -60,3 +64,5 @@
     <div id="ttList" class="tt-list"></div>
   </section>
 </main>
+</div>
+

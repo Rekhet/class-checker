@@ -26,6 +26,7 @@ const PALETTE = ["#376dc8", "#2e9e6b", "#c87a37", "#8b5cf6", "#c8485a",
 
 let sheets = [], active = 0;
 let timetable = initSheets();   // sets sheets/active; timetable = active sheet's classes
+let hoverPreview = null, hoverTimer = null;   // grayscale preview of a hovered search result
 
 // ---------- utils ----------
 const $ = (s) => document.querySelector(s);
@@ -141,7 +142,14 @@ function overlapsBusy(c, busy) {
   return false;
 }
 async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
-  const rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
+  let rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
+  if (f.emptyOnly) {   // only classes that fit the timetable's free slots (no overlap)
+    const busy = timetableBusy();
+    rows = rows.filter((c) => !overlapsBusy(c, busy));
+  }
+  if (f.timedOnly) {   // only classes with a scheduled time (exclude 시간미정/TBA)
+    rows = rows.filter((c) => (c.slots || []).some((s) => s.day_index != null && s.start_time));
+  }
   if (f.name) {   // rank by name relevance so a shorthand surfaces the best match first
     rows.sort((a, b) => nameScore(b.name, f.name) - nameScore(a.name, f.name)
       || (a.name || "").localeCompare(b.name || "")
@@ -247,6 +255,14 @@ function buildFilters() {
   form.append(makeDropdown("과정", "Level", "lvl"));
   form.append(makeDropdown("이수구분", "Type", "cls"));
   form.append(makeDropdown("학년", "Grade", "grd"));
+  // only classes that fit the timetable's empty slots (no time overlap)
+  const empty = el("input", { type: "checkbox", id: "emptyOnly" });
+  form.append(makeField("빈 시간", "Empty",
+    el("label", { className: "ov-toggle" }, empty, " 빈 시간대만")));
+  // only classes that have a scheduled time (exclude 시간미정/TBA)
+  const timed = el("input", { type: "checkbox", id: "timedOnly" });
+  form.append(makeField("시간 배정", "Timed",
+    el("label", { className: "ov-toggle" }, timed, " 시간 배정된 강좌만")));
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
 }
 
@@ -428,6 +444,8 @@ function currentFilters() {
     name: val("name"), professor: val("professor"), department: val("department"),
     classifications: checks("clsMenu"), levels: checks("lvlMenu"), grades: checks("grdMenu"),
     day: num("day"), period: num("period"),
+    emptyOnly: $("#emptyOnly")?.checked || false,
+    timedOnly: $("#timedOnly")?.checked || false,
   };
 }
 
@@ -470,6 +488,8 @@ function filterSummary(f) {
   (f.grades || []).forEach((x) => p.push(gradeLabel(x).split(" ")[0]));
   if (f.day != null) p.push(DAYS[f.day]);
   if (f.period != null) p.push(`${f.period}교시`);
+  if (f.emptyOnly) p.push("빈시간대");
+  if (f.timedOnly) p.push("시간배정");
   return p.length ? p.join(" · ") : "전체";
 }
 
@@ -526,6 +546,8 @@ function renderResults(classes, append = false) {
     const added = inTT.has(classKey(c));
     const card = el("li", { className: "card" + (added ? " in-tt" : "") });
     card.style.borderLeftColor = colorFor(c);
+    card.addEventListener("mouseenter", () => startHoverPreview(c));
+    card.addEventListener("mouseleave", cancelHoverPreview);
     const cls = (c.classification || []).map((x) =>
       el("span", { className: "chip cls" }, x));
     const summ = slotSummary(c.slots);
@@ -718,6 +740,16 @@ async function reconcileTT() {
   } catch { /* server down: keep the saved copy as-is */ }
 }
 
+// hover a search result for ~0.7s -> show it as a grayscale ghost on the grid
+function startHoverPreview(c) {
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => { hoverPreview = c; renderTT(); }, 700);
+}
+function cancelHoverPreview() {
+  clearTimeout(hoverTimer);
+  if (hoverPreview) { hoverPreview = null; renderTT(); }
+}
+
 function renderTT() {
   const grid = $("#ttGrid"); grid.replaceChildren();
   $("#ttEmpty").style.display = timetable.length ? "none" : "block";
@@ -754,9 +786,22 @@ function renderTT() {
       minS = Math.min(minS, a); maxE = Math.max(maxE, b); maxDay = Math.max(maxDay, s.day_index);
     }
   }
+  // hovered search result -> grayscale preview meetings (NOT part of the timetable)
+  const preview = [];
+  if (hoverPreview && !timetable.some((x) => classKey(x) === classKey(hoverPreview))) {
+    for (const s of (hoverPreview.slots || [])) {
+      if (s.day_index == null || !s.start_time || !s.end_time) continue;
+      const a = toMin(s.start_time), b = toMin(s.end_time);
+      if (b <= a) continue;
+      preview.push({ day: s.day_index, a, b });
+      minS = Math.min(minS, a); maxE = Math.max(maxE, b); maxDay = Math.max(maxDay, s.day_index);
+    }
+  }
+  if (preview.length) $("#ttEmpty").style.display = "none";
+  const hasAny = meetings.length || preview.length;
   const dayN = maxDay + 1;
-  const startMin = meetings.length ? Math.min(8 * 60, Math.floor(minS / 60) * 60) : 9 * 60;
-  const endMin = meetings.length ? Math.max(18 * 60, Math.ceil(maxE / 60) * 60) : 18 * 60;
+  const startMin = hasAny ? Math.min(8 * 60, Math.floor(minS / 60) * 60) : 9 * 60;
+  const endMin = hasAny ? Math.max(18 * 60, Math.ceil(maxE / 60) * 60) : 18 * 60;
   const H = (endMin - startMin) / 60 * HOUR_PX;
 
   const ttx = el("div", { className: "ttx" });
@@ -807,6 +852,16 @@ function renderTT() {
       b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
       if (c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
       col.append(b);
+    }
+    for (const m of preview.filter((x) => x.day === d)) {
+      const pb = el("div", { className: "ttx-block preview",
+        title: `${hoverPreview.name} (미리보기)` },
+        hoverPreview.name.length > 11 ? hoverPreview.name.slice(0, 11) + "…" : hoverPreview.name);
+      pb.style.top = ((m.a - startMin) / 60 * HOUR_PX) + "px";
+      pb.style.height = Math.max(15, (m.b - m.a) / 60 * HOUR_PX - 1) + "px";
+      pb.style.left = "1px"; pb.style.width = "calc(100% - 2px)";
+      pb.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
+      col.append(pb);
     }
     ttx.append(col);
   }
@@ -1197,7 +1252,30 @@ async function exportToGoogleCalendar() {
 }
 
 // ---------- wire up ----------
+// ---------- pages (top-nav router) ----------
+function showPage(name) {
+  const pages = [...$$(".page")];
+  if (!pages.length) return;
+  if (!pages.some((p) => p.dataset.page === name)) name = pages[0].dataset.page;
+  pages.forEach((p) => p.classList.toggle("active", p.dataset.page === name));
+  $$("#topnav .nav-link").forEach((n) => n.classList.toggle("active", n.dataset.page === name));
+}
+function setupNav() {
+  const nav = $("#topnav"); if (!nav) return;
+  nav.replaceChildren();
+  $$(".page").forEach((p) => {
+    const link = el("a", { className: "nav-link", href: "#" + p.dataset.page },
+      p.dataset.title || p.dataset.page);
+    link.dataset.page = p.dataset.page;
+    link.onclick = (e) => { e.preventDefault(); location.hash = p.dataset.page; };
+    nav.append(link);
+  });
+  window.addEventListener("hashchange", () => showPage((location.hash || "").slice(1)));
+  showPage((location.hash || "").slice(1) || ($$(".page")[0] || {}).dataset?.page);
+}
+
 function init() {
+  setupNav();        // build the nav from every .page partial that mounted
   buildFilters();   // construct the filter fields/dropdowns before anything fills them
   fillSelects();
   loadTerms();
@@ -1247,8 +1325,8 @@ function init() {
   };
   setDate($("#icsStart"), window.ICS_DEFAULT_START, iso(today));
   setDate($("#icsEnd"), window.ICS_DEFAULT_END, iso(semEnd));
-  // 과정/이수구분 are <details> dropdowns: close any open one whose box wasn't
-  // clicked, so an outside click collapses them and only one stays open at a time.
+  // 과정/이수구분/학년 are <details> dropdowns: an outside click closes any open
+  // one, and only one stays open at a time.
   document.addEventListener("click", (e) => {
     $$(".cls-dd[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; });
   });
