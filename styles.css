@@ -45,6 +45,9 @@ body {
   -webkit-font-smoothing: antialiased; letter-spacing: -0.005em; word-break: keep-all;
 }
 input::placeholder { color: var(--cp-faint); }
+/* sticky footer: #app fills at least the viewport so .site-footer (margin-top:auto)
+   sits at the bottom of the viewport when content is short, and below content when tall */
+#app { display: flex; flex-direction: column; min-height: 100vh; }
 h1 { font-size: 17px; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
 h2 { font-size: 14px; margin: 0; font-weight: 700; }
 .sub { color: var(--cp-muted); font-weight: 400; font-size: 12px; }
@@ -112,8 +115,11 @@ h2 { font-size: 14px; margin: 0; font-weight: 700; }
 }
 .name-input { margin: 0; }
 
-.adv { margin-top: 11px; }
-.adv.hidden { display: none; }
+/* smooth expand/collapse: closed = max-height 0; JS animates between 0 and the
+   measured height, then drops the clamp (max-height:none) once open */
+.adv { margin-top: 11px; overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height .28s ease, opacity .2s ease; }
+.adv.open { max-height: none; opacity: 1; }
 .adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .adv-grid label { display: flex; flex-direction: column; gap: 4px;
   font-size: 11px; color: var(--cp-muted); font-weight: 500; }
@@ -308,6 +314,25 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .bar-fill { height: 100%; width: 0; background: var(--cp-accent); transition: width .3s; }
 .progress-txt { font-size: 12px; color: var(--cp-muted); margin-top: 6px; }
 
+/* ===== footer + legal pages ===== */
+.site-footer { margin-top: auto; border-top: 1px solid var(--cp-line); background: var(--cp-paper);
+  padding: 18px 36px; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+  font-size: 12px; color: var(--cp-muted); }
+.site-footer nav { display: flex; gap: 16px; margin-left: auto; }
+.site-footer a { color: var(--cp-muted); text-decoration: none; }
+.site-footer a:hover { color: var(--cp-ink); text-decoration: underline; }
+
+.legal-page { max-width: 760px; margin: 0 auto; padding: 32px 36px 64px; }
+.legal-page h2 { font-size: 22px; margin-bottom: 6px; }
+.legal-page .legal-updated { font-size: 12px; color: var(--cp-faint); margin-bottom: 24px; }
+.legal-page h3 { font-size: 15px; margin: 24px 0 8px; }
+.legal-page p, .legal-page li { font-size: 13.5px; line-height: 1.7; color: var(--cp-ink); }
+.legal-page ul { padding-left: 18px; margin: 8px 0; }
+.legal-page li { margin-bottom: 4px; }
+.legal-page .muted { color: var(--cp-muted); }
+.legal-back { display: inline-block; margin-top: 28px; font-size: 13px;
+  color: var(--cp-accent); text-decoration: none; font-weight: 600; }
+
 /* ===== responsive ===== */
 @media (max-width: 1040px) {
   .tt-cols { flex-direction: column; }
@@ -326,4 +351,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   .tt-head { flex-wrap: wrap; }
   .adv-grid { grid-template-columns: 1fr; }
   .detail-drawer { width: 100%; }
+  .site-footer { padding: 16px; }
+  .legal-page { padding: 24px 16px 48px; }
 }

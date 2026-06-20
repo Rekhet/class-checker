@@ -26,7 +26,7 @@ const PALETTE = ["#376dc8", "#2e9e6b", "#c87a37", "#8b5cf6", "#c8485a",
 
 let sheets = [], active = 0;
 let timetable = initSheets();   // sets sheets/active; timetable = active sheet's classes
-let hoverPreview = null, hoverTimer = null;   // grayscale preview of a hovered search result
+let hoverPreview = null;   // ghost preview of a hovered search result
 
 // ---------- utils ----------
 const $ = (s) => document.querySelector(s);
@@ -238,8 +238,8 @@ function buildFilters() {
     type: "text", name: "name", id: "name", className: "name-input", placeholder: "강좌명 검색",
   }));
 
-  // advanced filters, toggled by #filterToggle
-  const adv = el("div", { className: "adv hidden", id: "advFilters" });
+  // advanced filters, smoothly expanded/collapsed by #filterToggle
+  const adv = el("div", { className: "adv", id: "advFilters" });
   const grid = el("div", { className: "adv-grid" });
   grid.append(labeled("연도", sel("year")));
   grid.append(labeled("학기", sel("term")));
@@ -253,6 +253,8 @@ function buildFilters() {
   grid.append(labeled("교시", sel("period")));
   adv.append(grid);
 
+  adv.append(el("div", { className: "adv-label" }, "과정"));
+  adv.append(el("div", { className: "chips", id: "levelChips" }));
   adv.append(el("div", { className: "adv-label" }, "이수구분"));
   adv.append(el("div", { className: "chips", id: "typeChips" }));
   adv.append(el("div", { className: "adv-label" }, "학년"));
@@ -277,6 +279,31 @@ function fillChips(containerId, tokens, labelOf = (t) => t) {
     chip.addEventListener("click", () => chip.classList.toggle("on"));
     box.append(chip);
   });
+}
+// smooth open/close of the advanced filters. A forced reflow commits the start
+// value so the max-height transition runs; once open, the clamp is dropped
+// (.open -> max-height:none) so the content can reflow (e.g. chips wrapping).
+function setAdvancedOpen(open) {
+  const adv = $("#advFilters"); if (!adv) return;
+  $("#filterToggle").textContent = open ? "간단히" : "상세 검색";
+  if (open) {
+    adv.classList.add("open");
+    adv.style.maxHeight = "0px";
+    void adv.offsetHeight;
+    adv.style.maxHeight = adv.scrollHeight + "px";
+    const done = (e) => {
+      if (e.propertyName !== "max-height") return;
+      adv.style.maxHeight = "";   // fall back to .open { max-height:none }
+      adv.removeEventListener("transitionend", done);
+    };
+    adv.addEventListener("transitionend", done);
+    setTimeout(() => { adv.style.maxHeight = ""; }, 350);   // fallback if no transitionend
+  } else {
+    adv.style.maxHeight = adv.scrollHeight + "px";   // from auto -> explicit, so 0 animates
+    void adv.offsetHeight;
+    adv.classList.remove("open");
+    adv.style.maxHeight = "0px";
+  }
 }
 
 // ---------- init ----------
@@ -353,7 +380,8 @@ const LEVELS = ["학사", "대학원", "석박사통합", "석사", "박사"];
 async function loadClassifications() {
   try {
     const { classifications } = await dataIndex();
-    fillChips("typeChips", classifications);
+    fillChips("levelChips", classifications.filter((t) => LEVELS.includes(t)));    // 과정
+    fillChips("typeChips", classifications.filter((t) => !LEVELS.includes(t)));    // 이수구분
   } catch { /* classification filters optional */ }
 }
 
@@ -440,12 +468,11 @@ function currentFilters() {
   const val = (n) => f.elements[n].value.trim();
   const chipVals = (id) => [...$$(`#${id} .chip-tog.on`)].map((c) => c.dataset.value);
   const num = (n) => { const v = val(n); return v === "" ? null : Number(v); };
-  const types = chipVals("typeChips");   // split back into 과정(level) vs 이수구분(type)
   return {
     year: val("year") || null, term: val("term") || null,
     name: val("name"), professor: val("professor"), department: val("department"),
-    classifications: types.filter((t) => !LEVELS.includes(t)),
-    levels: types.filter((t) => LEVELS.includes(t)),
+    classifications: chipVals("typeChips"),   // 이수구분 (전선/전필/교양…)
+    levels: chipVals("levelChips"),            // 과정 (학사/석사/박사…)
     grades: chipVals("gradeChips"),
     day: num("day"), period: num("period"),
     emptyOnly: $("#emptyOnly")?.checked || false,
@@ -717,13 +744,12 @@ async function reconcileTT() {
   } catch { /* server down: keep the saved copy as-is */ }
 }
 
-// hover a search result for ~0.7s -> show it as a grayscale ghost on the grid
+// hover a search result -> show it immediately as a ghost preview on the grid
 function startHoverPreview(c) {
-  clearTimeout(hoverTimer);
-  hoverTimer = setTimeout(() => { hoverPreview = c; renderTT(); }, 700);
+  if (hoverPreview === c) return;
+  hoverPreview = c; renderTT();
 }
 function cancelHoverPreview() {
-  clearTimeout(hoverTimer);
   if (hoverPreview) { hoverPreview = null; renderTT(); }
 }
 
@@ -1344,11 +1370,13 @@ function showPage(name) {
   if (!pages.some((p) => p.dataset.page === name)) name = pages[0].dataset.page;
   pages.forEach((p) => p.classList.toggle("active", p.dataset.page === name));
   $$("#topnav .nav-link").forEach((n) => n.classList.toggle("active", n.dataset.page === name));
+  window.scrollTo(0, 0);
 }
 function setupNav() {
   const nav = $("#topnav"); if (!nav) return;
   nav.replaceChildren();
   $$(".page").forEach((p) => {
+    if (p.dataset.nav === "false") return;   // legal pages: footer-only, not in top nav
     const link = el("a", { className: "nav-link", href: "#" + p.dataset.page },
       p.dataset.title || p.dataset.page);
     link.dataset.page = p.dataset.page;
@@ -1381,11 +1409,8 @@ function init() {
   renderTT();
   reconcileTT();
   $("#searchForm").addEventListener("submit", doSearch);
-  $("#filterToggle").addEventListener("click", () => {   // show/hide advanced filters
-    const adv = $("#advFilters");
-    adv.classList.toggle("hidden");
-    $("#filterToggle").textContent = adv.classList.contains("hidden") ? "상세 검색" : "간단히";
-  });
+  $("#filterToggle").addEventListener("click", () =>
+    setAdvancedOpen(!$("#advFilters").classList.contains("open")));
   $("#year").addEventListener("change", updateScope);
   $("#term").addEventListener("change", updateScope);
   $("#clearTT").addEventListener("click", clearTT);

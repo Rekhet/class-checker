@@ -1,0 +1,77 @@
+<!-- Footer + legal pages (개인정보처리방침 / 이용약관). The footer is global chrome
+     (outside any .page) so it shows everywhere. The two .page blocks carry
+     data-nav="false" so setupNav keeps them OUT of the top nav — they're reached
+     only via the footer links (#privacy / #terms), routed by the existing hash router.
+     Basic starter content; edit the contact line and review before publishing.
+     Footer is rendered LAST so it always sits at the bottom, under whichever page is active. -->
+<div class="page legal-page" data-page="privacy" data-title="개인정보처리방침" data-nav="false">
+  <h2>개인정보처리방침 <span class="sub">Privacy Policy</span></h2>
+  <div class="legal-updated">최종 업데이트: 2026-06-21</div>
+
+  <p>SNU Class Checker(이하 “서비스”)는 이용자의 개인정보를 소중히 다룹니다. 본 서비스는
+     별도의 회원가입 없이 동작하며, 강의 시간표 구성을 돕는 도구입니다.</p>
+
+  <h3>1. 수집하는 정보</h3>
+  <p>서비스는 이용자를 식별할 수 있는 개인정보를 서버에 수집·저장하지 않습니다.
+     이용자가 구성한 시간표는 이용자의 브라우저(localStorage)에만 저장되며 외부로 전송되지 않습니다.</p>
+
+  <h3>2. 강의 데이터</h3>
+  <p>검색에 사용되는 강의 정보는 공개된 서울대학교 수강편람 데이터를 가공한 것입니다.
+     해당 데이터에는 개인정보가 포함되지 않습니다.</p>
+
+  <h3>3. 외부 서비스</h3>
+  <ul>
+    <li><strong>Google Calendar 내보내기</strong>: 이용자가 직접 요청한 경우에만, 일정 생성 권한
+        (calendar.events)으로 Google 계정에 시간표를 추가합니다. 접근 토큰은 서버에 저장되지 않습니다.</li>
+    <li><strong>Google Fonts / CDN</strong>: 글꼴 및 일부 라이브러리(XLSX 내보내기)는 외부
+        CDN에서 로드됩니다. 이 과정에서 IP 등 기본 접속 정보가 해당 제공자에게 전달될 수 있습니다.</li>
+  </ul>
+
+  <h3>4. 쿠키 및 추적</h3>
+  <p>서비스는 광고 또는 분석용 추적 쿠키를 사용하지 않습니다.</p>
+
+  <h3>5. 문의</h3>
+  <p class="muted">개인정보 관련 문의: (연락처 이메일을 입력하세요)</p>
+
+  <a class="legal-back" href="#timetable">← 시간표로 돌아가기</a>
+</div>
+
+<div class="page legal-page" data-page="terms" data-title="이용약관" data-nav="false">
+  <h2>이용약관 <span class="sub">Terms of Service</span></h2>
+  <div class="legal-updated">최종 업데이트: 2026-06-21</div>
+
+  <p>본 약관은 SNU Class Checker(이하 “서비스”) 이용에 관한 조건을 규정합니다.
+     서비스를 이용함으로써 이용자는 본 약관에 동의한 것으로 간주됩니다.</p>
+
+  <h3>1. 서비스 소개</h3>
+  <p>본 서비스는 강의 시간표 구성을 돕는 비공식 도구이며, 서울대학교와 제휴하거나
+     서울대학교가 운영하는 서비스가 아닙니다.</p>
+
+  <h3>2. 데이터 정확성</h3>
+  <p>강의 정보는 실제와 다르거나 지연될 수 있습니다. 수강신청, 정원, 시간 등 중요한 정보는
+     반드시 공식 수강신청 시스템에서 다시 확인하시기 바랍니다.</p>
+
+  <h3>3. 책임의 한계</h3>
+  <p>서비스는 “있는 그대로(as-is)” 제공되며, 정확성·완전성·가용성에 대해 보증하지 않습니다.
+     서비스 이용 또는 이용 불가로 발생한 어떠한 손해에 대해서도 책임을 지지 않습니다.
+     수강신청 결과에 대한 책임은 이용자 본인에게 있습니다.</p>
+
+  <h3>4. 약관의 변경</h3>
+  <p>본 약관은 사전 고지 없이 변경될 수 있으며, 변경된 약관은 본 페이지에 게시된 시점부터 적용됩니다.</p>
+
+  <h3>5. 준거법</h3>
+  <p>본 약관은 대한민국 법률에 따라 해석되고 적용됩니다.</p>
+
+  <h3>6. 문의</h3>
+  <p class="muted">약관 관련 문의: (연락처 이메일을 입력하세요)</p>
+
+  <a class="legal-back" href="#timetable">← 시간표로 돌아가기</a>
+</div>
+
+<footer class="site-footer">
+  <span>© 2026 SNU Class Checker</span>
+  <nav>
+    <a href="#privacy">개인정보처리방침</a>
+    <a href="#terms">이용약관</a>
+  </nav>
+</footer>
