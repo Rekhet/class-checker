@@ -1,68 +1,88 @@
-<!-- Core dashboard: topbar + search + timetable. Always loaded (incl. production).
-     Content is wrapped in <div class="page"> blocks; a top nav switches between
-     pages (built in JS from every .page found, so dev.html adds its own). -->
+<!-- Core dashboard: header + sheet tabs + search rail + timetable hero + detail drawer.
+     Always loaded (incl. production). The name input, advanced filters and the drawer
+     body are built in JS (buildFilters / renderDetail). A top nav switches between
+     .page blocks, so dev.html can add its own page. Every id here is wired in init(). -->
 <header class="topbar">
   <h1>SNU Class Checker</h1>
   <nav class="topnav" id="topnav"></nav>
+  <span id="scopeInfo"></span>
 </header>
 
 <div class="page" data-page="timetable" data-title="시간표">
-<main>
-  <section class="panel search">
-    <h2 class="search-toggle" id="searchToggle">강좌 검색 <span class="sub">Search</span><span class="search-summary" id="searchSummary"></span><span class="fold-ind">▾</span></h2>
-    <!-- fields are built in JS from the makeField / makeDropdown factories (buildFilters) -->
-    <form id="searchForm" class="filters"></form>
-    <div class="results-head">
-      <span id="resultCount">—</span>
-      <span class="export-btns">
+<div class="tt-wrap">
+
+  <!-- timetable sheets (tabs), built in JS from the saved sheets -->
+  <div class="tt-sheets" id="ttSheets"></div>
+
+  <div class="tt-cols">
+
+    <!-- ===== search rail ===== -->
+    <section class="panel search">
+      <form id="searchForm">
+        <div class="search-head">
+          <h2>강좌 검색 <span class="sub">Search</span></h2>
+          <span class="filter-toggle" id="filterToggle">상세 검색</span>
+        </div>
+        <!-- name input, advanced filters and the submit button are appended here by buildFilters -->
+      </form>
+      <div class="result-meta" id="resultCount">검색어를 입력하세요</div>
+      <ul id="results" class="results"></ul>
+      <button type="button" id="loadMore" class="loadmore hidden">더 보기 Load more</button>
+    </section>
+
+    <!-- ===== timetable hero ===== -->
+    <section class="panel timetable">
+      <div class="tt-head">
+        <div class="tt-title">
+          <h2 id="activeName">시간표</h2>
+          <span class="sub" id="activeSub"></span>
+        </div>
+        <div class="tt-head-right">
+          <span id="creditSum" class="credit-sum">총 0학점</span>
+          <button id="clearTT" class="tt-clear">비우기 Clear</button>
+        </div>
+      </div>
+
+      <div id="ttNotice" class="tt-notice hidden"></div>
+      <div id="ttGrid"></div>
+      <div id="ttTBA" class="tt-tba"></div>
+      <div id="ttList" class="tt-list"></div>
+
+      <!-- tools: export / calendar / overlap guard -->
+      <div class="tt-tools">
         <button type="button" id="expXlsx" class="ghost">엑셀 XLSX</button>
         <button type="button" id="expCsv" class="ghost">CSV</button>
-      </span>
-    </div>
-    <ul id="results" class="results"></ul>
-    <button type="button" id="loadMore" class="loadmore hidden">더 보기 Load more</button>
-  </section>
-
-  <section class="panel timetable">
-    <div class="tt-head">
-      <h2>시간표 <span class="sub">Timetable</span></h2>
-      <div class="tt-head-right">
-        <span id="creditSum" class="credit-sum">총 0학점</span>
-        <button id="clearTT" class="danger">전체 삭제 Clear</button>
+        <button type="button" id="ttPng" class="ghost">이미지 PNG</button>
+        <button type="button" id="ttExport" class="ghost">내보내기 JSON</button>
+        <button type="button" id="ttImport" class="ghost">가져오기 JSON</button>
+        <input type="file" id="ttImportFile" accept="application/json,.json" hidden>
+        <label class="ov-toggle"><input type="checkbox" id="blockOverlap"> 시간 겹침 추가 차단</label>
+        <span class="tt-ics">
+          <label>시작 <input type="date" id="icsStart"></label>
+          <label>종료 <input type="date" id="icsEnd"></label>
+          <button type="button" id="ttIcs" class="ghost">캘린더 ICS</button>
+          <button type="button" id="ttGcal" class="ghost">Google Calendar</button>
+        </span>
       </div>
-    </div>
-    <div class="tt-sheets" id="ttSheets"></div>
-    <div class="tt-tools">
-      <label class="ov-toggle"><input type="checkbox" id="blockOverlap"> 시간 겹침 추가 차단</label>
-      <button type="button" id="ttPng" class="ghost">이미지 PNG</button>
-      <button type="button" id="ttExport" class="ghost">내보내기 JSON</button>
-      <button type="button" id="ttImport" class="ghost">가져오기 JSON</button>
-      <input type="file" id="ttImportFile" accept="application/json,.json" hidden>
-      <span class="tt-ics">
-        <label>시작 <input type="date" id="icsStart"></label>
-        <label>종료 <input type="date" id="icsEnd"></label>
-        <button type="button" id="ttIcs" class="ghost">캘린더 ICS</button>
-        <button type="button" id="ttGcal" class="ghost">Google Calendar</button>
-      </span>
-    </div>
-    <div id="ttNotice" class="tt-notice hidden"></div>
-    <div id="ttGrid"></div>
-    <div id="ttTBA" class="tt-tba"></div>
-    <div id="ttEmpty" class="tt-empty">강좌를 추가하면 여기에 표시됩니다.</div>
-    <div class="tt-manual">
-      <button type="button" id="ttAddManual" class="ghost">+ 직접 추가 Add manually</button>
-      <form id="manualForm" class="manual-form hidden">
-        <input type="text" id="mName" placeholder="강좌명 Name" required>
-        <input type="text" id="mProf" placeholder="교수 Prof (선택)">
-        <input type="number" id="mCredits" min="0" step="1" placeholder="학점" class="m-credits">
-        <select id="mDay"></select>
-        <input type="time" id="mStart">
-        <input type="time" id="mEnd">
-        <button type="submit" class="primary">추가 Add</button>
-      </form>
-    </div>
-    <div id="ttList" class="tt-list"></div>
-  </section>
-</main>
+
+      <div class="tt-manual">
+        <button type="button" id="ttAddManual" class="ghost">+ 직접 추가 Add manually</button>
+        <form id="manualForm" class="manual-form hidden">
+          <input type="text" id="mName" placeholder="강좌명 Name" required>
+          <input type="text" id="mProf" placeholder="교수 Prof (선택)">
+          <input type="number" id="mCredits" min="0" step="1" placeholder="학점" class="m-credits">
+          <select id="mDay"></select>
+          <input type="time" id="mStart">
+          <input type="time" id="mEnd">
+          <button type="submit" class="primary">추가 Add</button>
+        </form>
+      </div>
+    </section>
+
+  </div>
+</div>
 </div>
 
+<!-- ===== course detail drawer (body built in JS: renderDetail) ===== -->
+<div id="detailOverlay" class="detail-overlay hidden"></div>
+<aside id="detailDrawer" class="detail-drawer hidden"></aside>

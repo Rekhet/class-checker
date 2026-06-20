@@ -4,7 +4,7 @@ const DAYS = ["월", "화", "수", "목", "금", "토", "일"];   // 0..6
 const DAY_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const PERIODS = Array.from({ length: 14 }, (_, i) => i); // 0..13 -> 08:00..21:00
 // proportional timetable geometry
-const HOUR_PX = 44;          // vertical px per hour
+const HOUR_PX = 54;          // vertical px per hour
 const toMin = (hhmm) => {
   const [h, m] = String(hhmm || "0:0").split(":").map(Number);
   return h * 60 + m;
@@ -225,45 +225,58 @@ function hhmm(min) {
   return `${String((min / 60) | 0).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 }
 
-// ---------- reusable filter widgets ----------
-// one place that builds a labelled field / a multi-select dropdown, so every
-// filter box is structurally identical (no per-box markup duplicated).
-function makeField(title, en, control) {
-  return el("div", { className: "fld" }, `${title} `, el("span", {}, en), control);
-}
-function makeDropdown(title, en, baseId) {
-  const menu = el("div", { className: "cls-menu", id: baseId + "Menu" });
-  const summary = el("summary", { id: baseId + "Summary" }, "전체 All");
-  const details = el("details", { className: "cls-dd", id: baseId + "DD" }, summary, menu);
-  return el("div", { className: "fld cls-filter" }, `${title} `, el("span", {}, en), details);
-}
+// ---------- search rail (name input + foldable advanced filters) ----------
+// 과정(level)+이수구분(type) share one chip row: every classification token is a
+// chip; currentFilters() splits the selected ones back into levels vs types.
 function buildFilters() {
   const form = $("#searchForm");
   const sel = (name) => el("select", { name, id: name });
-  const inp = (name, ph) => el("input", { type: "text", name, id: name, placeholder: ph });
-  form.append(makeField("연도", "Year", sel("year")));
-  form.append(makeField("학기", "Term", sel("term")));
-  form.append(makeField("강좌명", "Name", inp("name", "예: 경제원론")));
-  form.append(makeField("교수", "Instructor", inp("professor", "예: 이창선")));
-  const dept = inp("department", "예: 경제학부");
+  const labeled = (text, control) => el("label", {}, text, control);
+
+  // always-visible course-name search
+  form.append(el("input", {
+    type: "text", name: "name", id: "name", className: "name-input", placeholder: "강좌명 검색",
+  }));
+
+  // advanced filters, toggled by #filterToggle
+  const adv = el("div", { className: "adv hidden", id: "advFilters" });
+  const grid = el("div", { className: "adv-grid" });
+  grid.append(labeled("연도", sel("year")));
+  grid.append(labeled("학기", sel("term")));
+  grid.append(labeled("교수", el("input", { type: "text", name: "professor", id: "professor", placeholder: "이름" })));
+  const dept = el("input", { type: "text", name: "department", id: "department", placeholder: "학과명" });
   dept.setAttribute("list", "deptList");
-  const deptField = makeField("학과", "Department", dept);
-  deptField.append(el("datalist", { id: "deptList" }));
-  form.append(deptField);
-  form.append(makeField("요일", "Day", sel("day")));
-  form.append(makeField("교시", "Period", sel("period")));
-  form.append(makeDropdown("과정", "Level", "lvl"));
-  form.append(makeDropdown("이수구분", "Type", "cls"));
-  form.append(makeDropdown("학년", "Grade", "grd"));
-  // only classes that fit the timetable's empty slots (no time overlap)
-  const empty = el("input", { type: "checkbox", id: "emptyOnly" });
-  form.append(makeField("빈 시간", "Empty",
-    el("label", { className: "ov-toggle" }, empty, " 빈 시간대만")));
-  // only classes that have a scheduled time (exclude 시간미정/TBA)
-  const timed = el("input", { type: "checkbox", id: "timedOnly" });
-  form.append(makeField("시간 배정", "Timed",
-    el("label", { className: "ov-toggle" }, timed, " 시간 배정된 강좌만")));
+  const deptLabel = labeled("학과", dept);
+  deptLabel.append(el("datalist", { id: "deptList" }));
+  grid.append(deptLabel);
+  grid.append(labeled("요일", sel("day")));
+  grid.append(labeled("교시", sel("period")));
+  adv.append(grid);
+
+  adv.append(el("div", { className: "adv-label" }, "이수구분"));
+  adv.append(el("div", { className: "chips", id: "typeChips" }));
+  adv.append(el("div", { className: "adv-label" }, "학년"));
+  adv.append(el("div", { className: "chips", id: "gradeChips" }));
+
+  const empty = el("input", { type: "checkbox", id: "emptyOnly" });   // only classes that fit the free slots
+  const timed = el("input", { type: "checkbox", id: "timedOnly" });   // only classes with a scheduled time
+  adv.append(el("div", { className: "adv-checks" },
+    el("label", {}, empty, " 빈 시간만"),
+    el("label", {}, timed, " 시간 배정만")));
+  form.append(adv);
+
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
+}
+// multi-select chip row: click toggles .on; currentFilters reads the selected set
+function fillChips(containerId, tokens, labelOf = (t) => t) {
+  const box = $("#" + containerId); if (!box) return;
+  box.replaceChildren();
+  tokens.forEach((t) => {
+    const chip = el("span", { className: "chip-tog" }, labelOf(t));
+    chip.dataset.value = t;
+    chip.addEventListener("click", () => chip.classList.toggle("on"));
+    box.append(chip);
+  });
 }
 
 // ---------- init ----------
@@ -300,6 +313,7 @@ async function loadTerms() {
     termSel.append(el("option", { value: t.term }, SEMESTER_LABEL[t.term] || t.term));
   });
   applySearchDefaults();
+  updateScope();
 }
 
 // config.js: map a friendly term default (1학기 / spring / code) to a term code
@@ -333,27 +347,14 @@ async function loadDepartments() {
   } catch { /* autocomplete is optional; free-text search still works */ }
 }
 
-// 과정 (level) is its own group, intersected with 이수구분 (type); rest are types.
+// 과정 (level) and 이수구분 (type) come from the same classification list; LEVELS
+// marks which tokens are "과정" so currentFilters can split the selected chips.
 const LEVELS = ["학사", "대학원", "석박사통합", "석사", "박사"];
 async function loadClassifications() {
   try {
     const { classifications } = await dataIndex();
-    fillCheckMenu("lvlMenu", "lvlSummary", classifications.filter((t) => LEVELS.includes(t)));
-    fillCheckMenu("clsMenu", "clsSummary", classifications.filter((t) => !LEVELS.includes(t)));
+    fillChips("typeChips", classifications);
   } catch { /* classification filters optional */ }
-}
-function fillCheckMenu(menuId, summaryId, tokens, labelOf = (t) => t) {
-  const menu = $("#" + menuId); menu.replaceChildren();
-  tokens.forEach((t) => {
-    const cb = el("input", { type: "checkbox", value: t });
-    cb.dataset.label = labelOf(t);   // display can differ from the raw filter value
-    cb.addEventListener("change", () => ddSummary(menuId, summaryId));
-    menu.append(el("label", {}, cb, labelOf(t)));
-  });
-}
-function ddSummary(menuId, summaryId) {
-  const sel = [...$$(`#${menuId} input:checked`)].map((c) => c.dataset.label || c.value);
-  $("#" + summaryId).textContent = sel.length ? sel.join(", ") : "전체 All";
 }
 
 // 학년: raw '0' means 전학년 (no grade restriction); show it readably.
@@ -361,7 +362,7 @@ const gradeLabel = (g) => (g === "0" ? "전학년 All-yr" : g);
 async function loadGrades() {
   try {
     const { grades } = await dataIndex();
-    fillCheckMenu("grdMenu", "grdSummary", grades, gradeLabel);
+    fillChips("gradeChips", grades, gradeLabel);
   } catch { /* grade filter optional */ }
 }
 
@@ -437,12 +438,15 @@ let lastFilters = null;   // null until a search runs; what export reuses
 function currentFilters() {
   const f = $("#searchForm");
   const val = (n) => f.elements[n].value.trim();
-  const checks = (id) => [...$$(`#${id} input:checked`)].map((c) => c.value);
+  const chipVals = (id) => [...$$(`#${id} .chip-tog.on`)].map((c) => c.dataset.value);
   const num = (n) => { const v = val(n); return v === "" ? null : Number(v); };
+  const types = chipVals("typeChips");   // split back into 과정(level) vs 이수구분(type)
   return {
     year: val("year") || null, term: val("term") || null,
     name: val("name"), professor: val("professor"), department: val("department"),
-    classifications: checks("clsMenu"), levels: checks("lvlMenu"), grades: checks("grdMenu"),
+    classifications: types.filter((t) => !LEVELS.includes(t)),
+    levels: types.filter((t) => LEVELS.includes(t)),
+    grades: chipVals("gradeChips"),
     day: num("day"), period: num("period"),
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
@@ -458,8 +462,19 @@ async function doSearch(e) {
   searchTotal = data.total;
   renderResults(data.classes, false);
   updateResultMeta();
-  $("#searchSummary").textContent = filterSummary(lastFilters);   // show what was searched
-  setSearchCollapsed(true);                                       // retract (smoothly)
+  updateScope();
+}
+
+// header scope line: "2026 여름학기 · 357개 강좌" for the searched year/term
+function updateScope() {
+  const info = $("#scopeInfo"); if (!info || !_dataIndex) return;
+  const y = $("#year")?.value, t = $("#term")?.value, terms = _dataIndex.terms;
+  let m;
+  if (y && t) m = terms.find((x) => x.year === y && x.term === t);
+  else if (t) m = terms.find((x) => x.term === t);
+  else if (y) m = terms.find((x) => x.year === y);
+  m = m || terms[0];
+  info.textContent = m ? `${m.label} · ${(m.count || 0).toLocaleString()}개 강좌` : "";
 }
 
 async function loadMore() {
@@ -473,51 +488,6 @@ function updateResultMeta() {
   const loaded = lastResults.length;
   $("#resultCount").textContent = `${loaded} / ${searchTotal}건 검색됨`;
   $("#loadMore").classList.toggle("hidden", loaded >= searchTotal);
-}
-
-// short text of what was searched, shown in the header while the box is folded
-function filterSummary(f) {
-  const p = [];
-  if (f.year) p.push(f.year);
-  if (f.term) p.push((SEMESTER_LABEL[f.term] || f.term).split(" ")[0]);
-  if (f.name) p.push(f.name);
-  if (f.professor) p.push(f.professor);
-  if (f.department) p.push(f.department);
-  (f.levels || []).forEach((x) => p.push(x));
-  (f.classifications || []).forEach((x) => p.push(x));
-  (f.grades || []).forEach((x) => p.push(gradeLabel(x).split(" ")[0]));
-  if (f.day != null) p.push(DAYS[f.day]);
-  if (f.period != null) p.push(`${f.period}교시`);
-  if (f.emptyOnly) p.push("빈시간대");
-  if (f.timedOnly) p.push("시간배정");
-  return p.length ? p.join(" · ") : "전체";
-}
-
-// smooth fold: animate max-height between 0 and the real height. A forced reflow
-// (reading offsetHeight) commits the start value so the transition runs — more
-// reliable than requestAnimationFrame.
-function setSearchCollapsed(collapse) {
-  const panel = $(".panel.search"), filters = $(".filters");
-  const h = filters.scrollHeight;   // real content height (ignores the max-height clamp)
-  filters.style.overflow = "hidden";   // clip while animating
-  if (collapse) {
-    filters.style.maxHeight = h + "px";
-    void filters.offsetHeight;
-    panel.classList.add("collapsed");
-    filters.style.maxHeight = "0px";    // overflow stays hidden (folded)
-  } else {
-    panel.classList.remove("collapsed");
-    filters.style.maxHeight = "0px";
-    void filters.offsetHeight;
-    filters.style.maxHeight = h + "px";
-    // once open, drop the clamp + let dropdown menus overflow again
-    const clear = () => { filters.style.maxHeight = ""; filters.style.overflow = ""; };
-    filters.addEventListener("transitionend", function done(e) {
-      if (e.propertyName !== "max-height") return;
-      clear(); filters.removeEventListener("transitionend", done);
-    });
-    setTimeout(clear, 350);   // fallback if transitionend doesn't fire
-  }
 }
 
 // export the full filtered result set, built client-side (no backend needed)
@@ -544,33 +514,30 @@ function renderResults(classes, append = false) {
   const inTT = new Set(timetable.map(classKey));
   for (const c of classes) {
     const added = inTT.has(classKey(c));
-    const card = el("li", { className: "card" + (added ? " in-tt" : "") });
-    card.style.borderLeftColor = colorFor(c);
+    const times = slotSummary(c.slots);
+    const sem = `${c.year || ""} ${(SEMESTER_LABEL[c.term] || c.term || "").split(" ")[0]}`.trim();
+    let seats = "";
+    if (c.applied != null && c.quota != null) {
+      seats = ` · 정원 ${c.applied}/${c.quota}`;
+      if (c.quota_returning != null)   // 재학생/신입생 split, same as the detail drawer
+        seats += ` (재학생 ${c.quota_returning}·신입생 ${(c.quota ?? 0) - c.quota_returning})`;
+    }
+    const card = el("li", { className: "rcard" });
+    card.addEventListener("click", () => openDetail(c));        // open the detail drawer
     card.addEventListener("mouseenter", () => startHoverPreview(c));
     card.addEventListener("mouseleave", cancelHoverPreview);
-    const cls = (c.classification || []).map((x) =>
-      el("span", { className: "chip cls" }, x));
-    const summ = slotSummary(c.slots);
-    const slotChips = summ.length
-      ? summ.map((s) => el("span", { className: "chip" }, s))
-      : [el("span", { className: "chip tba" }, "시간미정 TBA")];
-    card.append(
-      el("div", { className: "row" },
-        el("div", {},
-          el("div", { className: "name" }, c.name),
-          el("div", { className: "meta" },
-            `${c.professor || "미정"} · ${c.college ? c.college + " · " : ""}${c.department || ""} · ` +
-            `${c.sbjt_cd}(${c.lt_no}) · ${c.credits ?? "?"}학점 · ` +
-            `정원 ${c.applied ?? "?"}/${c.quota ?? "?"}` +
-            (c.quota_returning != null
-              ? ` (재학생 ${c.quota_returning} · 신입생 ${(c.quota ?? 0) - c.quota_returning})`
-              : ""))),
-        el("button", {
-          className: "add", textContent: added ? "추가됨 ✓" : "+ 추가",
-          onclick: () => added ? removeFromTT(c) : addToTT(c),
-        })),
-      el("div", { className: "tags" }, ...cls, ...slotChips),
-    );
+    const bar = el("span", { className: "rbar" }); bar.style.background = colorFor(c);
+    const addBtn = el("button", {
+      className: "radd" + (added ? " added" : ""), textContent: added ? "✓" : "담기",
+      onclick: (e) => { e.stopPropagation(); added ? removeFromTT(c) : addToTT(c); },
+    });
+    card.append(bar,
+      el("div", { className: "rbody" },
+        el("div", { className: "rname" }, c.name),
+        el("div", { className: "rmeta" },
+          `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점${seats}`),
+        el("div", { className: "rtime" }, times.length ? times.join("  ·  ") : "시간미정")),
+      addBtn);
     ul.append(card);
   }
 }
@@ -639,24 +606,31 @@ function renderSheets() {
   const box = $("#ttSheets"); if (!box) return;
   box.replaceChildren();
   sheets.forEach((s, i) => {
-    const tab = el("button", {
-      type: "button", className: "tt-sheet" + (i === active ? " active" : ""),
-      title: i === active ? "클릭하여 이름 변경" : "클릭하여 전환 (더블클릭: 이름 변경)",
-      // click the active tab to rename it; click another to switch
+    // click the active tab to rename it; click another to switch
+    const tab = el("div", {
+      className: "tt-sheet" + (i === active ? " active" : ""),
+      title: i === active ? "클릭하여 이름 변경" : "클릭하여 전환",
       onclick: () => (i === active ? renameSheet(i) : switchSheet(i)),
-      ondblclick: () => renameSheet(i),
-    }, s.name);
-    if (i === active) tab.append(el("span", {   // pen: rename hint on the active tab
-      className: "sheet-pen", title: "이름 변경",
-    }, "✎"));
+    },
+      el("span", {}, s.name),
+      el("span", { className: "sheet-count" }, String(s.classes.length)));
+    if (i === active) tab.append(el("span", { className: "sheet-pen", title: "이름 변경" }, "✎"));
     if (sheets.length > 1) tab.append(el("span", {
       className: "sheet-x", title: "삭제",
       onclick: (e) => { e.stopPropagation(); deleteSheet(i); },
     }, "×"));
     box.append(tab);
   });
-  box.append(el("button", { type: "button", className: "tt-sheet add",
-    title: "시간표 추가", onclick: addSheet }, "+"));
+  box.append(el("div", { className: "tt-sheet add", title: "시간표 추가", onclick: addSheet }, "＋ 시간표 추가"));
+  updateHero();
+}
+
+// hero header: active sheet name + class count (credit total is set in renderTT)
+function updateHero() {
+  const a = sheets[active] || { name: "시간표", classes: [] };
+  const n = a.classes.length;
+  if ($("#activeName")) $("#activeName").textContent = a.name;
+  if ($("#activeSub")) $("#activeSub").textContent = n ? `${n}개 강좌` : "비어 있음";
 }
 
 function addToTT(c) {
@@ -670,7 +644,8 @@ function addToTT(c) {
     professor: c.professor, credits: c.credits, slots: c.slots || [],
     manual: c.manual || undefined,
   });
-  saveTT(); renderTT(); refreshCardStates();
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (detailClass) renderDetail();
 }
 
 // a manual entry isn't in the catalog; give it a unique key and the manual flag
@@ -696,12 +671,14 @@ function addManual(e) {
 }
 function removeFromTT(c) {
   timetable = timetable.filter((x) => classKey(x) !== classKey(c));
-  saveTT(); renderTT(); refreshCardStates();
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (detailClass) renderDetail();
 }
 function clearTT() {
   if (!timetable.length) return;
-  if (!confirm("시간표를 모두 삭제할까요?")) return;
-  timetable = []; saveTT(); renderTT(); refreshCardStates();
+  if (!confirm("이 시간표를 비울까요?")) return;
+  timetable = []; saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (detailClass) renderDetail();
 }
 function refreshCardStates() {
   if (lastResults.length) renderResults(lastResults);
@@ -750,9 +727,97 @@ function cancelHoverPreview() {
   if (hoverPreview) { hoverPreview = null; renderTT(); }
 }
 
+// ---------- course detail drawer ----------
+let detailClass = null;
+async function openDetail(c) {
+  let full = c;
+  // a timetable entry is a trimmed snapshot — pull the full catalog row for the
+  // detail fields (seats, grade, classification) if they're missing.
+  if (c.department === undefined && c.term !== "MANUAL") {
+    try {
+      const found = (await lookupLocal([[c.year, c.term, c.sbjt_cd, c.lt_no]]))[0];
+      if (found) full = found;
+    } catch { /* offline: render whatever we have */ }
+  }
+  detailClass = full;
+  renderDetail();
+  $("#detailOverlay").classList.remove("hidden");
+  $("#detailDrawer").classList.remove("hidden");
+}
+function closeDetail() {
+  detailClass = null;
+  $("#detailOverlay").classList.add("hidden");
+  $("#detailDrawer").classList.add("hidden");
+  $("#detailDrawer").replaceChildren();
+}
+function renderDetail() {
+  const c = detailClass; if (!c) return;
+  const drawer = $("#detailDrawer"); drawer.replaceChildren();
+  const added = timetable.some((x) => classKey(x) === classKey(c));
+  const conflict = !added && overlapsBusy(c, timetableBusy());
+
+  const bar = el("span", { className: "d-bar" }); bar.style.background = colorFor(c);
+  const head = el("div", { className: "d-head" },
+    el("div", { className: "d-head-row" },
+      el("div", { className: "d-title" }, bar, el("h3", {}, c.name)),
+      el("button", { className: "d-close", title: "닫기", textContent: "×", onclick: closeDetail })),
+    el("div", { className: "d-sub" }, `${c.professor || "미정"} · ${c.department || "-"}`));
+
+  const body = el("div", { className: "d-body" });
+  if (conflict) body.append(el("div", { className: "d-conflict" }, "이미 담은 강좌와 시간이 겹칩니다."));
+
+  const grid = el("div", { className: "d-grid" });
+  const kv = (k, v) => grid.append(el("span", { className: "k" }, k),
+    v && v.nodeType ? v : el("span", {}, String(v)));
+  kv("학기", `${c.year || ""} ${(SEMESTER_LABEL[c.term] || c.term || "").split(" ")[0]}`.trim() || "-");
+  kv("학점", `${c.credits ?? "?"}학점`);
+  kv("학년", gradeLabel(String(c.grade ?? "")) || "-");
+  const cls = c.classification || [];
+  kv("구분", cls.length
+    ? el("div", { className: "d-chips" }, ...cls.map((x) => el("span", { className: "d-chip" }, x)))
+    : "-");
+  kv("코드", `${c.sbjt_cd || ""}(${c.lt_no || ""})`);
+  body.append(grid);
+
+  const seats = [];
+  if (c.quota != null) seats.push(["정원", c.quota]);
+  if (c.quota_returning != null) {
+    seats.push(["재학생정원", c.quota_returning]);
+    if (c.quota != null) seats.push(["신입생정원", c.quota - c.quota_returning]);
+  }
+  if (c.applied != null) seats.push(["신청", c.applied]);
+  if (c.enrolled != null) seats.push(["수강", c.enrolled]);
+  body.append(el("div", { className: "d-section" }, "정원"));
+  const seatRows = el("div", { className: "d-rows" });
+  (seats.length ? seats : [["정원", "-"]]).forEach(([k, v]) =>
+    seatRows.append(el("div", { className: "d-row" },
+      el("span", {}, k), el("span", { className: "v" }, String(v)))));
+  body.append(seatRows);
+
+  const lines = [];
+  for (const s of (c.slots || [])) {
+    if (s.day_index == null || !s.start_time) continue;
+    lines.push([DAYS[s.day_index], `${s.start_time}~${s.end_time || ""}`]);
+  }
+  body.append(el("div", { className: "d-section" }, "수업 시간"));
+  const slotRows = el("div", { className: "d-rows" });
+  (lines.length ? lines : [["—", "시간미정"]]).forEach(([d, t]) =>
+    slotRows.append(el("div", { className: "d-slot" },
+      el("span", { className: "day" }, d), el("span", { className: "time" }, t))));
+  body.append(slotRows);
+
+  const foot = el("div", { className: "d-foot" },
+    el("button", {
+      className: "d-toggle" + (added ? " remove" : ""),
+      textContent: added ? "시간표에서 빼기" : "이 시간표에 담기",
+      onclick: () => { added ? removeFromTT(c) : addToTT(c); },   // renderDetail re-runs via the mutators
+    }));
+
+  drawer.append(head, body, foot);
+}
+
 function renderTT() {
   const grid = $("#ttGrid"); grid.replaceChildren();
-  $("#ttEmpty").style.display = timetable.length ? "none" : "block";
   // credits are stored as plain numbers, so the total is a direct sum (null = 0)
   const creditSum = timetable.reduce((s, c) => s + (Number(c.credits) || 0), 0);
   $("#creditSum").textContent = `총 ${creditSum}학점`;
@@ -775,7 +840,7 @@ function renderTT() {
   // collect exact meetings (start/end) + time-less classes
   const meetings = [];
   const tba = [];
-  let minS = 24 * 60, maxE = 0, maxDay = 5;
+  let minS = 24 * 60, maxE = 0, maxDay = 4;   // default Mon–Fri; expand if a class lands later
   for (const c of timetable) {
     const sl = (c.slots || []).filter((s) => s.day_index != null && s.start_time && s.end_time);
     if (!sl.length) { tba.push(c); continue; }
@@ -786,7 +851,7 @@ function renderTT() {
       minS = Math.min(minS, a); maxE = Math.max(maxE, b); maxDay = Math.max(maxDay, s.day_index);
     }
   }
-  // hovered search result -> grayscale preview meetings (NOT part of the timetable)
+  // hovered search result -> ghost preview meetings (NOT part of the timetable)
   const preview = [];
   if (hoverPreview && !timetable.some((x) => classKey(x) === classKey(hoverPreview))) {
     for (const s of (hoverPreview.slots || [])) {
@@ -797,19 +862,25 @@ function renderTT() {
       minS = Math.min(minS, a); maxE = Math.max(maxE, b); maxDay = Math.max(maxDay, s.day_index);
     }
   }
-  if (preview.length) $("#ttEmpty").style.display = "none";
   const hasAny = meetings.length || preview.length;
   const dayN = maxDay + 1;
-  const startMin = hasAny ? Math.min(8 * 60, Math.floor(minS / 60) * 60) : 9 * 60;
+  const startMin = hasAny ? Math.min(9 * 60, Math.floor(minS / 60) * 60) : 9 * 60;
   const endMin = hasAny ? Math.max(18 * 60, Math.ceil(maxE / 60) * 60) : 18 * 60;
   const H = (endMin - startMin) / 60 * HOUR_PX;
+  const cols = `44px repeat(${dayN}, minmax(0, 1fr))`;
 
-  const ttx = el("div", { className: "ttx" });
-  ttx.style.gridTemplateColumns = `44px repeat(${dayN}, 1fr)`;
-  ttx.append(el("div", { className: "ttx-hd" }, ""));
+  // header row (separate + unbordered, matching the design)
+  const head = el("div", { className: "ttx-head" });
+  head.style.gridTemplateColumns = cols;
+  head.append(el("div", {}));
   for (let d = 0; d < dayN; d++)
-    ttx.append(el("div", { className: "ttx-hd" }, `${DAYS[d]} ${DAY_EN[d]}`));
+    head.append(el("div", { className: "ttx-hd" }, DAYS[d],
+      el("span", { className: "en" }, DAY_EN[d].toUpperCase())));
+  grid.append(head);
 
+  // bordered body grid
+  const ttx = el("div", { className: "ttx" });
+  ttx.style.gridTemplateColumns = cols;
   const gutter = el("div", { className: "ttx-gutter" });
   gutter.style.height = H + "px";
   for (let m = startMin; m <= endMin; m += 60) {
@@ -830,12 +901,18 @@ function renderTT() {
     for (const m of packed) if (m.lanes > 1) conflictKeys.add(classKey(m.c));
   }
 
+  const hourCount = (endMin - startMin) / 60;
   for (let d = 0; d < dayN; d++) {
     const col = el("div", { className: "ttx-col" });
     col.style.height = H + "px";
-    col.style.backgroundSize = `100% ${HOUR_PX}px`;
+    for (let i = 1; i < hourCount; i++) {   // hour gridlines
+      const line = el("div", { className: "ttx-line" });
+      line.style.top = (i * HOUR_PX) + "px";
+      col.append(line);
+    }
     for (const m of packedByDay[d]) {
       const c = m.c, conflict = conflictKeys.has(classKey(c));
+      const h = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2);
       const b = el("div", {
         className: "ttx-block" + (conflict ? " conflict" : "")
           + (c.timeChanged ? " changed" : "") + (c.removed ? " removed" : ""),
@@ -843,29 +920,37 @@ function renderTT() {
           + `\n${hhmm(m.a)}~${hhmm(m.b)}`
           + (c.timeChanged ? "\n⚠ 시간 변경됨" : "")
           + (c.removed ? "\n⚠ 폐강/삭제됨" : ""),
-      }, c.name.length > 11 ? c.name.slice(0, 11) + "…" : c.name);
+      });
       b.style.background = colorFor(c);
-      b.style.top = ((m.a - startMin) / 60 * HOUR_PX) + "px";
-      b.style.height = Math.max(15, (m.b - m.a) / 60 * HOUR_PX - 1) + "px";
+      b.style.top = ((m.a - startMin) / 60 * HOUR_PX + 1) + "px";
+      b.style.height = h + "px";
       b.style.left = `calc(${m.lane / m.lanes * 100}% + 1px)`;
       b.style.width = `calc(${100 / m.lanes}% - 2px)`;
-      b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
-      if (c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
+      b.append(el("div", { className: "b-name" }, c.name));
+      if (h > 34) b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
+      if (h > 52 && c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
+      b.addEventListener("click", () => openDetail(c));   // open the detail drawer
       col.append(b);
     }
     for (const m of preview.filter((x) => x.day === d)) {
       const pb = el("div", { className: "ttx-block preview",
-        title: `${hoverPreview.name} (미리보기)` },
-        hoverPreview.name.length > 11 ? hoverPreview.name.slice(0, 11) + "…" : hoverPreview.name);
-      pb.style.top = ((m.a - startMin) / 60 * HOUR_PX) + "px";
-      pb.style.height = Math.max(15, (m.b - m.a) / 60 * HOUR_PX - 1) + "px";
+        title: `${hoverPreview.name} (미리보기)` }, "미리보기");
+      pb.style.top = ((m.a - startMin) / 60 * HOUR_PX + 1) + "px";
+      pb.style.height = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2) + "px";
       pb.style.left = "1px"; pb.style.width = "calc(100% - 2px)";
-      pb.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
       col.append(pb);
     }
     ttx.append(col);
   }
-  grid.append(ttx);
+
+  // body wrapper hosts the empty-state overlay over the grid
+  const bodyWrap = el("div", {}); bodyWrap.style.position = "relative";
+  bodyWrap.append(ttx);
+  if (!hasAny)
+    bodyWrap.append(el("div", { className: "tt-empty-overlay" },
+      el("div", { className: "eo-t" }, "담은 강좌가 없습니다"),
+      el("div", { className: "eo-s" }, "왼쪽에서 검색해 시간표를 채워보세요")));
+  grid.append(bodyWrap);
 
   // time-less (TBA) classes — can't be placed on the grid
   const tbaBox = $("#ttTBA");
@@ -879,6 +964,7 @@ function renderTT() {
           title: `${c.professor || "미정"} · ${c.sbjt_cd}(${c.lt_no})`,
         }, c.name);
         chip.style.borderLeftColor = colorFor(c);
+        chip.addEventListener("click", () => openDetail(c));
         tbaBox.append(chip);
       }
     }
@@ -893,7 +979,7 @@ function renderTTList() {
   if (!box) return;
   box.replaceChildren();
   if (!timetable.length) return;
-  box.append(el("div", { className: "tt-list-h" }, `추가된 강좌 ${timetable.length}`));
+  box.append(el("div", { className: "tt-list-h" }, `담은 강좌 ${timetable.length}`));
   for (const c of timetable) {
     const times = slotSummary(c.slots);
     const meta = (c.professor ? c.professor + " · " : "")
@@ -902,7 +988,7 @@ function renderTTList() {
       + (c.manual ? " · 직접추가" : "");
     const row = el("div", { className: "tt-li" + (c.removed ? " removed" : "") },
       el("span", { className: "li-dot" }),
-      el("div", { className: "li-text" },
+      el("div", { className: "li-text", onclick: () => openDetail(c) },
         el("div", { className: "li-name" }, c.name),
         el("div", { className: "li-meta" }, meta)),
       el("button", {
@@ -1005,7 +1091,7 @@ function importTTJson(file) {
       const arr = Array.isArray(data) ? data : data.timetable;
       if (!Array.isArray(arr)) throw new Error("bad shape");
       timetable = arr.filter((c) => c && c.sbjt_cd && c.lt_no && c.name);
-      saveTT(); renderTT(); refreshCardStates();
+      saveTT(); renderSheets(); renderTT(); refreshCardStates();
     } catch { alert("불러올 수 없는 시간표 파일입니다."); }
   };
   reader.readAsText(file);
@@ -1024,9 +1110,10 @@ function roundRect(ctx, x, y, w, h, r) {
 // render the on-screen grid to PNG, reading live DOM geometry so it mirrors what's
 // shown (positions, colors, conflict outlines).
 function exportTTPng() {
-  const ttx = $("#ttGrid .ttx");
+  const root = $("#ttGrid");
+  const ttx = root && root.querySelector(".ttx");
   if (!ttx) { alert("시간표가 비어 있습니다."); return; }
-  const base = ttx.getBoundingClientRect();
+  const base = root.getBoundingClientRect();   // includes the separate header row
   const scale = 2;
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(base.width * scale);
@@ -1038,32 +1125,30 @@ function exportTTPng() {
     const r = e.getBoundingClientRect();
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height };
   };
-  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, base.width, base.height);
-  ttx.querySelectorAll(".ttx-hd, .ttx-gutter").forEach((e) => {
-    const b = box(e); ctx.fillStyle = "#f7f9fd"; ctx.fillRect(b.x, b.y, b.w, b.h);
-  });
-  ctx.font = "600 11px sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#1d2433";
-  ttx.querySelectorAll(".ttx-hd").forEach((e) => {
+  ctx.fillStyle = "#FBFBFA"; ctx.fillRect(0, 0, base.width, base.height);
+  ctx.font = "700 11px 'Noto Sans KR', sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#1A1A19";
+  root.querySelectorAll(".ttx-hd").forEach((e) => {
     const b = box(e); ctx.fillText(e.textContent, b.x + b.w / 2, b.y + b.h / 2);
   });
-  ctx.font = "10px sans-serif"; ctx.textAlign = "right"; ctx.fillStyle = "#6b7385";
-  ttx.querySelectorAll(".ttx-hour").forEach((e) => {
+  ctx.font = "10px 'Noto Sans KR', sans-serif"; ctx.textAlign = "right"; ctx.fillStyle = "#A2A29C";
+  root.querySelectorAll(".ttx-hour").forEach((e) => {
     const b = box(e); ctx.fillText(e.textContent, b.x + b.w, b.y + 3);
   });
-  ttx.querySelectorAll(".ttx-block").forEach((e) => {
+  root.querySelectorAll(".ttx-block").forEach((e) => {
+    if (e.classList.contains("preview")) return;   // skip the hover ghost
     const b = box(e);
     ctx.fillStyle = getComputedStyle(e).backgroundColor;
-    roundRect(ctx, b.x, b.y, b.w, b.h, 5); ctx.fill();
+    roundRect(ctx, b.x, b.y, b.w, b.h, 4); ctx.fill();
     if (e.classList.contains("conflict")) {
-      ctx.strokeStyle = "#c8485a"; ctx.lineWidth = 2;
-      roundRect(ctx, b.x + 1, b.y + 1, b.w - 2, b.h - 2, 4); ctx.stroke();
+      ctx.strokeStyle = "#C8485A"; ctx.lineWidth = 2;
+      roundRect(ctx, b.x + 1, b.y + 1, b.w - 2, b.h - 2, 3); ctx.stroke();
     }
     ctx.fillStyle = "#fff"; ctx.textAlign = "left";
-    ctx.font = "600 10px sans-serif";
-    ctx.fillText(e.childNodes[0] ? e.childNodes[0].textContent : "", b.x + 5, b.y + 9, b.w - 8);
-    ctx.font = "9px sans-serif";
+    ctx.font = "600 10px 'Noto Sans KR', sans-serif";
+    ctx.fillText(e.childNodes[0] ? e.childNodes[0].textContent : "", b.x + 6, b.y + 11, b.w - 10);
+    ctx.font = "9px 'Noto Sans KR', sans-serif";
     e.querySelectorAll("small").forEach((s, i) =>
-      ctx.fillText(s.textContent, b.x + 5, b.y + 21 + i * 11, b.w - 8));
+      ctx.fillText(s.textContent, b.x + 6, b.y + 24 + i * 11, b.w - 10));
   });
   canvas.toBlob((blob) => downloadBlob(blob, "timetable.png"), "image/png");
 }
@@ -1296,9 +1381,16 @@ function init() {
   renderTT();
   reconcileTT();
   $("#searchForm").addEventListener("submit", doSearch);
-  $("#searchToggle").addEventListener("click", () =>
-    setSearchCollapsed(!$(".panel.search").classList.contains("collapsed")));
+  $("#filterToggle").addEventListener("click", () => {   // show/hide advanced filters
+    const adv = $("#advFilters");
+    adv.classList.toggle("hidden");
+    $("#filterToggle").textContent = adv.classList.contains("hidden") ? "상세 검색" : "간단히";
+  });
+  $("#year").addEventListener("change", updateScope);
+  $("#term").addEventListener("change", updateScope);
   $("#clearTT").addEventListener("click", clearTT);
+  $("#detailOverlay").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
   const refreshBtn = $("#refreshBtn");   // admin panel — absent in production
   if (refreshBtn) refreshBtn.addEventListener("click", refreshDB);
   $("#loadMore").addEventListener("click", loadMore);
@@ -1325,11 +1417,6 @@ function init() {
   };
   setDate($("#icsStart"), window.ICS_DEFAULT_START, iso(today));
   setDate($("#icsEnd"), window.ICS_DEFAULT_END, iso(semEnd));
-  // 과정/이수구분/학년 are <details> dropdowns: an outside click closes any open
-  // one, and only one stays open at a time.
-  document.addEventListener("click", (e) => {
-    $$(".cls-dd[open]").forEach((d) => { if (!d.contains(e.target)) d.open = false; });
-  });
 }
 // loader.js injects the partials and then appends this script, so the DOM is
 // already parsed by now — run init immediately (don't wait for DOMContentLoaded).
