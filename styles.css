@@ -189,7 +189,12 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .rtag.warn { background: var(--cp-conflict); color: #fff; }
 
 /* wishlist bar + panel */
-.wish-bar { padding: 8px 18px 0; }
+.wish-bar { display: flex; align-items: center; gap: 8px; padding: 8px 18px 0; }
+.wish-mini { margin-left: 0; background: none; border: 1px solid var(--cp-line); border-radius: 7px;
+  padding: 4px 9px; font-size: 11px; color: var(--cp-muted); cursor: pointer; }
+.wish-mini:hover { color: var(--cp-ink); border-color: var(--cp-accent); }
+.wish-mini:last-of-type { margin-right: 0; }
+.wish-toggle { margin-right: auto; }
 .wish-toggle { background: none; border: 1px solid var(--cp-line); border-radius: 8px; padding: 5px 11px;
   font-size: 12px; font-weight: 600; color: var(--cp-muted); cursor: pointer; font-variant-numeric: tabular-nums; }
 .wish-toggle.on, .wish-toggle:hover { color: var(--cp-ink); border-color: var(--cp-accent); }

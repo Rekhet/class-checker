@@ -1479,6 +1479,37 @@ function importTTJson(file) {
   };
   reader.readAsText(file);
 }
+function exportWishlist() {
+  if (!wishlist.length) { alert("찜한 강좌가 없습니다."); return; }
+  const blob = new Blob([JSON.stringify({ version: 1, wishlist }, null, 2)], { type: "application/json" });
+  downloadBlob(blob, "wishlist.json");
+}
+// merge (dedupe by classKey) rather than replace, so importing on another device adds
+// to — never wipes — the local list.
+function importWishlist(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const arr = Array.isArray(data) ? data : data.wishlist;
+      if (!Array.isArray(arr)) throw new Error("bad shape");
+      const have = new Set(wishlist.map(classKey));
+      let added = 0;
+      for (const c of arr) {
+        if (!(c && c.sbjt_cd && c.lt_no && c.name)) continue;
+        const k = classKey(c);
+        if (have.has(k)) continue;
+        have.add(k);
+        wishlist.push({ year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
+          professor: c.professor, credits: c.credits, slots: c.slots || [], manual: c.manual || undefined });
+        added++;
+      }
+      saveWishlist(); renderWishlist(); refreshCardStates();
+      alert(`${added}개 추가됨 (총 ${wishlist.length}개).`);
+    } catch { alert("불러올 수 없는 찜 목록 파일입니다."); }
+  };
+  reader.readAsText(file);
+}
 
 function roundRect(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
@@ -2025,6 +2056,12 @@ function init() {
   $("#undoBtn").addEventListener("click", undo);
   $("#redoBtn").addEventListener("click", redo);
   $("#wishToggle").addEventListener("click", toggleWishPanel);
+  $("#wishExport").addEventListener("click", exportWishlist);
+  $("#wishImport").addEventListener("click", () => $("#wishImportFile").click());
+  $("#wishImportFile").addEventListener("change", (e) => {
+    if (e.target.files[0]) importWishlist(e.target.files[0]);
+    e.target.value = "";                     // allow re-importing the same file
+  });
   renderWishlist();                          // seed the count
   $("#detailOverlay").addEventListener("click", closeDetail);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
