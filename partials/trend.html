@@ -1,0 +1,36 @@
+<!-- 인원 추이 (enrollment trend) page. Loads data/trend_<year>_<term>.json (a shared
+     time axis + per-class applied/cart/enrolled/quota arrays) and draws an inline-SVG
+     line chart with a hover tooltip. Built in app.js (initTrend / drawTrendChart). -->
+<div class="page" data-page="trend" data-title="인원 추이">
+<div class="tt-wrap trend-wrap">
+
+  <div class="trend-head">
+    <div class="tt-title">
+      <h2>인원 추이 <span class="sub">Enrollment trend</span></h2>
+    </div>
+    <div class="trend-pick">
+      <select id="trendTerm"></select>
+      <div class="trend-search">
+        <input id="trendClass" placeholder="강좌 검색 (이름)" autocomplete="off">
+        <ul id="trendResults" class="trend-results hidden"></ul>
+      </div>
+      <select id="trendMetric">
+        <option value="all">전체</option>
+        <option value="a">신청</option>
+        <option value="c">장바구니</option>
+        <option value="e">수강 인원</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="trendMsg" class="trend-msg">강좌를 선택하면 신청·장바구니 인원 추이가 표시됩니다.</div>
+
+  <div id="trendChartWrap" class="trend-chart-wrap hidden">
+    <div id="trendTitle" class="trend-title"></div>
+    <div id="trendChart"></div>
+    <div id="trendTip" class="trend-tip hidden"></div>
+  </div>
+  <div id="trendLegend" class="trend-legend hidden"></div>
+
+</div>
+</div>

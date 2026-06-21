@@ -324,6 +324,11 @@ function fillSelects() {
     rt.append(el("option", { value: "" }, "전체 All"));
     ADMIN_TERMS.forEach((t) => rt.append(el("option", { value: t.code }, t.label)));
   }
+  const ct = $("#cntTerm");            // 인원 추이 collection panel (admin only)
+  if (ct) {
+    ct.append(el("option", { value: "" }, "전체 All"));
+    ADMIN_TERMS.forEach((t) => ct.append(el("option", { value: t.code }, t.label)));
+  }
   const md = $("#mDay");
   DAYS.forEach((d, i) => md.append(el("option", { value: i }, `${d} ${DAY_EN[i]}`)));
 }
@@ -1094,6 +1099,54 @@ async function pollRefresh() {
   }
 }
 
+// ---------- 인원 추이 collection (admin) ----------
+let cntPoll = null;
+async function runCounts(force, confirm = false) {
+  const years = $("#cntYears").value.split(",").map((s) => s.trim()).filter(Boolean);
+  const tv = $("#cntTerm").value;
+  const terms = tv ? [tv] : [];
+  $("#cntBtn").disabled = $("#cntForceBtn").disabled = true;
+  $("#cntProgress").classList.remove("hidden");
+  $("#cntTxt").textContent = "수집 시작…";
+  let res = {};
+  try {
+    res = await api("/api/refresh-counts", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ years, terms, force, confirm }),
+    });
+  } catch { /* 409 etc handled by polling */ }
+  if (res && res.needs_confirm) {   // forced re-collect of a 마감 term — ask (default N)
+    $("#cntBtn").disabled = $("#cntForceBtn").disabled = false;
+    $("#cntProgress").classList.add("hidden");
+    const list = (res.closed || []).map((c) => c.join("/")).join(", ");
+    if (window.confirm(`이미 마감된 학기: ${list}\n다시 강제 수집할까요? (기본: 아니오)`)) {
+      return runCounts(force, true);
+    }
+    return;
+  }
+  cntPoll = setInterval(pollCounts, 1500);
+}
+async function pollCounts() {
+  const s = await loadStatus();
+  if (!s) return;
+  const r = s.counts_refresh || {};
+  const p = r.progress || {};
+  if (p.slot_total) {
+    $("#cntBar").style.width = Math.round((p.slot_index / p.slot_total) * 100) + "%";
+    $("#cntTxt").textContent = `${p.label || p.term} · ${p.slot_index}/${p.slot_total}`;
+  } else if (p.phase) {
+    $("#cntTxt").textContent = `${p.phase}: ${p.label || p.term || ""}`;
+  }
+  if (!r.running) {
+    clearInterval(cntPoll); cntPoll = null;
+    $("#cntBtn").disabled = $("#cntForceBtn").disabled = false;
+    $("#cntBar").style.width = "100%";
+    $("#cntTxt").textContent = r.error
+      ? "실패: " + r.error
+      : `완료 · 갱신 ${r.result?.updated ?? "?"} · 샘플 ${r.result?.samples ?? "?"}`;
+  }
+}
+
 // ---------- export / import ----------
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -1362,6 +1415,254 @@ async function exportToGoogleCalendar() {
   }
 }
 
+// ---------- 인원 추이 (enrollment trend) ----------
+const SVGNS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs = {}, ...kids) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  for (const c of kids) if (c != null) e.append(c.nodeType ? c : document.createTextNode(c));
+  return e;
+}
+const TREND_SERIES = [
+  { k: "a", name: "신청", color: "#8786D8" },
+  { k: "c", name: "장바구니", color: "#C87A37" },
+  { k: "e", name: "수강", color: "#2E9E6B" },
+];
+const TREND_FAINT = "#A2A29C", TREND_GRID = "#ECEBE7", TREND_LINE = "#DCDBD7";
+let _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map() };
+let _trendInited = false;
+
+// lazy: build the term picker + load the default term the first time the page shows
+async function ensureTrend() {
+  if (_trendInited) return;
+  const sel = $("#trendTerm"); if (!sel) return;
+  _trendInited = true;
+  const idx = await dataIndex();
+  sel.replaceChildren();
+  idx.terms.forEach((t) => sel.append(el("option",
+    { value: `${t.year}|${t.term}` }, `${t.year} ${SEMESTER_LABEL[t.term] || t.term}`)));
+  const want = `${(window.SEARCH_DEFAULT_YEAR || "").toString().trim()}|${resolveTermDefault(window.SEARCH_DEFAULT_TERM)}`;
+  if ([...sel.options].some((o) => o.value === want)) sel.value = want;
+  sel.addEventListener("change", loadTrendTerm);
+  const inp = $("#trendClass");
+  inp.addEventListener("input", () => renderTrendResults(inp.value));
+  inp.addEventListener("focus", () => renderTrendResults(inp.value));
+  inp.addEventListener("keydown", trendResultsKey);
+  $("#trendMetric").addEventListener("change", () => { if (_trend.key) drawTrendChart(); });
+  document.addEventListener("click", (e) => {     // close the results list on outside click
+    if (!e.target.closest(".trend-search")) $("#trendResults")?.classList.add("hidden");
+  });
+  await loadTrendTerm();
+}
+
+async function loadTrendTerm() {
+  const sel = $("#trendTerm"); if (!sel || !sel.value) return;
+  const [year, term] = sel.value.split("|");
+  $("#trendClass").value = "";
+  $("#trendResults").replaceChildren(); $("#trendResults").classList.add("hidden");
+  const idx = await dataIndex();
+  const meta = idx.terms.find((t) => t.year === year && t.term === term);
+  if (!meta || !meta.trend) {
+    _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map() };
+    setTrendPickerEnabled(false);
+    showTrendMsg("이 학기는 아직 수집된 인원 데이터가 없습니다.");
+    return;
+  }
+  showTrendMsg("불러오는 중…");
+  let data;
+  try { data = await fetch("data/" + meta.trend).then((r) => r.json()); }
+  catch { showTrendMsg("데이터를 불러오지 못했습니다."); return; }
+  const rows = await termRows(year, term);   // names/prof for the picker
+  const info = new Map(rows.map((c) =>
+    [`${c.sbjt_cd}(${c.lt_no})`, { name: c.name, prof: c.professor || "" }]));
+  const classes = Object.keys(data.series).map((key) => {
+    const m = info.get(key) || {};
+    return { key, name: m.name || key, prof: m.prof || "",
+             label: `${m.name || key}${m.prof ? " · " + m.prof : ""}` };
+  }).sort((a, b) => a.name.localeCompare(b.name));
+  _trend = { key: null, data, ts: data.ts || [], classes,
+             byKey: new Map(classes.map((c) => [c.key, c.label])), year, term };
+  setTrendPickerEnabled(classes.length > 0);
+  const closedNote = data.closed ? ` · 마감${data.closedAt ? " " + data.closedAt.slice(0, 10) : ""}` : "";
+  showTrendMsg(classes.length
+    ? `강좌를 검색해 선택하세요 (${classes.length.toLocaleString()}개 강좌 · ${(data.ts || []).length}개 시점)${closedNote}`
+    : "이 학기는 아직 수집된 인원 데이터가 없습니다.");
+}
+function setTrendPickerEnabled(on) {
+  const inp = $("#trendClass"), m = $("#trendMetric");
+  if (inp) { inp.disabled = !on; inp.placeholder = on ? "강좌 검색 (이름)" : "수집된 데이터 없음"; if (!on) inp.value = ""; }
+  if (m) m.disabled = !on;
+}
+
+// fuzzy class picker (same relevance ranking as the main search: nameScore over
+// the classes that have a trend series), rendered as a clickable results list
+function renderTrendResults(q) {
+  const ul = $("#trendResults"); if (!ul) return;
+  if (!_trend.classes || !_trend.classes.length) {   // no trend data for this term
+    ul.classList.add("hidden"); return;
+  }
+  q = (q || "").trim();
+  let items = _trend.classes;
+  if (q) items = items
+    .map((c) => ({ c, s: Math.max(nameScore(c.name, q), nameScore(c.label, q)) }))
+    .filter((x) => x.s > 0)
+    .sort((a, b) => b.s - a.s || a.c.name.localeCompare(b.c.name))
+    .map((x) => x.c);
+  ul.replaceChildren();
+  _trend._results = items.slice(0, 50);
+  _trend._active = -1;
+  if (!items.length) {
+    ul.append(el("li", { className: "r-empty" }, "일치하는 강좌가 없습니다"));
+    ul.classList.remove("hidden");
+    return;
+  }
+  _trend._results.forEach((c) => {
+    const li = el("li", {},
+      el("div", { className: "r-name" }, c.name),
+      el("div", { className: "r-sub" }, `${c.prof ? c.prof + " · " : ""}${c.key}`));
+    li.addEventListener("mousedown", (e) => { e.preventDefault(); pickTrendClass(c); });
+    ul.append(li);
+  });
+  ul.classList.remove("hidden");
+}
+// keyboard: ↓/↑ move the highlight, Enter picks (top result if none highlighted), Esc closes
+function trendResultsKey(e) {
+  const ul = $("#trendResults");
+  const res = _trend._results || [];
+  if (e.key === "Escape") { ul.classList.add("hidden"); return; }
+  if (e.key === "Enter") {
+    if (ul.classList.contains("hidden") || !res.length) {
+      renderTrendResults($("#trendClass").value);   // open the list if it was closed
+      return;
+    }
+    e.preventDefault();
+    pickTrendClass(res[_trend._active >= 0 ? _trend._active : 0]);
+    return;
+  }
+  if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  if (!res.length) return;
+  e.preventDefault();
+  _trend._active = e.key === "ArrowDown"
+    ? Math.min((_trend._active < 0 ? -1 : _trend._active) + 1, res.length - 1)
+    : Math.max(_trend._active - 1, 0);
+  [...ul.children].forEach((li, i) => li.classList.toggle("active", i === _trend._active));
+  ul.children[_trend._active]?.scrollIntoView({ block: "nearest" });
+}
+function pickTrendClass(c) {
+  if (!c) return;
+  _trend.key = c.key;
+  $("#trendClass").value = c.label;
+  $("#trendResults").classList.add("hidden");
+  drawTrendChart();
+}
+
+function showTrendMsg(t) {
+  const m = $("#trendMsg"); if (m) { m.textContent = t; m.classList.remove("hidden"); }
+  setTrendChartVisible(false);
+}
+function setTrendChartVisible(on) {
+  $("#trendChartWrap")?.classList.toggle("hidden", !on);
+  $("#trendLegend")?.classList.toggle("hidden", !on);
+  if (on) $("#trendMsg")?.classList.add("hidden");
+}
+function niceCeil(v) {
+  if (v <= 5) return 5;
+  const pow = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / pow;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * pow;
+}
+const _tsDate = (iso) => new Date(iso);
+const fmtTs = (iso) => { const d = _tsDate(iso); return `${d.getMonth() + 1}/${d.getDate()}`; };
+const fmtTsFull = (iso) => { const d = _tsDate(iso);
+  return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+
+function _trendPath(svg, arr, X, Y, color, n, dashed) {
+  if (!arr) return;
+  let d = "", started = false;
+  for (let i = 0; i < n; i++) {
+    if (arr[i] == null) { started = false; continue; }   // break line over gaps
+    d += (started ? "L" : "M") + X(i) + " " + Y(arr[i]) + " ";
+    started = true;
+  }
+  if (d) svg.append(svgEl("path", { d: d.trim(), fill: "none", stroke: color,
+    "stroke-width": dashed ? 1.5 : 2, "stroke-dasharray": dashed ? "4 4" : "",
+    "stroke-linejoin": "round", "stroke-linecap": "round", opacity: dashed ? 0.7 : 1 }));
+  if (!dashed) for (let i = 0; i < n; i++) if (arr[i] != null)
+    svg.append(svgEl("circle", { cx: X(i), cy: Y(arr[i]), r: 2.5, fill: color }));
+}
+
+function drawTrendChart() {
+  const { data, key, ts } = _trend;
+  const s = data.series[key]; if (!s) return;
+  const n = ts.length;
+  // metric chooser: 전체(all) or one of 신청/장바구니/수강 (so the cart→enrolled drop is readable)
+  const metric = $("#trendMetric")?.value || "all";
+  const visible = metric === "all" ? TREND_SERIES : TREND_SERIES.filter((d) => d.k === metric);
+  const W = 900, H = 360, padL = 44, padR = 16, padT = 14, padB = 30;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  let max = 1;
+  for (const def of visible) for (const v of (s[def.k] || [])) if (v != null && v > max) max = v;
+  for (const v of (s.q || [])) if (v != null && v > max) max = v;
+  const niceMax = niceCeil(max);
+  const X = (i) => n <= 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
+  const Y = (v) => padT + plotH - (v / niceMax) * plotH;
+
+  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}` });
+  for (let g = 0; g <= 4; g++) {
+    const val = niceMax * g / 4, y = Y(val);
+    svg.append(svgEl("line", { x1: padL, y1: y, x2: W - padR, y2: y, stroke: TREND_GRID, "stroke-width": 1 }));
+    svg.append(svgEl("text", { x: padL - 6, y: y + 3, "text-anchor": "end", "font-size": 10, fill: TREND_FAINT }, String(Math.round(val))));
+  }
+  const xticks = Math.min(n, 5);
+  for (let t = 0; t < xticks; t++) {
+    const i = xticks <= 1 ? 0 : Math.round(t * (n - 1) / (xticks - 1));
+    svg.append(svgEl("text", { x: X(i), y: H - 10, "text-anchor": "middle", "font-size": 10, fill: TREND_FAINT }, fmtTs(ts[i])));
+  }
+  _trendPath(svg, s.q, X, Y, TREND_FAINT, n, true);                 // quota reference
+  for (const def of visible) _trendPath(svg, s[def.k], X, Y, def.color, n, false);
+
+  const guide = svgEl("line", { x1: 0, y1: padT, x2: 0, y2: padT + plotH, stroke: TREND_LINE, "stroke-width": 1, visibility: "hidden" });
+  svg.append(guide);
+  const overlay = svgEl("rect", { x: padL, y: padT, width: plotW, height: plotH, fill: "transparent" });
+  svg.append(overlay);
+
+  $("#trendChart").replaceChildren(svg);
+  const disp = (_trend.byKey && _trend.byKey.get(key)) || key;
+  $("#trendTitle").textContent = disp + (_trend.data && _trend.data.closed ? " · 마감" : "");
+  renderTrendLegend(s, visible);
+  setTrendChartVisible(true);
+
+  const wrap = $("#trendChartWrap"), tip = $("#trendTip");
+  overlay.addEventListener("mousemove", (ev) => {
+    const r = svg.getBoundingClientRect();
+    let i = n <= 1 ? 0 : Math.round(((ev.clientX - r.left) / r.width * W - padL) / plotW * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    const gx = X(i);
+    guide.setAttribute("x1", gx); guide.setAttribute("x2", gx); guide.setAttribute("visibility", "visible");
+    const rows = visible.map((d) =>
+      `<div class="tip-row"><span><span class="dot" style="background:${d.color}"></span>${d.name}</span><b>${s[d.k][i] ?? "—"}</b></div>`).join("");
+    tip.innerHTML = `<div class="tip-t">${fmtTsFull(ts[i])}</div>${rows}` +
+      (s.q && s.q[i] != null ? `<div class="tip-row"><span>정원</span><b>${s.q[i]}</b></div>` : "");
+    const wr = wrap.getBoundingClientRect();
+    const topVal = Math.max(0, ...visible.map((d) => s[d.k][i] ?? 0));
+    tip.style.left = ((gx / W) * r.width + (r.left - wr.left)) + "px";
+    tip.style.top = ((Y(topVal) / H) * r.height + (r.top - wr.top)) + "px";
+    tip.classList.remove("hidden");
+  });
+  overlay.addEventListener("mouseleave", () => { tip.classList.add("hidden"); guide.setAttribute("visibility", "hidden"); });
+}
+
+function renderTrendLegend(s, visible) {
+  const lg = $("#trendLegend"); lg.replaceChildren();
+  const add = (color, name) => {
+    const node = el("span", { className: "lg" }, el("span", { className: "dot" }), name);
+    node.querySelector(".dot").style.background = color;
+    lg.append(node);
+  };
+  (visible || TREND_SERIES).forEach((d) => add(d.color, d.name));
+  if (s.q && s.q.some((v) => v != null)) add(TREND_FAINT, "정원");
+}
+
 // ---------- wire up ----------
 // ---------- pages (top-nav router) ----------
 function showPage(name) {
@@ -1370,6 +1671,7 @@ function showPage(name) {
   if (!pages.some((p) => p.dataset.page === name)) name = pages[0].dataset.page;
   pages.forEach((p) => p.classList.toggle("active", p.dataset.page === name));
   $$("#topnav .nav-link").forEach((n) => n.classList.toggle("active", n.dataset.page === name));
+  if (name === "trend") ensureTrend();   // lazy-init the trend page on first view
   window.scrollTo(0, 0);
 }
 function setupNav() {
@@ -1418,6 +1720,11 @@ function init() {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
   const refreshBtn = $("#refreshBtn");   // admin panel — absent in production
   if (refreshBtn) refreshBtn.addEventListener("click", refreshDB);
+  const cntBtn = $("#cntBtn");           // 인원 추이 collection (admin only)
+  if (cntBtn) {
+    cntBtn.addEventListener("click", () => runCounts(false));
+    $("#cntForceBtn").addEventListener("click", () => runCounts(true));
+  }
   $("#loadMore").addEventListener("click", loadMore);
   $("#expXlsx").addEventListener("click", () => exportSearch("xlsx"));
   $("#expCsv").addEventListener("click", () => exportSearch("csv"));
