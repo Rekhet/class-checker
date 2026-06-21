@@ -25,6 +25,10 @@
         </div>
         <!-- name input, advanced filters and the submit button are appended here by buildFilters -->
       </form>
+      <div class="wish-bar">
+        <button type="button" id="wishToggle" class="wish-toggle">★ 찜한 강좌 <span id="wishCount">0</span></button>
+      </div>
+      <div id="wishPanel" class="wish-panel hidden"></div>
       <div class="result-meta" id="resultCount">검색어를 입력하세요</div>
       <ul id="results" class="results"></ul>
       <button type="button" id="loadMore" class="loadmore hidden">더 보기 Load more</button>
@@ -39,6 +43,8 @@
         </div>
         <div class="tt-head-right">
           <span id="creditSum" class="credit-sum">총 0학점</span>
+          <button type="button" id="undoBtn" class="tt-icon" title="실행 취소 (Ctrl+Z)" disabled>↶</button>
+          <button type="button" id="redoBtn" class="tt-icon" title="다시 실행 (Ctrl+Shift+Z)" disabled>↷</button>
           <button id="clearTT" class="tt-clear">비우기 Clear</button>
         </div>
       </div>

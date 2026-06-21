@@ -28,15 +28,18 @@ const PALETTE = ["#376dc8", "#2e9e6b", "#c87a37", "#8b5cf6", "#c8485a",
 // but each sheet's class list lives in its own localStorage key and is loaded on
 // demand into an LRU cache (so 1000s of sheets don't serialize/hold all at once).
 const META_KEY = "snu_sheets_v2";
+const WISHLIST_KEY = "snu_wishlist";
 const SHEET_PREFIX = "snu_sheet_";
 const MAX_LIVE_SHEETS = Math.max(2, window.MAX_LIVE_SHEETS || 12);   // configurable
 const SHEET_TAB_LIMIT = Math.max(1, window.SHEET_TAB_LIMIT || 20);   // above this -> picker, not tabs
 const MAX_SHEETS = Math.max(1, window.MAX_SHEETS || 1000);           // hard cap on sheet count
-let meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1 };
+let meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {} };
 const liveSheets = new Map();   // id -> classes[]; insertion order = LRU (oldest first)
 let _quotaWarned = false;       // declared before initSheets() runs (it writes to storage)
 let _metaRaf = 0;               // pending rAF id for the coalesced meta write
 let timetable = initSheets();   // active sheet's classes (=== liveSheets.get(activeId()))
+let wishlist = _loadWishlist(); // bookmarked classes (not on any sheet), persisted
+const _undo = {}, _redo = {};   // per-sheet edit history (in-memory, sheet id -> [snapshots])
 let hoverPreview = null;   // ghost preview of a hovered search result
 
 // ---------- utils ----------
@@ -121,6 +124,10 @@ function matchRow(c, f) {
   const cls = c.classification || [];
   if (f.classifications?.length && !f.classifications.some((x) => cls.includes(x))) return false;
   if (f.levels?.length && !f.levels.some((x) => cls.includes(x))) return false;
+  if (f.credits != null) {
+    const cr = Number(c.credits);
+    if (f.credits === "4+" ? !(cr >= 4) : cr !== f.credits) return false;
+  }
   if (f.day != null || f.period != null) {
     if (!(c.slots || []).some((s) =>
       (f.day == null || s.day_index === f.day) && (f.period == null || s.period === f.period)))
@@ -262,6 +269,12 @@ function buildFilters() {
   grid.append(deptLabel);
   grid.append(labeled("요일", sel("day")));
   grid.append(labeled("교시", sel("period")));
+  grid.append(labeled("학점", el("select", { name: "credits", id: "credits" },
+    el("option", { value: "" }, "전체"),
+    el("option", { value: "1" }, "1학점"),
+    el("option", { value: "2" }, "2학점"),
+    el("option", { value: "3" }, "3학점"),
+    el("option", { value: "4+" }, "4학점 이상"))));
   adv.append(grid);
 
   adv.append(el("div", { className: "adv-label" }, "과정"));
@@ -491,6 +504,7 @@ function currentFilters() {
     levels: chipVals("levelChips"),            // 과정 (학사/석사/박사…)
     grades: chipVals("gradeChips"),
     day: num("day"), period: num("period"),
+    credits: (() => { const v = val("credits"); return v === "" ? null : (v === "4+" ? "4+" : Number(v)); })(),
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
   };
@@ -574,13 +588,19 @@ function renderResults(classes, append = false) {
       className: "radd" + (added ? " added" : ""), textContent: added ? "✓" : "담기",
       onclick: (e) => { e.stopPropagation(); added ? removeFromTT(c) : addToTT(c); },
     });
+    const wished = inWish(c);
+    const wishBtn = el("button", {
+      className: "rwish" + (wished ? " on" : ""), textContent: wished ? "★" : "☆",
+      title: wished ? "찜 해제" : "찜하기",
+      onclick: (e) => { e.stopPropagation(); toggleWish(c); },
+    });
     card.append(bar,
       el("div", { className: "rbody" },
         el("div", { className: "rname" }, c.name),
         el("div", { className: "rmeta" },
           `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점${seats}`),
         el("div", { className: "rtime" }, times.length ? times.join("  ·  ") : "시간미정")),
-      addBtn);
+      wishBtn, addBtn);
     ul.append(card);
   }
 }
@@ -652,13 +672,13 @@ function initSheets() {
     const m = JSON.parse(localStorage.getItem(META_KEY));
     if (m && Array.isArray(m.ids) && m.ids.length) {
       meta = { active: Math.min(Math.max(0, m.active | 0), m.ids.length - 1),
-               ids: m.ids, names: m.names || {}, counts: m.counts || {},
+               ids: m.ids, names: m.names || {}, counts: m.counts || {}, seen: m.seen || {},
                nextId: m.nextId || (m.ids.reduce((mx, x) => (x > mx ? x : mx), 0) + 1) };
       return _loadSheet(activeId());
     }
   } catch { /* fall through to migrate */ }
   // migrate v1 (all sheets in one key) or the legacy single timetable -> per-sheet
-  meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1 };
+  meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {} };
   let v1 = null;
   try { v1 = JSON.parse(localStorage.getItem(SHEETS_KEY)); } catch { /* none */ }
   if (v1 && Array.isArray(v1.sheets) && v1.sheets.length) {
@@ -688,7 +708,7 @@ function switchSheet(i) {
   if (i === meta.active || i < 0 || i >= meta.ids.length) return;
   saveTT();
   meta.active = i; timetable = _loadSheet(activeId());
-  _saveMeta(); renderSheets(); renderTT(); refreshCardStates();
+  _saveMeta(); renderSheets(); renderTT(); refreshCardStates(); updateUndoButtons();
 }
 function addSheet() {
   if (meta.ids.length >= MAX_SHEETS) {
@@ -711,6 +731,8 @@ function _removeSheets(idSet) {
   meta.ids = meta.ids.filter((id) => !idSet.has(id));
   for (const id of idSet) {
     delete meta.names[id]; delete meta.counts[id]; liveSheets.delete(id);
+    if (meta.seen) delete meta.seen[id];
+    delete _sheetChanges[id];
     try { localStorage.removeItem(_sheetKey(id)); } catch { /* ignore */ }
   }
   const ai = meta.ids.indexOf(keptActive);  // <0 only when the active sheet itself was deleted
@@ -756,6 +778,8 @@ function _buildTab(id, i) {               // one tab node (metadata-only)
   },
     el("span", {}, meta.names[id] || "시간표"),
     el("span", { className: "sheet-count" }, String(meta.counts[id] ?? 0)));
+  const chg = _sheetChanges[id];
+  if (chg) tab.append(el("span", { className: "sheet-chg", title: `변경 ${chg.chg.length + chg.rm.length}건` }, "●"));
   if (i === meta.active) tab.append(el("span", { className: "sheet-pen", title: "이름 변경" }, "✎"));
   if (meta.ids.length > 1) tab.append(el("span", {
     className: "sheet-x", title: "삭제",
@@ -769,7 +793,7 @@ function _buildSheetPicker() {
     onchange: (e) => switchSheet(Number(e.target.value)) });
   meta.ids.forEach((id, i) => {
     const o = el("option", { value: String(i) },
-      `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})`);
+      `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})${_sheetChanges[id] ? " ⚠" : ""}`);
     if (i === meta.active) o.selected = true;
     sel.append(o);
   });
@@ -804,6 +828,7 @@ function addToTT(c) {
     alert("이미 추가된 강좌와 시간이 겹쳐 추가하지 않았습니다.");
     return;
   }
+  pushUndo();
   timetable.push({
     year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
     professor: c.professor, credits: c.credits, slots: c.slots || [],
@@ -835,6 +860,7 @@ function addManual(e) {
   $("#manualForm").classList.add("hidden");
 }
 function removeFromTT(c) {
+  pushUndo();
   timetable = timetable.filter((x) => classKey(x) !== classKey(c));
   saveTT(); renderSheets(); renderTT(); refreshCardStates();
   if (detailClass) renderDetail();
@@ -842,6 +868,7 @@ function removeFromTT(c) {
 function clearTT() {
   if (!timetable.length) return;
   if (!confirm("이 시간표를 비울까요?")) return;
+  pushUndo();
   timetable = []; saveTT(); renderSheets(); renderTT(); refreshCardStates();
   if (detailClass) renderDetail();
 }
@@ -852,6 +879,85 @@ function refreshCardStates() {               // rAF-coalesced (mirror renderShee
 }
 function refreshCardStatesNow() {
   if (lastResults.length) renderResults(lastResults);
+  renderWishlist();
+}
+
+// ---------- wishlist (bookmarked courses, separate from any sheet) ----------
+function _loadWishlist() {
+  try { const a = JSON.parse(localStorage.getItem(WISHLIST_KEY)); return Array.isArray(a) ? a : []; }
+  catch { return []; }
+}
+function saveWishlist() {
+  try { localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist)); _quotaWarned = false; }
+  catch (e) { _onQuota(e); }
+}
+function inWish(c) { const k = classKey(c); return wishlist.some((x) => classKey(x) === k); }
+function toggleWish(c) {
+  const k = classKey(c);
+  if (inWish(c)) wishlist = wishlist.filter((x) => classKey(x) !== k);
+  else wishlist.push({ year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
+    professor: c.professor, credits: c.credits, slots: c.slots || [], manual: c.manual || undefined });
+  saveWishlist(); renderWishlist(); refreshCardStates();
+}
+function renderWishlist() {
+  const cnt = $("#wishCount"); if (cnt) cnt.textContent = String(wishlist.length);
+  const panel = $("#wishPanel"); if (!panel || panel.classList.contains("hidden")) return;
+  if (!wishlist.length) {
+    panel.replaceChildren(el("div", { className: "wish-empty" }, "찜한 강좌가 없습니다. 검색 결과의 ☆를 눌러 저장하세요."));
+    return;
+  }
+  const inTT = new Set(timetable.map(classKey));
+  panel.replaceChildren(...wishlist.map((c) => {
+    const added = inTT.has(classKey(c));
+    const bar = el("span", { className: "wbar" }); bar.style.background = colorFor(c);
+    return el("div", { className: "wish-item" }, bar,
+      el("div", { className: "wbody" },
+        el("div", { className: "wname" }, c.name),
+        el("div", { className: "wmeta" }, `${c.professor || "미정"} · ${c.credits ?? "?"}학점 · ${slotSummary(c.slots).join(", ") || "시간미정"}`)),
+      el("button", { className: "wadd" + (added ? " added" : ""), disabled: added,
+        title: added ? "이미 추가됨" : "시간표에 추가", onclick: () => addToTT(c) }, added ? "✓" : "담기"),
+      el("button", { className: "wdel", title: "찜 해제", onclick: () => toggleWish(c) }, "✕"));
+  }));
+}
+function toggleWishPanel() {
+  const p = $("#wishPanel"); if (!p) return;
+  const open = !p.classList.toggle("hidden");
+  $("#wishToggle")?.classList.toggle("on", open);
+  if (open) renderWishlist();
+}
+
+// ---------- undo / redo (per active sheet, in-memory) ----------
+function _snapTT() { return JSON.stringify(timetable); }
+function pushUndo() {
+  const id = activeId();
+  (_undo[id] || (_undo[id] = [])).push(_snapTT());
+  if (_undo[id].length > 100) _undo[id].shift();
+  _redo[id] = [];
+  updateUndoButtons();
+}
+function _applySnapshot(json) {
+  timetable = JSON.parse(json);
+  liveSheets.set(activeId(), timetable);
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (detailClass) renderDetail();
+  updateUndoButtons();
+}
+function undo() {
+  const id = activeId(), st = _undo[id];
+  if (!st || !st.length) return;
+  (_redo[id] || (_redo[id] = [])).push(_snapTT());
+  _applySnapshot(st.pop());
+}
+function redo() {
+  const id = activeId(), st = _redo[id];
+  if (!st || !st.length) return;
+  (_undo[id] || (_undo[id] = [])).push(_snapTT());
+  _applySnapshot(st.pop());
+}
+function updateUndoButtons() {
+  const id = activeId(), u = $("#undoBtn"), r = $("#redoBtn");
+  if (u) u.disabled = !(_undo[id] && _undo[id].length);
+  if (r) r.disabled = !(_redo[id] && _redo[id].length);
 }
 
 // signature of a class's meeting times, for detecting catalog changes
@@ -859,32 +965,89 @@ function slotSig(slots) {
   return (slots || []).map((s) => `${s.day_index}-${s.start_time}`).sort().join("|");
 }
 
-// reconcile the saved timetable against the latest catalog: refresh changed
-// times, flag time-changed / cancelled classes. Best-effort (skips if offline).
-async function reconcileTT() {
-  if (!timetable.length) return;
+// per-sheet change summary from the last reconcile: id -> {chg:[names], rm:[names], sig}
+let _sheetChanges = {};
+function _nm(c) { return c.name || c.sbjt_cd || "(이름 없음)"; }
+function _changeSig(chg, rm) { return "c:" + [...chg].sort().join("§") + ";r:" + [...rm].sort().join("§"); }
+// flag one sheet's classes against the latest catalog `cur` (Map keyed by classKey).
+// Mutates in place; returns {changed, chg, rm} where chg/rm are the CURRENT flagged names.
+function _reconcileClasses(classes, cur) {
   let changed = false;
-  try {
-    const catalog = timetable.filter((c) => !c.manual);   // manual entries aren't in the catalog
-    if (!catalog.length) return;
-    const keys = catalog.map((c) => [c.year, c.term, c.sbjt_cd, c.lt_no]);
-    const classes = await lookupLocal(keys);
-    const cur = new Map(classes.map((c) => [classKey(c), c]));
-    for (const c of catalog) {
-      const now = cur.get(classKey(c));
-      if (!now) {                       // gone from catalog -> cancelled
-        if (!c.removed) { c.removed = true; changed = true; }
-        continue;
-      }
-      if (c.removed) { delete c.removed; changed = true; }
-      if (slotSig(c.slots) !== slotSig(now.slots)) {
-        c.slots = now.slots; c.timeChanged = true; changed = true;
-      } else if (c.timeChanged) {
-        delete c.timeChanged; changed = true;
-      }
-    }
-    if (changed) { saveTT(); renderTT(); refreshCardStates(); }
-  } catch { /* server down: keep the saved copy as-is */ }
+  for (const c of classes) {
+    if (c.manual) continue;               // manual entries aren't in the catalog
+    const now = cur.get(classKey(c));
+    if (!now) { if (!c.removed) { c.removed = true; changed = true; } continue; }
+    if (c.removed) { delete c.removed; changed = true; }
+    if (slotSig(c.slots) !== slotSig(now.slots)) { c.slots = now.slots; c.timeChanged = true; changed = true; }
+    else if (c.timeChanged) { delete c.timeChanged; changed = true; }
+  }
+  return { changed, chg: classes.filter((c) => c.timeChanged).map(_nm), rm: classes.filter((c) => c.removed).map(_nm) };
+}
+// seed the active sheet's summary from already-stored flags so the banner shows instantly
+// on load, before the async catalog reconcile resolves.
+function _seedActiveChanges() {
+  const chg = timetable.filter((c) => c.timeChanged).map(_nm);
+  const rm = timetable.filter((c) => c.removed).map(_nm);
+  if (chg.length || rm.length) _sheetChanges[activeId()] = { chg, rm, sig: _changeSig(chg, rm) };
+  else delete _sheetChanges[activeId()];
+}
+// reconcile EVERY sheet against the latest catalog in one pass: one catalog scan
+// (lookupLocal is term-batched) + reading each sheet from storage (no LRU churn).
+// Best-effort (skips silently if offline).
+async function reconcileAll() {
+  const ids = meta.ids.slice();
+  const aid = activeId();
+  const lists = ids.map((id) => (id === aid ? timetable : _readSheet(id)));
+  const keys = [];
+  for (const list of lists)
+    for (const c of list) if (!c.manual) keys.push([c.year, c.term, c.sbjt_cd, c.lt_no]);
+  if (!keys.length) { _sheetChanges = {}; renderSheets(); renderTT(); return; }
+  let cur;
+  try { cur = new Map((await lookupLocal(keys)).map((c) => [classKey(c), c])); }
+  catch { return; }                       // offline: keep saved copies + existing flags
+  const next = {};
+  ids.forEach((id, i) => {
+    const { changed, chg, rm } = _reconcileClasses(lists[i], cur);
+    if (chg.length || rm.length) next[id] = { chg, rm, sig: _changeSig(chg, rm) };
+    if (changed) { if (id === aid) saveTT(); else _writeSheet(id, lists[i]); }
+  });
+  _sheetChanges = next;
+  renderSheets(); renderTT(); refreshCardStates();
+}
+
+// "label N: a, b, 외 K개" chip for one change category
+function _chipList(label, names, cls) {
+  if (!names.length) return null;
+  const cap = 4, shown = names.slice(0, cap).join(", ");
+  const extra = names.length > cap ? ` 외 ${names.length - cap}개` : "";
+  return el("span", { className: "chg-item " + cls },
+    el("b", {}, `${label} ${names.length}`),
+    el("span", { className: "chg-names" }, ` ${shown}${extra}`));
+}
+// itemized + dismissible change banner. Active sheet's changes show until "확인"ed
+// (remembered by signature, so only NEW changes re-surface); other changed sheets get
+// a jump link.
+function renderChangeNotice() {
+  const notice = $("#ttNotice"); if (!notice) return;
+  const aid = activeId();
+  const mine = _sheetChanges[aid];
+  const dismissed = mine && (meta.seen || {})[aid] === mine.sig;
+  const others = meta.ids.filter((id) => id !== aid && _sheetChanges[id]);
+  if ((!mine || dismissed) && !others.length) { notice.replaceChildren(); notice.classList.add("hidden"); return; }
+  const kids = [];
+  if (mine && !dismissed) {
+    const items = [_chipList("시간 변경", mine.chg, "is-chg"), _chipList("폐강", mine.rm, "is-rm")].filter(Boolean);
+    kids.push(el("span", { className: "chg-lead" }, "변경된 강좌:"), ...items,
+      el("button", { type: "button", className: "chg-dismiss", title: "확인",
+        onclick: () => { (meta.seen ||= {})[aid] = mine.sig; _saveMeta(); renderTT(); } }, "확인 ×"));
+  }
+  if (others.length) {
+    const n = others.reduce((s, id) => s + _sheetChanges[id].chg.length + _sheetChanges[id].rm.length, 0);
+    kids.push(el("button", { type: "button", className: "chg-others", title: "변경된 다른 시간표로 이동",
+      onclick: () => switchSheet(meta.ids.indexOf(others[0])) }, `다른 시간표 ${others.length}개에 변경 ${n}건 →`));
+  }
+  notice.replaceChildren(...kids);
+  notice.classList.remove("hidden");
 }
 
 // hover a search result -> show it immediately as a ghost preview on the grid
@@ -996,20 +1159,7 @@ function renderTTNow() {
   const creditSum = timetable.reduce((s, c) => s + (Number(c.credits) || 0), 0);
   $("#creditSum").textContent = `총 ${creditSum}학점`;
 
-  const nChanged = timetable.filter((c) => c.timeChanged).length;
-  const nRemoved = timetable.filter((c) => c.removed).length;
-  const notice = $("#ttNotice");
-  if (notice) {
-    if (nChanged || nRemoved) {
-      const parts = [];
-      if (nChanged) parts.push(`시간 변경 ${nChanged}`);
-      if (nRemoved) parts.push(`폐강 ${nRemoved}`);
-      notice.textContent = "최근 갱신 반영: " + parts.join(" · ");
-      notice.classList.remove("hidden");
-    } else {
-      notice.classList.add("hidden");
-    }
-  }
+  renderChangeNotice();
 
   // collect exact meetings (start/end) + time-less classes
   const meetings = [];
@@ -1238,7 +1388,7 @@ async function pollRefresh() {
       ? "실패: " + r.error
       : `완료 · 강좌 ${r.result?.classes ?? "?"} · 시간셀 ${r.result?.slots ?? "?"}`;
     doSearch();
-    if (!r.error) { reconcileTT(); loadTimeStats(); }  // catalog changed
+    if (!r.error) { reconcileAll(); loadTimeStats(); }  // catalog changed
   }
 }
 
@@ -1312,6 +1462,7 @@ function importTTJson(file) {
       const data = JSON.parse(reader.result);
       const arr = Array.isArray(data) ? data : data.timetable;
       if (!Array.isArray(arr)) throw new Error("bad shape");
+      pushUndo();
       timetable = arr.filter((c) => c && c.sbjt_cd && c.lt_no && c.name);
       saveTT(); renderSheets(); renderTT(); refreshCardStates();
     } catch { alert("불러올 수 없는 시간표 파일입니다."); }
@@ -1851,17 +2002,30 @@ function init() {
       pollTimer = setInterval(pollRefresh, 1500);
     }
   });
+  _seedActiveChanges();                       // instant banner from stored flags
   renderSheetsNow();                          // first paint synchronous (rAF may be parked if loaded hidden)
   renderTTNow();
-  reconcileTT();
+  reconcileAll();                             // async: refresh all sheets vs latest catalog
   $("#searchForm").addEventListener("submit", doSearch);
   $("#filterToggle").addEventListener("click", () =>
     setAdvancedOpen(!$("#advFilters").classList.contains("open")));
   $("#year").addEventListener("change", updateScope);
   $("#term").addEventListener("change", updateScope);
   $("#clearTT").addEventListener("click", clearTT);
+  $("#undoBtn").addEventListener("click", undo);
+  $("#redoBtn").addEventListener("click", redo);
+  $("#wishToggle").addEventListener("click", toggleWishPanel);
+  renderWishlist();                          // seed the count
   $("#detailOverlay").addEventListener("click", closeDetail);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
+  document.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || e.target.isContentEditable) return;
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+    else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redo(); }
+  });
   const refreshBtn = $("#refreshBtn");   // admin panel — absent in production
   if (refreshBtn) refreshBtn.addEventListener("click", refreshDB);
   const cntBtn = $("#cntBtn");           // 인원 추이 collection (admin only)

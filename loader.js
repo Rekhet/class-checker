@@ -8,7 +8,7 @@
     .split(",").map((s) => s.trim()).filter(Boolean);
   for (const name of parts) {
     try {
-      const r = await fetch(name);   // relative — works on the server and on static hosts
+      const r = await fetch(name, { cache: "no-cache" });   // revalidate so edited/redeployed partials aren't served stale
       if (r.ok) mount.insertAdjacentHTML("beforeend", await r.text());
     } catch { /* optional partial unavailable (e.g. dev.html on a static host) — skip */ }
   }
