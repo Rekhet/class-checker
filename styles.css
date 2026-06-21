@@ -183,6 +183,10 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .rwish { flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 16px; line-height: 1;
   color: var(--cp-faint); padding: 2px; align-self: flex-start; }
 .rwish.on, .rwish:hover { color: var(--cp-warn); }
+.rtag { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 700; padding: 1px 5px;
+  border-radius: 4px; vertical-align: middle; }
+.rtag.eng { background: var(--cp-accent); color: var(--cp-accentInk); }
+.rtag.warn { background: var(--cp-conflict); color: #fff; }
 
 /* wishlist bar + panel */
 .wish-bar { padding: 8px 18px 0; }

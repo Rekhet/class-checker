@@ -128,6 +128,8 @@ function matchRow(c, f) {
     const cr = Number(c.credits);
     if (f.credits === "4+" ? !(cr >= 4) : cr !== f.credits) return false;
   }
+  if (f.room && !has(c.room, f.room)) return false;
+  if (f.englishOnly && c.language !== "영어") return false;
   if (f.day != null || f.period != null) {
     if (!(c.slots || []).some((s) =>
       (f.day == null || s.day_index === f.day) && (f.period == null || s.period === f.period)))
@@ -275,6 +277,7 @@ function buildFilters() {
     el("option", { value: "2" }, "2학점"),
     el("option", { value: "3" }, "3학점"),
     el("option", { value: "4+" }, "4학점 이상"))));
+  grid.append(labeled("강의실", el("input", { type: "text", name: "roomFilter", id: "roomFilter", placeholder: "예: 38 또는 38-422" })));
   adv.append(grid);
 
   adv.append(el("div", { className: "adv-label" }, "과정"));
@@ -286,9 +289,11 @@ function buildFilters() {
 
   const empty = el("input", { type: "checkbox", id: "emptyOnly" });   // only classes that fit the free slots
   const timed = el("input", { type: "checkbox", id: "timedOnly" });   // only classes with a scheduled time
+  const eng = el("input", { type: "checkbox", id: "englishOnly" });   // only 영어강의
   adv.append(el("div", { className: "adv-checks" },
     el("label", {}, empty, " 빈 시간만"),
-    el("label", {}, timed, " 시간 배정만")));
+    el("label", {}, timed, " 시간 배정만"),
+    el("label", {}, eng, " 영어강의만")));
   form.append(adv);
 
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
@@ -505,6 +510,8 @@ function currentFilters() {
     grades: chipVals("gradeChips"),
     day: num("day"), period: num("period"),
     credits: (() => { const v = val("credits"); return v === "" ? null : (v === "4+" ? "4+" : Number(v)); })(),
+    room: val("roomFilter"),
+    englishOnly: $("#englishOnly")?.checked || false,
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
   };
@@ -594,11 +601,14 @@ function renderResults(classes, append = false) {
       title: wished ? "찜 해제" : "찜하기",
       onclick: (e) => { e.stopPropagation(); toggleWish(c); },
     });
+    const tags = [];
+    if (c.language === "영어") tags.push(el("span", { className: "rtag eng" }, "영어"));
+    if (c.status === "폐강대상") tags.push(el("span", { className: "rtag warn" }, "폐강대상"));
     card.append(bar,
       el("div", { className: "rbody" },
-        el("div", { className: "rname" }, c.name),
+        el("div", { className: "rname" }, c.name, ...tags),
         el("div", { className: "rmeta" },
-          `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점${seats}`),
+          `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점${c.room ? " · " + c.room : ""}${seats}`),
         el("div", { className: "rtime" }, times.length ? times.join("  ·  ") : "시간미정")),
       wishBtn, addBtn);
     ul.append(card);
