@@ -1523,6 +1523,20 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 // render the on-screen grid to PNG, reading live DOM geometry so it mirrors what's
 // shown (positions, colors, conflict outlines).
+// wrap text to fit maxW (char-level — works for Korean without spaces). measureText
+// reads the ctx's CURRENT font, so set the font before calling.
+function _wrapText(ctx, text, maxW) {
+  const out = [];
+  let line = "";
+  for (const ch of String(text || "")) {
+    if (ch === "\n") { out.push(line); line = ""; continue; }
+    const t = line + ch;
+    if (line && ctx.measureText(t).width > maxW) { out.push(line); line = ch; }
+    else line = t;
+  }
+  if (line) out.push(line);
+  return out;
+}
 function exportTTPng() {
   flushUI();                                  // grid may have a pending coalesced render
   const root = $("#ttGrid");
@@ -1559,11 +1573,21 @@ function exportTTPng() {
       roundRect(ctx, b.x + 1, b.y + 1, b.w - 2, b.h - 2, 3); ctx.stroke();
     }
     ctx.fillStyle = "#fff"; ctx.textAlign = "left";
+    const padX = 6, innerW = b.w - padX * 2, bottom = b.y + b.h - 2;
+    let ty = b.y + 11;
     ctx.font = "600 10px 'Noto Sans KR', sans-serif";
-    ctx.fillText(e.childNodes[0] ? e.childNodes[0].textContent : "", b.x + 6, b.y + 11, b.w - 10);
+    for (const ln of _wrapText(ctx, e.childNodes[0] ? e.childNodes[0].textContent : "", innerW)) {
+      if (ty > bottom) break;                 // ran out of vertical room in the block
+      ctx.fillText(ln, b.x + padX, ty); ty += 11;
+    }
     ctx.font = "9px 'Noto Sans KR', sans-serif";
-    e.querySelectorAll("small").forEach((s, i) =>
-      ctx.fillText(s.textContent, b.x + 6, b.y + 24 + i * 11, b.w - 10));
+    ty += 2;                                   // small gap before the meta lines
+    outer: for (const s of e.querySelectorAll("small")) {
+      for (const ln of _wrapText(ctx, s.textContent, innerW)) {
+        if (ty > bottom) break outer;
+        ctx.fillText(ln, b.x + padX, ty); ty += 10;
+      }
+    }
   });
   canvas.toBlob((blob) => downloadBlob(blob, "timetable.png"), "image/png");
 }
