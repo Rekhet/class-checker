@@ -18,3 +18,15 @@ window.SEARCH_DEFAULT_TERM = "fall";
 // Default calendar (.ics) export range. "YYYY-MM-DD" each; empty = today / +16 weeks.
 window.ICS_DEFAULT_START = "2026-09-01";
 window.ICS_DEFAULT_END = "2026-12-21";
+
+// How many timetable sheets to keep in memory at once (LRU). Others are flushed to
+// localStorage and loaded on demand — keeps memory bounded with many sheets. Min 2.
+window.MAX_LIVE_SHEETS = 12;
+
+// Above this many sheets, the tab strip is replaced by a compact dropdown picker
+// (a 2000-tab strip is unusable + slow). Min 1.
+window.SHEET_TAB_LIMIT = 20;
+
+// Hard cap on total sheets. Blocks creating more (with a message) before localStorage
+// fills up — ~1K full sheets is the safe quota ceiling (~5MB / ~2KB per sheet). Min 1.
+window.MAX_SHEETS = 1000;

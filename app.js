@@ -24,8 +24,19 @@ const ADMIN_TERMS = Object.entries(SEMESTER_LABEL)
 const PALETTE = ["#376dc8", "#2e9e6b", "#c87a37", "#8b5cf6", "#c8485a",
   "#0d9488", "#d4a017", "#5b48b0", "#1f7a8c", "#b5446e"];
 
-let sheets = [], active = 0;
-let timetable = initSheets();   // sets sheets/active; timetable = active sheet's classes
+// Sheets are id-keyed: lightweight metadata (names/counts/order) for ALL sheets,
+// but each sheet's class list lives in its own localStorage key and is loaded on
+// demand into an LRU cache (so 1000s of sheets don't serialize/hold all at once).
+const META_KEY = "snu_sheets_v2";
+const SHEET_PREFIX = "snu_sheet_";
+const MAX_LIVE_SHEETS = Math.max(2, window.MAX_LIVE_SHEETS || 12);   // configurable
+const SHEET_TAB_LIMIT = Math.max(1, window.SHEET_TAB_LIMIT || 20);   // above this -> picker, not tabs
+const MAX_SHEETS = Math.max(1, window.MAX_SHEETS || 1000);           // hard cap on sheet count
+let meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1 };
+const liveSheets = new Map();   // id -> classes[]; insertion order = LRU (oldest first)
+let _quotaWarned = false;       // declared before initSheets() runs (it writes to storage)
+let _metaRaf = 0;               // pending rAF id for the coalesced meta write
+let timetable = initSheets();   // active sheet's classes (=== liveSheets.get(activeId()))
 let hoverPreview = null;   // ghost preview of a hovered search result
 
 // ---------- utils ----------
@@ -589,79 +600,201 @@ function slotSummary(slots) {
 }
 
 // ---------- timetable sheets ----------
+// ---------- timetable sheets (id-keyed; per-sheet storage + LRU memory) ----------
+// function declarations (hoisted) so the early `let timetable = initSheets()` can call them
+function activeId() { return meta.ids[meta.active]; }
+function _sheetKey(id) { return SHEET_PREFIX + id; }
+function _readSheet(id) {
+  try { const a = JSON.parse(localStorage.getItem(_sheetKey(id))); return Array.isArray(a) ? a : []; }
+  catch { return []; }
+}
+function _onQuota(e) {                       // surface a full localStorage instead of silent data loss
+  console.error("localStorage write failed (quota?)", e);
+  if (!_quotaWarned) {
+    _quotaWarned = true;
+    alert("저장 공간이 가득 찼습니다. 새로 추가한 시간표가 저장되지 않을 수 있습니다. 사용하지 않는 시간표를 삭제해 주세요.");
+  }
+}
+function _writeSheet(id, classes) {
+  try { localStorage.setItem(_sheetKey(id), JSON.stringify(classes)); _quotaWarned = false; }
+  catch (e) { _onQuota(e); }
+}
+// metadata write is rAF-coalesced: a bulk add/deleteSheet loop mutates `meta` many times
+// per frame but persists ONCE. Was O(n²) — re-serializing the whole growing meta on every
+// op. `meta` in memory is always authoritative; only the write to disk is deferred.
+function _saveMetaNow() {
+  _metaRaf = 0;
+  try { localStorage.setItem(META_KEY, JSON.stringify(meta)); _quotaWarned = false; }
+  catch (e) { _onQuota(e); }
+}
+function _saveMeta() { if (!_metaRaf) _metaRaf = requestAnimationFrame(_saveMetaNow); }
+function flushMeta() { if (_metaRaf) { cancelAnimationFrame(_metaRaf); _saveMetaNow(); } }
+// LRU: bring a sheet's classes into memory (most-recent), flushing+dropping the
+// least-recently-used ones beyond MAX_LIVE_SHEETS (never the active sheet).
+function _loadSheet(id) {
+  if (liveSheets.has(id)) { const v = liveSheets.get(id); liveSheets.delete(id); liveSheets.set(id, v); return v; }
+  const classes = _readSheet(id);
+  liveSheets.set(id, classes);
+  _evict();
+  return classes;
+}
+function _evict() {
+  for (const id of [...liveSheets.keys()]) {
+    if (liveSheets.size <= MAX_LIVE_SHEETS) break;
+    if (id === activeId()) continue;
+    _writeSheet(id, liveSheets.get(id));   // flush before dropping from memory
+    liveSheets.delete(id);
+  }
+}
+
 function initSheets() {
   try {
-    const raw = JSON.parse(localStorage.getItem(SHEETS_KEY));
-    if (raw && Array.isArray(raw.sheets) && raw.sheets.length) {
-      sheets = raw.sheets.map((s) => ({ name: s.name || "시간표", classes: s.classes || [] }));
-      active = Math.min(Math.max(0, raw.active | 0), sheets.length - 1);
-      return sheets[active].classes;
+    const m = JSON.parse(localStorage.getItem(META_KEY));
+    if (m && Array.isArray(m.ids) && m.ids.length) {
+      meta = { active: Math.min(Math.max(0, m.active | 0), m.ids.length - 1),
+               ids: m.ids, names: m.names || {}, counts: m.counts || {},
+               nextId: m.nextId || (m.ids.reduce((mx, x) => (x > mx ? x : mx), 0) + 1) };
+      return _loadSheet(activeId());
     }
   } catch { /* fall through to migrate */ }
-  let legacy = [];
-  try { legacy = JSON.parse(localStorage.getItem(TT_KEY)) || []; } catch { /* none */ }
-  sheets = [{ name: "시간표 1", classes: legacy }];
-  active = 0;
-  return sheets[active].classes;
+  // migrate v1 (all sheets in one key) or the legacy single timetable -> per-sheet
+  meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1 };
+  let v1 = null;
+  try { v1 = JSON.parse(localStorage.getItem(SHEETS_KEY)); } catch { /* none */ }
+  if (v1 && Array.isArray(v1.sheets) && v1.sheets.length) {
+    v1.sheets.forEach((s, i) => {
+      const id = meta.nextId++; meta.ids.push(id);
+      meta.names[id] = s.name || `시간표 ${i + 1}`;
+      const cls = s.classes || []; meta.counts[id] = cls.length; _writeSheet(id, cls);
+    });
+    meta.active = Math.min(Math.max(0, v1.active | 0), meta.ids.length - 1);
+  } else {
+    let legacy = [];
+    try { legacy = JSON.parse(localStorage.getItem(TT_KEY)) || []; } catch { /* none */ }
+    const id = meta.nextId++; meta.ids = [id]; meta.names[id] = "시간표 1";
+    meta.counts[id] = legacy.length; _writeSheet(id, legacy);
+  }
+  _saveMeta();
+  return _loadSheet(activeId());
 }
 function saveTT() {
-  sheets[active].classes = timetable;   // keep the active sheet in sync
-  localStorage.setItem(SHEETS_KEY, JSON.stringify({ version: 1, sheets, active }));
+  const id = activeId();
+  liveSheets.set(id, timetable);        // keep the active array in the cache
+  meta.counts[id] = timetable.length;
+  _writeSheet(id, timetable);           // O(active sheet) — not every sheet
+  _saveMeta();
 }
 function switchSheet(i) {
-  if (i === active || i < 0 || i >= sheets.length) return;
+  if (i === meta.active || i < 0 || i >= meta.ids.length) return;
   saveTT();
-  active = i; timetable = sheets[active].classes;
-  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  meta.active = i; timetable = _loadSheet(activeId());
+  _saveMeta(); renderSheets(); renderTT(); refreshCardStates();
 }
 function addSheet() {
+  if (meta.ids.length >= MAX_SHEETS) {
+    alert(`시간표는 최대 ${MAX_SHEETS}개까지 만들 수 있습니다. 사용하지 않는 시간표를 삭제해 주세요.`);
+    return;
+  }
   saveTT();
-  sheets.push({ name: `시간표 ${sheets.length + 1}`, classes: [] });
-  active = sheets.length - 1; timetable = sheets[active].classes;
-  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  const id = meta.nextId++;
+  meta.ids.push(id); meta.names[id] = `시간표 ${meta.ids.length}`; meta.counts[id] = 0;
+  meta.active = meta.ids.length - 1;
+  timetable = []; liveSheets.set(id, timetable); _evict();
+  _writeSheet(id, timetable); _saveMeta();
+  renderSheets(); renderTT(); refreshCardStates();
+}
+// remove a set of sheet ids in ONE O(n) pass (not repeated O(n) splices -> O(n²)).
+// Callers must keep the active sheet out of idSet, so at least one sheet always remains.
+function _removeSheets(idSet) {
+  const keptActive = activeId();            // survives unless this is a single-delete of the active sheet
+  const oldActive = meta.active;
+  meta.ids = meta.ids.filter((id) => !idSet.has(id));
+  for (const id of idSet) {
+    delete meta.names[id]; delete meta.counts[id]; liveSheets.delete(id);
+    try { localStorage.removeItem(_sheetKey(id)); } catch { /* ignore */ }
+  }
+  const ai = meta.ids.indexOf(keptActive);  // <0 only when the active sheet itself was deleted
+  meta.active = ai >= 0 ? ai : Math.min(oldActive, meta.ids.length - 1);
+  timetable = _loadSheet(activeId());
+  _saveMeta(); renderSheets(); renderTT(); refreshCardStates();
 }
 function deleteSheet(i) {
-  if (sheets.length <= 1) { alert("마지막 시간표는 삭제할 수 없습니다."); return; }
-  if (!confirm(`'${sheets[i].name}' 시간표를 삭제할까요?`)) return;
-  sheets.splice(i, 1);
-  if (active >= sheets.length) active = sheets.length - 1;
-  else if (i < active) active--;
-  timetable = sheets[active].classes;
-  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (meta.ids.length <= 1) { alert("마지막 시간표는 삭제할 수 없습니다."); return; }
+  const id = meta.ids[i];
+  if (id == null) return;
+  if (!confirm(`'${meta.names[id]}' 시간표를 삭제할까요?`)) return;
+  _removeSheets(new Set([id]));
+}
+// delete many sheets with a SINGLE confirm (vs one dialog per call). Never deletes the
+// active sheet, so one always remains. `ids` omitted/empty = all sheets but the active one.
+function deleteSheetsBulk(ids, { confirm: ask = true } = {}) {
+  const active = activeId();
+  const pool = (ids && ids.length ? ids : meta.ids).filter((id) => id !== active && meta.names[id] != null);
+  const set = new Set(pool);
+  if (!set.size) return;
+  if (ask && !confirm(`${set.size}개 시간표를 삭제할까요? (현재 시간표는 유지됩니다)`)) return;
+  _removeSheets(set);
 }
 function renameSheet(i) {
-  const name = (prompt("시간표 이름:", sheets[i].name) || "").trim();
+  const id = meta.ids[i];
+  const name = (prompt("시간표 이름:", meta.names[id]) || "").trim();
   if (!name) return;
-  sheets[i].name = name; saveTT(); renderSheets();
+  meta.names[id] = name; _saveMeta(); renderSheets();
 }
+// rAF-coalesced: many mutations in one frame (e.g. a bulk addSheet loop) collapse
+// into ONE rebuild instead of O(n²) rebuilds.
+let _sheetsRaf = 0;
 function renderSheets() {
+  if (_sheetsRaf) return;
+  _sheetsRaf = requestAnimationFrame(() => { _sheetsRaf = 0; renderSheetsNow(); });
+}
+function _buildTab(id, i) {               // one tab node (metadata-only)
+  const tab = el("div", {
+    className: "tt-sheet" + (i === meta.active ? " active" : ""),
+    title: i === meta.active ? "클릭하여 이름 변경" : "클릭하여 전환",
+    onclick: () => (i === meta.active ? renameSheet(i) : switchSheet(i)),
+  },
+    el("span", {}, meta.names[id] || "시간표"),
+    el("span", { className: "sheet-count" }, String(meta.counts[id] ?? 0)));
+  if (i === meta.active) tab.append(el("span", { className: "sheet-pen", title: "이름 변경" }, "✎"));
+  if (meta.ids.length > 1) tab.append(el("span", {
+    className: "sheet-x", title: "삭제",
+    onclick: (e) => { e.stopPropagation(); deleteSheet(i); },
+  }, "×"));
+  return tab;
+}
+// past SHEET_TAB_LIMIT a tab strip is unusable + huge — switch to a compact picker
+function _buildSheetPicker() {
+  const sel = el("select", { className: "sheet-select",
+    onchange: (e) => switchSheet(Number(e.target.value)) });
+  meta.ids.forEach((id, i) => {
+    const o = el("option", { value: String(i) },
+      `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})`);
+    if (i === meta.active) o.selected = true;
+    sel.append(o);
+  });
+  return el("div", { className: "sheet-picker" },
+    sel,
+    el("button", { type: "button", className: "sheet-mini", title: "이름 변경",
+      onclick: () => renameSheet(meta.active) }, "✎"),
+    el("button", { type: "button", className: "sheet-mini", title: "삭제",
+      onclick: () => deleteSheet(meta.active) }, "×"),
+    el("span", { className: "sheet-total" }, `${meta.ids.length}개`));
+}
+function renderSheetsNow() {
   const box = $("#ttSheets"); if (!box) return;
   box.replaceChildren();
-  sheets.forEach((s, i) => {
-    // click the active tab to rename it; click another to switch
-    const tab = el("div", {
-      className: "tt-sheet" + (i === active ? " active" : ""),
-      title: i === active ? "클릭하여 이름 변경" : "클릭하여 전환",
-      onclick: () => (i === active ? renameSheet(i) : switchSheet(i)),
-    },
-      el("span", {}, s.name),
-      el("span", { className: "sheet-count" }, String(s.classes.length)));
-    if (i === active) tab.append(el("span", { className: "sheet-pen", title: "이름 변경" }, "✎"));
-    if (sheets.length > 1) tab.append(el("span", {
-      className: "sheet-x", title: "삭제",
-      onclick: (e) => { e.stopPropagation(); deleteSheet(i); },
-    }, "×"));
-    box.append(tab);
-  });
+  if (meta.ids.length > SHEET_TAB_LIMIT) box.append(_buildSheetPicker());
+  else meta.ids.forEach((id, i) => box.append(_buildTab(id, i)));
   box.append(el("div", { className: "tt-sheet add", title: "시간표 추가", onclick: addSheet }, "＋ 시간표 추가"));
   updateHero();
 }
 
 // hero header: active sheet name + class count (credit total is set in renderTT)
 function updateHero() {
-  const a = sheets[active] || { name: "시간표", classes: [] };
-  const n = a.classes.length;
-  if ($("#activeName")) $("#activeName").textContent = a.name;
+  const id = activeId();
+  const n = meta.counts[id] ?? (timetable ? timetable.length : 0);
+  if ($("#activeName")) $("#activeName").textContent = (meta.names[id] || "시간표");
   if ($("#activeSub")) $("#activeSub").textContent = n ? `${n}개 강좌` : "비어 있음";
 }
 
@@ -712,7 +845,12 @@ function clearTT() {
   timetable = []; saveTT(); renderSheets(); renderTT(); refreshCardStates();
   if (detailClass) renderDetail();
 }
-function refreshCardStates() {
+let _cardsRaf = 0;
+function refreshCardStates() {               // rAF-coalesced (mirror renderSheets)
+  if (_cardsRaf) return;
+  _cardsRaf = requestAnimationFrame(() => { _cardsRaf = 0; refreshCardStatesNow(); });
+}
+function refreshCardStatesNow() {
   if (lastResults.length) renderResults(lastResults);
 }
 
@@ -847,7 +985,12 @@ function renderDetail() {
   drawer.append(head, body, foot);
 }
 
-function renderTT() {
+let _ttRaf = 0;
+function renderTT() {                         // rAF-coalesced (mirror renderSheets): bulk
+  if (_ttRaf) return;                         // sheet ops rebuild the grid ONCE per frame
+  _ttRaf = requestAnimationFrame(() => { _ttRaf = 0; renderTTNow(); });
+}
+function renderTTNow() {
   const grid = $("#ttGrid"); grid.replaceChildren();
   // credits are stored as plain numbers, so the total is a direct sum (null = 0)
   const creditSum = timetable.reduce((s, c) => s + (Number(c.credits) || 0), 0);
@@ -1189,6 +1332,7 @@ function roundRect(ctx, x, y, w, h, r) {
 // render the on-screen grid to PNG, reading live DOM geometry so it mirrors what's
 // shown (positions, colors, conflict outlines).
 function exportTTPng() {
+  flushUI();                                  // grid may have a pending coalesced render
   const root = $("#ttGrid");
   const ttx = root && root.querySelector(".ttx");
   if (!ttx) { alert("시간표가 비어 있습니다."); return; }
@@ -1707,8 +1851,8 @@ function init() {
       pollTimer = setInterval(pollRefresh, 1500);
     }
   });
-  renderSheets();
-  renderTT();
+  renderSheetsNow();                          // first paint synchronous (rAF may be parked if loaded hidden)
+  renderTTNow();
   reconcileTT();
   $("#searchForm").addEventListener("submit", doSearch);
   $("#filterToggle").addEventListener("click", () =>
@@ -1750,6 +1894,17 @@ function init() {
   setDate($("#icsStart"), window.ICS_DEFAULT_START, iso(today));
   setDate($("#icsEnd"), window.ICS_DEFAULT_END, iso(semEnd));
 }
+// force all coalesced renders + the deferred meta write to run NOW. Used by PNG export
+// (reads live DOM geometry) and on page hide (so a pending meta write isn't lost).
+function flushUI() {
+  if (_sheetsRaf) { cancelAnimationFrame(_sheetsRaf); _sheetsRaf = 0; renderSheetsNow(); }
+  if (_ttRaf) { cancelAnimationFrame(_ttRaf); _ttRaf = 0; renderTTNow(); }
+  if (_cardsRaf) { cancelAnimationFrame(_cardsRaf); _cardsRaf = 0; refreshCardStatesNow(); }
+  flushMeta();
+}
+addEventListener("pagehide", flushMeta);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushMeta(); });
+
 // loader.js injects the partials and then appends this script, so the DOM is
 // already parsed by now — run init immediately (don't wait for DOMContentLoaded).
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

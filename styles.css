@@ -92,6 +92,16 @@ h2 { font-size: 14px; margin: 0; font-weight: 700; }
 .tt-sheet .sheet-x:hover { opacity: 1; }
 .tt-sheet.add { color: var(--cp-muted); }
 
+/* picker mode (many sheets): a compact select replaces the tab strip */
+.sheet-picker { display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+.sheet-select { font-size: 12.5px; padding: 7px 9px; max-width: 320px;
+  border: 1px solid var(--cp-line); border-radius: 6px; background: var(--cp-paper);
+  color: var(--cp-ink); font-family: inherit; }
+.sheet-mini { background: transparent; border: 1px solid var(--cp-line); color: var(--cp-muted);
+  border-radius: 6px; padding: 5px 9px; font-size: 13px; line-height: 1; }
+.sheet-mini:hover { background: var(--cp-soft); filter: none; }
+.sheet-total { font-size: 11.5px; color: var(--cp-faint); font-variant-numeric: tabular-nums; }
+
 /* two-column layout */
 .tt-cols { display: flex; gap: 24px; align-items: flex-start; }
 
