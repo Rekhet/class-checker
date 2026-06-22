@@ -459,3 +459,85 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   .site-footer { padding: 16px; }
   .legal-page { padding: 24px 16px 48px; }
 }
+
+/* ---------- 졸업요건 (graduation audit) ---------- */
+.grad-wrap { max-width: 920px; margin: 0 auto; padding: 18px; }
+.grad-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.grad-head { flex-wrap: wrap; }
+.grad-head h2 { margin: 0; }
+.grad-major { font-size: 13px; color: var(--cp-muted); font-weight: 600; }
+.grad-batch { margin-left: auto; border: 1px solid var(--cp-line); border-radius: 8px; padding: 6px 10px;
+  font-size: 12.5px; color: var(--cp-ink); background: var(--cp-bg, #fff); cursor: pointer; }
+.gsheet { display: inline-flex; align-items: center; overflow: hidden; padding: 0; }
+.gsheet .gs-name { background: none; border: none; color: inherit; cursor: pointer; font: inherit;
+  padding: 6px 11px; font-variant-numeric: tabular-nums; }
+.gsheet .gs-del { background: none; border: none; color: inherit; cursor: pointer; font-size: 14px;
+  line-height: 1; padding: 6px 8px 6px 0; opacity: .55; }
+.gsheet .gs-del:hover { opacity: 1; }
+.gsheet.add { padding: 6px 11px; color: var(--cp-accent); font-weight: 600; }
+.gsheet-add { border: 1px dashed var(--cp-line); border-radius: 8px; padding: 6px 10px; font-size: 12px;
+  color: var(--cp-accent); background: none; cursor: pointer; }
+.grad-pick { margin-bottom: 16px; }
+.gp-label { font-size: 12px; font-weight: 600; color: var(--cp-ink); margin-bottom: 7px; }
+.gp-hint { font-weight: 400; color: var(--cp-faint); }
+.grad-sheets { display: flex; flex-wrap: wrap; gap: 7px; }
+.gsheet { background: none; border: 1px solid var(--cp-line); border-radius: 8px; padding: 6px 11px;
+  font-size: 12px; color: var(--cp-muted); cursor: pointer; font-variant-numeric: tabular-nums; }
+.gsheet.on { color: var(--cp-accentInk); background: var(--cp-accent); border-color: var(--cp-accent); }
+.grad-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.grad-card { border: 1px solid var(--cp-line); border-radius: 10px; padding: 12px 14px; }
+.grad-card.ok { border-color: var(--cp-accent); }
+.gc-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.gc-label { font-size: 12.5px; font-weight: 600; color: var(--cp-ink); }
+.gc-num { font-size: 12px; color: var(--cp-muted); font-variant-numeric: tabular-nums; }
+.gc-track { height: 7px; border-radius: 4px; background: var(--cp-soft); overflow: hidden; }
+.gc-fill { height: 100%; background: var(--cp-accent); border-radius: 4px; }
+.grad-card.ok .gc-fill { background: #3FA66A; }
+.grad-sec { margin-top: 22px; }
+.grad-sec h3 { font-size: 14px; margin: 0 0 10px; color: var(--cp-ink); }
+.grad-sec .grad-card { margin-bottom: 8px; }
+.grad-chklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 14px; margin: 8px 0 12px; }
+.chk { font-size: 12px; display: flex; align-items: baseline; gap: 6px; }
+.chk-i { font-weight: 700; }
+.chk.done .chk-i { color: #3FA66A; }
+.chk.miss { color: var(--cp-muted); }
+.chk.miss .chk-i { color: var(--cp-faint); }
+.chk-code { color: var(--cp-faint); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.grad-subh { font-size: 12px; font-weight: 600; color: var(--cp-ink); margin: 12px 0 6px; }
+.gy-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--cp-line); }
+.gy-name { flex: 1; min-width: 0; font-size: 12.5px; color: var(--cp-ink); }
+.gy-area { border: 1px solid var(--cp-line); border-radius: 6px; padding: 3px 6px; font-size: 11.5px; color: var(--cp-ink); }
+.gy-area.unset { border-color: var(--cp-warn); color: var(--cp-warn); }
+.grad-flag { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--cp-muted); padding: 4px 0; }
+.grad-flag.ok { color: var(--cp-ink); }
+.grad-flag.warn { color: var(--cp-conflict); font-weight: 600; }
+.grad-batch + .grad-batch { margin-left: 8px; }
+
+/* 전공 구성 (major list) */
+.grad-majorlist { display: flex; flex-direction: column; gap: 7px; }
+.gm-row { display: flex; align-items: center; gap: 7px; }
+.gm-mark { font-weight: 800; font-size: 13px; width: 14px; text-align: center; }
+.gm-mark.ok { color: #3FA66A; }
+.gm-mark.no { color: var(--cp-conflict); }
+.gm-mark:not(.ok):not(.no) { color: var(--cp-faint); }
+.gbh-mark { font-weight: 800; }
+.gbh-mark.ok { color: #3FA66A; }
+.gbh-mark.no { color: var(--cp-conflict); }
+.gm-type { font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+.gm-type.gm-main { background: var(--cp-accent); color: var(--cp-accentInk); }
+.gm-type.gm-double { background: #3FA66A; color: #fff; }
+.gm-type.gm-minor { background: var(--cp-soft); color: var(--cp-ink); }
+.gm-major, .gm-year { border: 1px solid var(--cp-line); border-radius: 7px; padding: 5px 9px; font-size: 12.5px; color: var(--cp-ink); }
+.gm-del { background: none; border: none; color: var(--cp-faint); cursor: pointer; font-size: 15px; line-height: 1; padding: 2px 6px; }
+.gm-del:hover { color: var(--cp-conflict); }
+.gm-adds { display: flex; gap: 7px; margin-top: 2px; }
+.gm-add { background: none; border: 1px dashed var(--cp-line); border-radius: 7px; padding: 5px 11px;
+  font-size: 12px; color: var(--cp-accent); font-weight: 600; cursor: pointer; }
+.gm-add:hover { border-color: var(--cp-accent); }
+
+/* per-major audit block */
+.grad-block { margin-top: 22px; padding-top: 14px; border-top: 2px solid var(--cp-line); }
+.grad-block:first-child { border-top: none; margin-top: 4px; }
+.grad-block-h { font-size: 15px; margin: 0 0 12px; color: var(--cp-ink); }
+.grad-flag.eng { cursor: pointer; }
+.grad-note { font-size: 11.5px; color: var(--cp-muted); line-height: 1.5; margin-top: 4px; }
