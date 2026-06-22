@@ -1,0 +1,24 @@
+<!-- 졸업요건 (graduation audit) page. Spec from data/grad_req/*.json; "taken" courses
+     come from user-selected timetable sheets, enriched against the catalog. Body built
+     in JS (renderGrad). data-page/data-title wire it into the top nav (setupNav). -->
+<div class="page" data-page="grad" data-title="졸업요건 (demo)">
+  <div class="grad-wrap">
+    <div class="grad-head">
+      <div class="grad-title">
+        <h2>졸업요건 <span class="sub">Graduation</span></h2>
+      </div>
+    </div>
+
+    <div class="grad-pick">
+      <div class="gp-label">전공 구성 <span class="gp-hint">(주전공 + 복수전공·부전공 추가)</span></div>
+      <div id="gradMajorList" class="grad-majorlist"></div>
+    </div>
+
+    <div class="grad-pick">
+      <div class="gp-label">대상 시간표 목록</div>
+      <div id="gradSheetPick" class="grad-sheets"></div>
+    </div>
+
+    <div id="gradBody" class="grad-body"></div>
+  </div>
+</div>
