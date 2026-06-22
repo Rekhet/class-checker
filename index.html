@@ -8,7 +8,17 @@
 </head>
 <body>
   <div id="app" data-partials="partials/main.html,partials/trend.html,partials/grad.html,partials/legal.html"></div>
-  <script src="config.js"></script>
-  <script src="loader.js"></script>
+  <script>
+    // Cache-bust JS so redeploys take effect immediately (GitHub Pages caches these otherwise).
+    (function () {
+      var v = Date.now();
+      ["config.js", "loader.js"].forEach(function (src) {
+        var s = document.createElement("script");
+        s.src = src + "?v=" + v;
+        s.async = false;   // preserve execution order: config.js before loader.js
+        document.head.appendChild(s);
+      });
+    })();
+  </script>
 </body>
 </html>

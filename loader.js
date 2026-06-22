@@ -13,6 +13,6 @@
     } catch { /* optional partial unavailable (e.g. dev.html on a static host) — skip */ }
   }
   const s = document.createElement("script");
-  s.src = "app.js";
+  s.src = "app.js?v=" + Date.now();   // cache-bust so redeploys load fresh app.js (no stale pre-refactor build)
   document.body.appendChild(s);
 })();
