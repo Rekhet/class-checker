@@ -1,0 +1,75 @@
+{
+  "id": "cbe_2026",
+  "major": "화학생물공학부",
+  "college": "공과대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "cbe.snu.ac.kr 교육과정자료실 menuNo=300040 view.do?boardId=25319 (2026학번, inline table). 상세: _scrape/eng_browser.md",
+  "total_credits": 130,
+  "general": "eng_cbe_2025",
+  "major_min_credits": 62,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "화학생물공학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "화학생물공학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 62,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양(공통교육과정) 53학점, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공 62학점. 병행/복수/부전공은 공대 baseline(병행45·복수39·부전공21) 적용 — 학부 페이지에 단일 62만 명시.",
+    "전공선택: 전선 16학점 중 학부 전선 4과목 필수(select_min 16에 반영; 4과목 필수 풀은 카탈로그 참조).",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "전공필수: 학부 게시 표가 전필 학점/코드를 분리 명시하지 않음(전공 62·전선 4과목 필수만) → required.all 생략, required_credits 미설정."
+  ]
+}

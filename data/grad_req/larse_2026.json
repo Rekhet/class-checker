@@ -1,0 +1,52 @@
+{
+  "id": "larse_2026",
+  "major": "조경·지역시스템공학부",
+  "college": "농업생명과학대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://larse.snu.ac.kr/교과과정/ (학부 공통 통합 교과과정, 조경+지역시스템 * 전필; 「*」=전공필수 명시). 전공 서브도메인(snula·ageng)은 dead/스텁 → 실 교과과정은 larse 통합 페이지. 농생대 공통 130/36/48. 상세: _scrape/agri.md",
+  "total_credits": 130,
+  "general": "agri_sci_2025",
+  "major_min_credits": 48,
+  "major_double_credits": 48,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["조경·지역시스템공학부"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["조경·지역시스템공학부"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "조경식물재료학", "code": "5271.212A" },
+    { "name": "조경컴퓨터그래픽", "code": "5271.213" },
+    { "name": "공간디자인", "code": "5271.214A" },
+    { "name": "GIS와계량분석실습", "code": "5271.221B" },
+    { "name": "경관생태학", "code": "5271.225" },
+    { "name": "서양조경의역사와이론", "code": "5271.226" },
+    { "name": "조경생태분석", "code": "5271.227" },
+    { "name": "조경공학", "code": "5271.224A" },
+    { "name": "조경계획", "code": "5271.311" },
+    { "name": "공원녹지계획", "code": "5271.321" },
+    { "name": "동양조경의역사와이론", "code": "5271.323A" },
+    { "name": "조경설계1", "code": "5271.324" },
+    { "name": "조경설계2", "code": "5271.412" },
+    { "name": "조경미학", "code": "5271.422" },
+    { "name": "측량학및실습", "code": "457.002" },
+    { "name": "응용공학수학1", "code": "5272.201" },
+    { "name": "정역학", "code": "5272.211" },
+    { "name": "지역컴퓨터설계", "code": "5272.212" },
+    { "name": "지역시스템공학", "code": "5272.416" },
+    { "name": "지역시스템공학전공 학사논문연구", "code": "M1708.000200" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 48, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 48, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 48, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 24, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 36학점(agri_sci_2025), 주전공 48학점. 전체·주전공·복수·부전공 각 평점 2.0 이상.",
+    "학부-level 스펙. 조경·지역시스템공학부 = 2개 전공(조경학전공·지역시스템공학전공) 공유 — 전공 구분은 스키마보다 세분. major_required_known = 두 전공 * 전필 합집합. 학부명 중간점(·) 주의.",
+    "조경학 전필(*): 조경식물재료학·조경컴퓨터그래픽·공간디자인·GIS와계량분석실습·경관생태학·서양조경의역사와이론·조경생태분석·조경공학·조경계획·공원녹지계획·동양조경의역사와이론·조경설계1·2·조경미학(졸업작품스튜디오1·2 M1707.000300/000400 = 졸업필수). 지역시스템공학 전필(*): 측량학및실습·응용공학수학1·정역학·지역컴퓨터설계·지역시스템공학·지역시스템공학전공 학사논문연구(지역시스템설계및실습 5272.417 = 전선).",
+    "지역시스템공학 = 공학 성격(공학수학·정역학). 교양은 농생대 자연계 agri_sci_2025(36) 적용.",
+    "전필 총학점·전선 min 명시 수치 페이지 미기재(larse 요약표 미노출) → 전선 min = 48−전필(전공별). 과목당 학점 페이지 미표기 → required.all/required_credits 생략.",
+    "외국어진행강좌: 농생대 자연계 baseline 3과목(전공 1과목 포함). 페이지 명시 없어 baseline-assumed."
+  ]
+}

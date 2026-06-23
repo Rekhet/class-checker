@@ -1,0 +1,29 @@
+{
+  "id": "compose_2026",
+  "major": "작곡과",
+  "college": "음악대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/5 → 「작곡과내규250903」(2025.09.03 개정). 상세: _scrape/music_browser.md",
+  "total_credits": 130,
+  "general": "music_2025",
+  "major_min_credits": 65,
+  "major_double_credits": 65,
+  "minor_credits": 65,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["작곡과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["작곡과"], "classifications": ["전필"] },
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 65, "general": true, "select_min": 0, "required_credits": 65 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 65, "general": true, "select_min": 0, "required_credits": 65 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 65, "general": false, "select_min": 0, "required_credits": 65 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 65, "general": false, "select_min": 0, "required_credits": 65 }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",
+    "세부전공: 작곡 / 이론 / 지휘(전자음악 포함). 전공필수 학점 학번·세부전공별 상이: 2023학번 이후 작곡·이론·전자음악 = 총 65학점 / ⚠ 지휘전공 = 74학점. major_min_credits = 65(작곡/이론/전자, 2023~); 지휘전공은 74 적용 필요.",
+    "전필 구성: 음악분석 3·4(2018~ 지휘 제외), 작곡실기/지휘실기 등 세부전공 실기 + 기초공통. 현대음악사 1·2 = 2023학번부터 내규상 전필 해제. 코드 미확보 → required.all 미생성.",
+    "복수전공·부전공: 작곡/전자음악/지휘 대상, 학점 = 전공필수 교과목 전체 이수. 자격 = 3정규학기+36학점. 작곡과 내 세부전공 상호간 복수(부)전공 불허. → double/minor major_min = 전필 65(근사).",
+    "외국어: 내규에 전용 영어강의 의무 조항 없음 → 교양 외국어 + 대학 공통규정. 전공 영어강의 baseline 1과목(보수적)."
+  ]
+}

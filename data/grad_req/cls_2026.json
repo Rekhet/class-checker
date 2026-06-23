@@ -1,0 +1,37 @@
+{
+  "id": "cls_2026",
+  "major": "자유전공학부",
+  "college": "학부대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "자유전공학부-졸업-규정25학번.pdf (2025학번~, cls.snu.ac.kr/졸업규정/). 상세: _scrape/soc.md",
+  "total_credits": 130,
+  "general": "ub_free_2025",
+  "major_min_credits": 15,
+  "major_double_credits": 15,
+  "minor_credits": 15,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["자유전공학부"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["자유전공학부"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "주제탐구세미나1" },
+    { "name": "전공설계1" },
+    { "name": "주제탐구세미나2" },
+    { "name": "종합설계(학생설계전공)" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "자유전공(자체전공) 단일", "major_min_credits": 15, "general": true, "select_min": 0, "required_credits": 8 },
+    { "key": "multi", "name": "자유전공(자체전공) 주전공", "major_min_credits": 15, "general": true, "select_min": 0, "required_credits": 8 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 15, "general": false, "select_min": 0, "required_credits": 8 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 15, "general": false, "select_min": 0, "required_credits": 8 }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 ub_free_2025(수과컴 6: 수학3+과학·컴퓨팅3, 전체교양 8 중 사회봉사1 필수, 지성열쇠9, 베리타스3, 외국어6).",
+    "2-tier 구조: 자유전공학부 자체전공(자유전공) 15학점 + 전공선택(기존전공/주전공: 타 학과·연합·학생설계전공) 별도 이수. major_min_credits=15는 자체전공만.",
+    "자유전공학부 전공 이수(15학점) = 전공필수 5(8) [주제탐구세미나1 + 전공설계1 (+종합설계 *학생설계전공만)] + 필수전선 3 [주제탐구세미나2] + 전공선택 4(7) [자율연구1·2, 현장학습1·2, 고전탐구세미나1·2, 창의융합세미나·프로젝트, 전공설계2, 주제심화세미나·프로젝트, 인문예술/사회과학/자연과학/글로벌 융합세미나, 사회공헌프로젝트]. required_credits=8은 주제탐구세미나1·2 + 전공설계1 기준(종합설계 포함 시 학생설계전공). 전필 코드 미게시 — 카탈로그(자유전공학부) 파생 필요.",
+    "전공선택(기존전공) 이수: 해당 전공(학과) 홈페이지 기준 — 전공이수학점·전필·영어강의·졸업논문은 그 학과 규정 따름. 이전 이수 전공교과목은 21학점까지만 전공학점 인정(학생설계 제외). 2개 이상 기존전공 중복 ≤9학점.",
+    "제2전공(부전공/연계/학생설계부전공): 해당 학과 기준.",
+    "영어강의: 자체엔 없음; TEPS 900↓ 영어 1과목 이수. (선택 전공이 인문대면 외국어진행 3과목 등 — 그 학과 규정.)",
+    "졸업논문 제출. 첫 전공선택 후 4학기 경과. 8학기 이상 등록."
+  ]
+}

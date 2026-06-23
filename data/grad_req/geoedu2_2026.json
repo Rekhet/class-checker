@@ -1,0 +1,41 @@
+{
+  "id": "geoedu2_2026",
+  "major": "지리교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://geoedu.snu.ac.kr/학부-졸업-기준/ (교양·교직·전공·기타 세부 이수규준 인라인) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_hum_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["지리교육과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "지리교육론" },
+    { "name": "지형학원론" },
+    { "name": "도시지리학" },
+    { "name": "경제지리교육론" },
+    { "name": "통합사회교육론" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "단일전공 60 (지리교육과 외 전공 이수 다전공생 52). 부전공 학점은 페이지 미명시 → 사범대 baseline 21 적용.",
+    "전공필수 4과목 12학점(2025학번부터 5과목 15학점, required_credits=15): 지리교육론·지형학원론·도시지리학·경제지리교육론·통합사회교육론(2025~). 코드 미수록 → required.all 비움. 교과교육영역 4과목 12학점(지리교육론·지리교재연구 및 지도법·지리 논리 및 논술·지리 평가방법론). 기본이수 7개 분야 21학점.",
+    "외국어진행강좌: 9학점 이상(전공 3학점 포함; 개설 경제지리교육론·아메리카지역연구·아시아지역연구) → english_min_courses=3.",
+    "전선인정: 타학과 전공 교과목 최대 9학점까지 주전공 전공선택 인정.",
+    "교직과정 22→23학점(2024학번 디지털 교육 T2184.002400 1학점 신설; 교직이론 12↑/6과목[교육학개론 필수] + 교직소양 + 교육실습 4)은 전공과 별개. 학교현장실습 선이수 = 7학기↑ 등록 + 98학점↑. 교원자격 표시과목 = 지리. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직인적성 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회 · 정기학술답사 5회(복수 4·부전공 3)."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "note": "Universal 교양 bucket library. Rulesets reference these by key with a per-college min. name/areas/pick_min_areas are SNU-wide; only the credit minimum + bucket selection vary per college. fine-area keys come from area_codes.json.",
+  "defs": {
+    "writing":   { "name": "글쓰기와 말하기", "areas": ["writing"] },
+    "writingB":  { "name": "사고와 표현", "areas": ["writing"] },
+    "foreign":   { "name": "외국어", "areas": ["foreign"] },
+    "math":      { "name": "수학", "areas": ["math", "stat"] },
+    "science":   { "name": "과학", "areas": ["physics", "chem", "bio", "earth", "science"] },
+    "computing": { "name": "컴퓨팅", "areas": ["computing"] },
+    "msc":       { "name": "수학·과학·컴퓨팅", "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    "claves":    { "name": "지성의 열쇠", "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    "veritas":   { "name": "베리타스", "areas": ["veritas"] },
+    "world":     { "name": "학문의 세계", "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "id": "eng_energy_2025",
+  "college": "공과대학 에너지자원공학과",
+  "applies": "2025·2026",
+  "total_min": 49,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "math", "name": "수학", "min": 12, "areas": ["math", "stat"] },
+    { "key": "science", "name": "과학", "min": 12, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "physics_2026",
+  "major": "물리천문학부 물리학전공",
+  "college": "자연과학대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://physics.snu.ac.kr/academics/undergraduate/curriculum (2026학번 이수규정) + 자연과학대학 공통교육과정 2026. 상세: _scrape/natsci.md",
+  "total_credits": 130,
+  "general": "natsci_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 5,
+  "major_select_match": { "departments": ["물리·천문학부"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "역학", "code": "M2173.004300" },
+    { "name": "전기와 자기", "code": "300.214" },
+    { "name": "양자물리", "code": "M1419.001300" },
+    { "name": "열과 통계물리", "code": "884.302" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "단일전공", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [
+        { "name": "역학", "code": "M2173.004300", "credits": 3 },
+        { "name": "전기와 자기", "code": "300.214", "credits": 3 },
+        { "name": "양자물리", "code": "M1419.001300", "credits": 3 },
+        { "name": "열과 통계물리", "code": "884.302", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [
+        { "name": "역학", "code": "M2173.004300", "credits": 3 },
+        { "name": "전기와 자기", "code": "300.214", "credits": 3 },
+        { "name": "양자물리", "code": "M1419.001300", "credits": 3 },
+        { "name": "열과 통계물리", "code": "884.302", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 15,
+      "required": { "all": [
+        { "name": "역학", "code": "M2173.004300", "credits": 3 },
+        { "name": "전기와 자기", "code": "300.214", "credits": 3 },
+        { "name": "양자물리", "code": "M1419.001300", "credits": 3 },
+        { "name": "열과 통계물리", "code": "884.302", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 12,
+      "required": { "all": [
+        { "name": "역학", "code": "M2173.004300", "credits": 3 },
+        { "name": "전기와 자기", "code": "300.214", "credits": 3 },
+        { "name": "양자물리", "code": "M1419.001300", "credits": 3 },
+        { "name": "열과 통계물리", "code": "884.302", "credits": 3 }
+      ] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0, 등록 6회 이상.",
+    "전공필수 15학점 = 역학·전기와자기·양자물리·열과통계물리 + 중급물리실험1/2 중 택1(3학점). 부전공 전필 12학점(실험 제외).",
+    "전공선택 인정: 자연대·공대 타학과 개설과목 최대 15학점.",
+    "외국어진행강좌: 전공 3과목 포함 5과목 이상 권장(2008학번~).",
+    "졸업논문 필수."
+  ]
+}

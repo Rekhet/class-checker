@@ -1,0 +1,43 @@
+{
+  "id": "plantsci_2026",
+  "major": "식물생산과학부",
+  "college": "농업생명과학대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://plantsci.snu.ac.kr/ (학부 포털) + 원예생명공학 https://hort.snu.ac.kr/학사졸업/·/학부교과과정/ + 산업인력개발학 https://aged.snu.ac.kr/course/undergraduate/{graduation-requirements,curriculum} + 작물생명과학 calslab.snu.ac.kr/agronomy(편람 위임). 농생대 공통 130/36/48. 상세: _scrape/agri.md + _scrape/partial_browser.md",
+  "total_credits": 130,
+  "general": "agri_sci_2025",
+  "major_min_credits": 48,
+  "major_double_credits": 48,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["식물생산과학부"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["식물생산과학부"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "화훼학및실험", "code": "5172.201" },
+    { "name": "원예작물생리학", "code": "5172.202" },
+    { "name": "과수학및실험", "code": "5172.203" },
+    { "name": "식물생장발달학", "code": "5172.204" },
+    { "name": "생화학", "code": "519.003" },
+    { "name": "채소학및실험", "code": "5172.301" },
+    { "name": "원예작물육종학", "code": "5172.302A" },
+    { "name": "시설원예학및실험", "code": "5172.305" },
+    { "name": "수확물생리학및실험", "code": "5172.306A" },
+    { "name": "식물세포생물학", "code": "M2744.000300" },
+    { "name": "원예생명공학연습", "code": "5172.401A" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 48, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 48, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 48, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 24, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 36학점(agri_sci_2025), 주전공 48학점. 전체·주전공·복수·부전공 각 평점 2.0 이상.",
+    "학부-level 스펙. 식물생산과학부 = 3개 전공(작물생명과학·원예생명공학·산업인력개발학) 공유 — 전공 구분은 스키마보다 세분(전공별 전필 set 상이).",
+    "전필 코드 = 원예생명공학전공 표준이수형태(* 마커, 2017학년도 이후): 화훼학및실험·원예작물생리학·과수학및실험·식물생장발달학·생화학·채소학및실험·원예작물육종학·시설원예학및실험·수확물생리학및실험·식물세포생물학·원예생명공학연습 ≈ 31학점. 산업인력개발학 전필(별도, ≈17학점): 디지털 전환 시대의 삶·진로·직업 M1671.001500·산업인력개발교수학습방법론 5173.302A·산업인력조직개발론 M1671.001000·산업인력양성프로그램개발 5173.304·산업인력개발 통계분석 및 실습 M1671.000800·산업인력개발학 학사논문연구 M1671.001300. 작물생명과학 전필 코드 = 미상(SNU 교과과정편람 위임).",
+    "전필 총학점·전선 min 명시 수치 페이지 미기재 → 전선 min = 48−전필(전공별). required_credits 생략(전공 간 상이).",
+    "외국어진행강좌: 농생대 자연계 baseline 3과목(전공 1과목 포함, 대학영어 포함). 페이지 명시 없어 baseline-assumed.",
+    "졸업논문 제출 필수(원예 = 졸업 직전 학기). 제2전공 신청 = 3정규학기·36학점 이후."
+  ]
+}

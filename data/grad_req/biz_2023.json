@@ -1,0 +1,466 @@
+{
+  "id": "biz_2023",
+  "major": "경영학과",
+  "college": "경영대학",
+  "batch": [
+    "2023"
+  ],
+  "track": "단일전공",
+  "source": "졸업기준(2023학번) PDF + 졸업요건(복수전공.부전공)_추가수정_20240205.pdf (cba.snu.ac.kr/academics/undergraduate/graduation/requirements). 상세: _scrape/soc.md, _scrape/peryear_soc.md | 2023 batch: OLD 공통교육과정(학문의 기초/세계), 전필 = 경영철학과 윤리 포함 30학점 set. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "biz_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 5,
+  "major_select_match": {
+    "departments": [
+      "경영학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "경영학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "경영학과 나의 미래",
+      "code": "M2171.002000"
+    },
+    {
+      "name": "경영을 위한 경제학",
+      "code": "M2171.001900"
+    },
+    {
+      "name": "경영철학과 윤리",
+      "code": "M2171.002100"
+    },
+    {
+      "name": "회계원리",
+      "code": "251.205"
+    },
+    {
+      "name": "관리회계",
+      "code": "251.306"
+    },
+    {
+      "name": "생산서비스운영",
+      "code": "M1338.003000"
+    },
+    {
+      "name": "경영과학",
+      "code": "251.207A"
+    },
+    {
+      "name": "조직행위론",
+      "code": "251.209"
+    },
+    {
+      "name": "인사관리",
+      "code": "251.303"
+    },
+    {
+      "name": "경영정보론",
+      "code": "251.326"
+    },
+    {
+      "name": "재무관리",
+      "code": "251.301"
+    },
+    {
+      "name": "마케팅관리",
+      "code": "251.321"
+    },
+    {
+      "name": "경영전략",
+      "code": "251.424"
+    },
+    {
+      "name": "졸업세미나",
+      "code": "M1338.002600"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "english_min_courses": 5,
+      "required_credits": 30,
+      "required": {
+        "all": [
+          {
+            "name": "경영학과 나의 미래",
+            "code": "M2171.002000",
+            "credits": 1
+          },
+          {
+            "name": "경영을 위한 경제학",
+            "code": "M2171.001900",
+            "credits": 3
+          },
+          {
+            "name": "경영철학과 윤리",
+            "credits": 3,
+            "code": "M2171.002100"
+          },
+          {
+            "name": "경영정보론",
+            "code": "251.326",
+            "credits": 3
+          },
+          {
+            "name": "재무관리",
+            "code": "251.301",
+            "credits": 3
+          },
+          {
+            "name": "마케팅관리",
+            "code": "251.321",
+            "credits": 3
+          },
+          {
+            "name": "경영전략",
+            "code": "251.424",
+            "credits": 3
+          },
+          {
+            "name": "졸업세미나",
+            "code": "M1338.002600",
+            "credits": 2
+          }
+        ],
+        "choose": [
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "회계원리",
+                "code": "251.205",
+                "credits": 3
+              },
+              {
+                "name": "관리회계",
+                "code": "251.306",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "생산서비스운영",
+                "code": "M1338.003000",
+                "credits": 3
+              },
+              {
+                "name": "경영과학",
+                "code": "251.207A",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "조직행위론",
+                "code": "251.209",
+                "credits": 3
+              },
+              {
+                "name": "인사관리",
+                "code": "251.303",
+                "credits": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "english_min_courses": 3,
+      "required_credits": 30,
+      "required": {
+        "all": [
+          {
+            "name": "경영학과 나의 미래",
+            "code": "M2171.002000",
+            "credits": 1
+          },
+          {
+            "name": "경영을 위한 경제학",
+            "code": "M2171.001900",
+            "credits": 3
+          },
+          {
+            "name": "경영철학과 윤리",
+            "credits": 3,
+            "code": "M2171.002100"
+          },
+          {
+            "name": "경영정보론",
+            "code": "251.326",
+            "credits": 3
+          },
+          {
+            "name": "재무관리",
+            "code": "251.301",
+            "credits": 3
+          },
+          {
+            "name": "마케팅관리",
+            "code": "251.321",
+            "credits": 3
+          },
+          {
+            "name": "경영전략",
+            "code": "251.424",
+            "credits": 3
+          },
+          {
+            "name": "졸업세미나",
+            "code": "M1338.002600",
+            "credits": 2
+          }
+        ],
+        "choose": [
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "회계원리",
+                "code": "251.205",
+                "credits": 3
+              },
+              {
+                "name": "관리회계",
+                "code": "251.306",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "생산서비스운영",
+                "code": "M1338.003000",
+                "credits": 3
+              },
+              {
+                "name": "경영과학",
+                "code": "251.207A",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "조직행위론",
+                "code": "251.209",
+                "credits": 3
+              },
+              {
+                "name": "인사관리",
+                "code": "251.303",
+                "credits": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "english_min_courses": 3,
+      "required_credits": 23,
+      "required": {
+        "all": [
+          {
+            "name": "경영정보론",
+            "code": "251.326",
+            "credits": 3
+          },
+          {
+            "name": "재무관리",
+            "code": "251.301",
+            "credits": 3
+          },
+          {
+            "name": "마케팅관리",
+            "code": "251.321",
+            "credits": 3
+          },
+          {
+            "name": "경영전략",
+            "code": "251.424",
+            "credits": 3
+          },
+          {
+            "name": "졸업세미나",
+            "code": "M1338.002600",
+            "credits": 2
+          }
+        ],
+        "choose": [
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "회계원리",
+                "code": "251.205",
+                "credits": 3
+              },
+              {
+                "name": "관리회계",
+                "code": "251.306",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "생산서비스운영",
+                "code": "M1338.003000",
+                "credits": 3
+              },
+              {
+                "name": "경영과학",
+                "code": "251.207A",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "조직행위론",
+                "code": "251.209",
+                "credits": 3
+              },
+              {
+                "name": "인사관리",
+                "code": "251.303",
+                "credits": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "english_min_courses": 3,
+      "required_credits": 21,
+      "required": {
+        "all": [
+          {
+            "name": "경영정보론",
+            "code": "251.326",
+            "credits": 3
+          },
+          {
+            "name": "재무관리",
+            "code": "251.301",
+            "credits": 3
+          },
+          {
+            "name": "마케팅관리",
+            "code": "251.321",
+            "credits": 3
+          },
+          {
+            "name": "경영전략",
+            "code": "251.424",
+            "credits": 3
+          }
+        ],
+        "choose": [
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "회계원리",
+                "code": "251.205",
+                "credits": 3
+              },
+              {
+                "name": "관리회계",
+                "code": "251.306",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "생산서비스운영",
+                "code": "M1338.003000",
+                "credits": 3
+              },
+              {
+                "name": "경영과학",
+                "code": "251.207A",
+                "credits": 3
+              }
+            ]
+          },
+          {
+            "min_courses": 1,
+            "pool": [
+              {
+                "name": "조직행위론",
+                "code": "251.209",
+                "credits": 3
+              },
+              {
+                "name": "인사관리",
+                "code": "251.303",
+                "credits": 3
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 biz_2022(OLD 공통교육과정: 학문의 기초/세계).",
+    "전공 학점 by track: 심화전공(단일) 60 = 전필 30 + 전선 30. 다전공 39 = 전필 30 + 전선 9. 복수전공 39(2018학번~) = 전필 23 + 전선 16. 부전공 21 = 전필 21.",
+    "전공필수(2023학번, 30학점) = 기초필수(경영학과 나의 미래 M2171.002000[1], 경영철학과 윤리[3], 경영을 위한 경제학 M2171.001900[3]) + 각론필수(영역당 ≥1과목 택1: [회계원리 251.205/관리회계 251.306], [생산서비스운영 M1338.003000/경영과학 251.207A], [조직행위론 251.209/인사관리 251.303]) + 경영정보론 251.326·재무관리 251.301·마케팅관리 251.321·경영전략 251.424 + 졸업세미나 M1338.002600[2]. (2024학번~ = 경영철학과 윤리 폐지 27학점.) 경영철학과 윤리 코드 미게시 — 카탈로그(경영학과·전필) 파생 필요. choose 그룹 = 영역 택1.",
+    "복수전공 전필(23) = 각론필수 7영역 + 졸업세미나 (기초필수 제외, 2018학번~ 불변). 부전공 전필(21) = 각론필수 집합 (졸업세미나 제외, 2018학번~ 불변).",
+    "조직행위론 251.209는 M1338.004000으로도 개설(코드 변형 가능). 초과 전필 → 전선 산입.",
+    "영어강의: 심화전공 전공 5과목 이상, 다전공/복수/부전공 전공 3과목 이상. 전공 영어강좌만 인정(교양·일선 불가). 트랙별 english_min_courses 필드 참조.",
+    "영어성적: 졸업신청학기 영어/말하기/쓰기 시험 모두 제출(NEW TEPS 374↑ 등)."
+  ]
+}

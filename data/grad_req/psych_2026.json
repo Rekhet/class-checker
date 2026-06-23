@@ -1,0 +1,51 @@
+{
+  "id": "psych_2026",
+  "major": "심리학과",
+  "college": "사회과학대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://psych.snu.ac.kr/sub04/sub02.php (이수규정 + 표준이수형태). 상세: _scrape/soc.md",
+  "total_credits": 130,
+  "general": "soc_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 39,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["심리학과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["심리학과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "심리통계학", "code": "207.202" },
+    { "name": "실험심리입문 및 실험", "code": "207.214" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 6,
+      "required": { "all": [
+        { "name": "심리통계학", "code": "207.202", "credits": 3 },
+        { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 6,
+      "required": { "all": [
+        { "name": "심리통계학", "code": "207.202", "credits": 3 },
+        { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6,
+      "required": { "all": [
+        { "name": "심리통계학", "code": "207.202", "credits": 3 },
+        { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6,
+      "required": { "all": [
+        { "name": "심리통계학", "code": "207.202", "credits": 3 },
+        { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
+      ] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공 학점: 심화전공(단일) 60 이상, 다전공(복수/부/연합/연계) 39 이상. 부전공도 다전공군으로 39 적용(사회대 표준 21과 다름 — 페이지 명시값).",
+    "전공필수: 심리통계학 207.202 + 실험심리입문 및 실험 207.214 반드시 포함(6학점).",
+    "전공선택 최소: 별도 카운트 규칙 없음(총학점 − 전필).",
+    "타과 전선 인정: 리스트 교과목 최대 9학점(심리학 주전공·복수전공만, 부전공 제외). S/U 성적 전선 인정 불가.",
+    "외국어진행강좌 최소 과목수 페이지 명시 없음 — baseline 1과목.",
+    "졸업논문(지도교수 승인) 제출."
+  ]
+}

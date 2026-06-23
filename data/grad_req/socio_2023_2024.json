@@ -1,0 +1,90 @@
+{
+  "id": "socio_2023_2024",
+  "major": "사회학과",
+  "college": "사회과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://sociology.snu.ac.kr/undergraduate/academic/ + /undergraduate/curriculum/ (25학번~ 학위취득요건). 상세: _scrape/soc.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "soc_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "사회학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "사회학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "사회조사방법"
+    },
+    {
+      "name": "사회학사"
+    },
+    {
+      "name": "사회연구를 위한 데이터과학"
+    },
+    {
+      "name": "현대사회학이론"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 12
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 12
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 12
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 6
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수(18~24학번, 4과목): 사회조사방법·사회학사·사회연구를 위한 데이터과학(구 사회통계)·현대사회학이론. (25학번~ = +사회학연구실습 5과목.) 전필 코드 본 페이지 미게시 — 카탈로그(사회학과·전필)에서 파생 필요. required_credits=12는 4과목×3 가정 baseline.",
+    "복수전공(18~24학번): 전필 4과목 + 전공선택 27학점(25학번~ = 전필 5 + 전선 24).",
+    "부전공: 전필 2과목 포함 21학점. required_credits=6은 전필 2과목 가정.",
+    "타과 전선 인정: 복수전공 과목연계 확인 시 9학점까지 중복인정.",
+    "외국어진행강좌: 전공 영어수업 졸업요건에서 제외(2021.2 졸업생부터 소급, 명시적 폐지). english_min_courses=1은 시스템 baseline(실질 요건 없음).",
+    "졸업논문 제출 필수."
+  ]
+}

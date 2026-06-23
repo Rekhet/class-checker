@@ -1,0 +1,12 @@
+{
+  "id": "agri_econ_2022",
+  "college": "농업생명과학대학 인문계 (농경제사회학부)",
+  "applies": "2021~2024",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  ],
+  "notes": ["학문의 세계 하위 <자연과 기술>/<생명과 환경> 영역 이수는 해당 영역 1과목(3학점) + 학문의 기초 <수량적 분석과 추론>/<과학적 사고와 실험>/<컴퓨터와 정보 활용> 1과목(3학점)으로 대체 가능.", "전체 교양 교과목 중 14학점 자유 선택."]
+}

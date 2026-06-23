@@ -1,0 +1,151 @@
+{
+  "id": "englit_2026",
+  "major": "영어영문학과",
+  "college": "인문대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "https://english.snu.ac.kr/undergraduate/english-major/ · …/english-second-major-and-minor/ (정적 HTML). 상세: _scrape/hum.md",
+  "total_credits": 130,
+  "general": "hum_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "영어영문학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "영어학입문",
+      "code": "100.109"
+    },
+    {
+      "name": "영문학입문",
+      "code": "M1236.000600"
+    },
+    {
+      "name": "미국문학개관",
+      "code": "M1236.000900"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "영어학입문",
+            "code": "100.109",
+            "credits": 3
+          },
+          {
+            "name": "영문학입문",
+            "code": "M1236.000600",
+            "credits": 3
+          },
+          {
+            "name": "미국문학개관",
+            "code": "M1236.000900",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "영어학입문",
+            "code": "100.109",
+            "credits": 3
+          },
+          {
+            "name": "영문학입문",
+            "code": "M1236.000600",
+            "credits": 3
+          },
+          {
+            "name": "미국문학개관",
+            "code": "M1236.000900",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "영어학입문",
+            "code": "100.109",
+            "credits": 3
+          },
+          {
+            "name": "영문학입문",
+            "code": "M1236.000600",
+            "credits": 3
+          },
+          {
+            "name": "미국문학개관",
+            "code": "M1236.000900",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "영어학입문",
+            "code": "100.109",
+            "credits": 3
+          },
+          {
+            "name": "영문학입문",
+            "code": "M1236.000600",
+            "credits": 3
+          },
+          {
+            "name": "미국문학개관",
+            "code": "M1236.000900",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
+    "전공필수 = 고정 과목 아닌 분포 요건: 문학개관 3과목(영국문학개관1·2·미국문학개관) 중 2과목 이상 + 어학 전공 1과목 이상 + 영어학입문. 코드 미표기라 required.all 미생성(분포 요건은 spec 자동검증 밖).",
+    "외국어진행강좌 ≥3과목(영문과 전공 1과목 이상 포함). 제2외국어 9학점은 교양(hum_2025) 측; 복수전공(타단대) 1과목 C-↑.",
+    "특이: TEPS-Writing 특별시험(71점 미만 시 대학영어2:글쓰기/고급영어:학술작문 B0↑). 졸업논문. 복수전공=주전공 요건 전부 충족."
+  ]
+}

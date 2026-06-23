@@ -1,0 +1,131 @@
+{
+  "id": "asia_2023_2024",
+  "major": "아시아언어문명학부",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://asia.snu.ac.kr/{서아시아,인도,동남아시아,일본}언어문명전공-교과목/ (교과목 정적 HTML; 총학점표는 학부규정 페이지 SPA-blocked → 인문대 standard 가정). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "아시아언어문명학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "아시아문명론입문",
+      "code": "1003.221"
+    },
+    {
+      "name": "아시아연구지도",
+      "code": "M2641.000300"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "아시아문명론입문",
+            "code": "1003.221",
+            "credits": 3
+          },
+          {
+            "name": "아시아연구지도",
+            "code": "M2641.000300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "아시아문명론입문",
+            "code": "1003.221",
+            "credits": 3
+          },
+          {
+            "name": "아시아연구지도",
+            "code": "M2641.000300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "아시아문명론입문",
+            "code": "1003.221",
+            "credits": 3
+          },
+          {
+            "name": "아시아연구지도",
+            "code": "M2641.000300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "아시아문명론입문",
+            "code": "1003.221",
+            "credits": 3
+          },
+          {
+            "name": "아시아연구지도",
+            "code": "M2641.000300",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
+    "학부 내 4개 전공(서아시아·인도·동남아시아·일본 언어문명) 통합 spec. 학부 전공필수(전 전공 공통) 2과목: 아시아문명론입문[1003.221]·아시아연구지도[M2641.000300] = 6학점(학점 3/3 가정, 근사).",
+    "⚠ 총학점·track 표는 학부규정 페이지 SPA-blocked → 인문대 standard(60/39/39/21) 가정. 전공별 공통교과목·전공탐색·인정과목(타과목 3과목 이내만 전공인정)은 전공별 상이 — 단일 spec으로 미반영.",
+    "외국어진행강좌 ≥3과목. 제2외국어 9학점은 교양(hum_2025) 측. 권장교양: 아랍어/산스크리트어/힌디어/말레이-인도네시아어/베트남어/고급일본어."
+  ]
+}

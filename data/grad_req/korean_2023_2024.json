@@ -1,0 +1,179 @@
+{
+  "id": "korean_2023_2024",
+  "major": "국어국문학과",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://korean.snu.ac.kr/졸업요건/ (WordPress 정적 HTML 표). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "국어국문학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "한국어연구입문",
+      "code": "100.100"
+    },
+    {
+      "name": "한국어의 역사",
+      "code": "101.301A"
+    },
+    {
+      "name": "한국고전문학사",
+      "code": "101.221"
+    },
+    {
+      "name": "한국현대문학사",
+      "code": "101.222"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국어연구입문",
+            "code": "100.100",
+            "credits": 3
+          },
+          {
+            "name": "한국어의 역사",
+            "code": "101.301A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사",
+            "code": "101.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사",
+            "code": "101.222",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국어연구입문",
+            "code": "100.100",
+            "credits": 3
+          },
+          {
+            "name": "한국어의 역사",
+            "code": "101.301A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사",
+            "code": "101.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사",
+            "code": "101.222",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국어연구입문",
+            "code": "100.100",
+            "credits": 3
+          },
+          {
+            "name": "한국어의 역사",
+            "code": "101.301A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사",
+            "code": "101.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사",
+            "code": "101.222",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국어연구입문",
+            "code": "100.100",
+            "credits": 3
+          },
+          {
+            "name": "한국어의 역사",
+            "code": "101.301A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사",
+            "code": "101.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사",
+            "code": "101.222",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
+    "전공필수 4과목(한국어연구입문·한국어의역사·한국고전문학사·한국현대문학사) — 단일·다전공·복수·부전공 모두 포함. hum.md에 코드 미표기(이름만)이라 required.all 미생성, 전선 학점으로 산입(근사).",
+    "외국어진행강좌 ≥3과목. 제2외국어 9학점은 교양(hum_2025) 측 요건(전공어 제외, 중급1↑); 본 spec 미집계. 복수전공(타단대)은 제2외국어 1과목 C-↑.",
+    "내규: 졸업논문 작성·발표, 학술답사 1회 이상. 전공 학점은 학번 무관 동일."
+  ]
+}

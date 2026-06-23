@@ -1,0 +1,175 @@
+{
+  "id": "germanlit_2023_2024",
+  "major": "독어독문학과",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://german.snu.ac.kr/공지사항/list/?category1=졸업&mod=document&uid=1186 (독어독문학과 졸업규정, 정적 HTML). 상세: _scrape/hum.md, _scrape/fill_hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계) + ~25학번 전필 set(독문번역연습1·고급독일어1·독문법및작문 + 독어독문학특강).",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "독어독문학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "고급독일어 1",
+      "code": "105.300B"
+    },
+    {
+      "name": "독문번역연습 1",
+      "code": "105.223A"
+    },
+    {
+      "name": "독문법 및 작문",
+      "code": "105.228"
+    },
+    {
+      "name": "독어독문학특강",
+      "code": "M1241.000200"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "고급독일어 1",
+            "code": "105.300B",
+            "credits": 3
+          },
+          {
+            "name": "독문번역연습 1",
+            "code": "105.223A",
+            "credits": 3
+          },
+          {
+            "name": "독문법 및 작문",
+            "code": "105.228",
+            "credits": 3
+          },
+          {
+            "name": "독어독문학특강",
+            "code": "M1241.000200",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "고급독일어 1",
+            "code": "105.300B",
+            "credits": 3
+          },
+          {
+            "name": "독문번역연습 1",
+            "code": "105.223A",
+            "credits": 3
+          },
+          {
+            "name": "독문법 및 작문",
+            "code": "105.228",
+            "credits": 3
+          },
+          {
+            "name": "독어독문학특강",
+            "code": "M1241.000200",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "고급독일어 1",
+            "code": "105.300B",
+            "credits": 3
+          },
+          {
+            "name": "독문번역연습 1",
+            "code": "105.223A",
+            "credits": 3
+          },
+          {
+            "name": "독문법 및 작문",
+            "code": "105.228",
+            "credits": 3
+          },
+          {
+            "name": "독어독문학특강",
+            "code": "M1241.000200",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 12
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "고급독일어 1",
+            "code": "105.300B",
+            "credits": 3
+          },
+          {
+            "name": "독문번역연습 1",
+            "code": "105.223A",
+            "credits": 3
+          },
+          {
+            "name": "독문법 및 작문",
+            "code": "105.228",
+            "credits": 3
+          }
+        ]
+      },
+      "required_credits": 9
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2022 어댑터(OLD 공통교육과정, 36학점).",
+    "전공필수 = ~25학번 set 3과목: 독문번역연습1(105.223A)·고급독일어1(105.300B)·독문법및작문(105.228). 26학번부터 독문번역연습1 → 독문학이란무엇인가(M1241.000400)로 교체 = germanlit_2026.json. 단일·복수전공은 독어독문학특강(M1241.000200, 2학기) 추가 필수 — 미이수 시 졸업 불가; 부전공은 전필 3과목만.",
+    "외국어진행강좌 ≥3과목(독일어 1과목 포함). 제2외국어 9학점은 교양(hum_2022) 측; 복수전공(타단대) 1과목.",
+    "특이: 독일어 자격증 Zertifikat B2 이상 필수(17학번~). 졸업논문 제출(자격증 미제출 시 졸업신청 불가).",
+    "track 학점: 단일(심화) 60 / 다전공·복수 39 / 부전공 21 — 학번 무관(인문대 baseline)."
+  ]
+}

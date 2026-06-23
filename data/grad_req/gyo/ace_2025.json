@@ -1,0 +1,14 @@
+{
+  "id": "ace_2025",
+  "college": "첨단융합학부",
+  "applies": "2025·2026",
+  "total_min": 48,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "msc", "name": "수학·과학·컴퓨팅", "min": 20, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 12, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 4 },
+    { "key": "veritas", "name": "베리타스", "min": 6, "areas": ["veritas"] }
+  ],
+  "notes": ["수과컴 20 = 수학·과학(물리/화학/생물 중 2영역)·컴퓨팅 필수 이수.", "지성의 열쇠는 4개 영역 각 3학점.", "베리타스 6학점 (강좌 1 + 강좌 2)."]
+}

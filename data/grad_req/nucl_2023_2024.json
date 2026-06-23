@@ -1,0 +1,66 @@
+{
+  "id": "nucl_2023_2024",
+  "major": "원자핵공학과",
+  "college": "공과대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "nucleng.snu.ac.kr/undergraduate/rule 「원자핵공학과 전공·교양 교과과정 이수안내」 PDF(?mode=download&seqidx=18, 2025학번 — 2026 미게시, 최신값 적용). 상세: _scrape/review_r1.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "eng_nuclear_2022",
+  "major_min_credits": 62,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "원자핵공학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 62,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 53학점 이상, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공 62학점(학과개설 48학점 이상 포함). 복수/부전공 세부는 학과내규 → major_double_credits·minor_credits 공대 baseline(39/21) 적용(근사).",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상(2025학번~ 권장).",
+    "이수안내 최신 게시 = 2025학번(2026 미게시). batch에 2025·2026 포함하되 2025 기준값 사용.",
+    "전공필수: 이수안내 PDF가 전공 총학점·학과개설 하한만 명시하고 전필 과목 코드/학점을 분리 게시하지 않음 → required.all 생략, required_credits 미설정. 전필 식별은 카탈로그(원자핵공학과·전필)에서 파생."
+  ]
+}

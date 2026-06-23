@@ -1,0 +1,15 @@
+{
+  "id": "hum_2025",
+  "college": "인문대학",
+  "applies": "2025·2026",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 12, "areas": ["foreign"] },
+    { "key": "msc", "name": "수학·과학·컴퓨팅", "min": 3, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] },
+    { "key": "classics", "name": "지성의 확장(고전원전읽기)", "min": 2, "areas": ["x_classics"] }
+  ],
+  "notes": ["외국어 12 = 제2외국어 9(중급이상 1과목 포함) + 영어 최소 1과목 3 (TEPS 800 이하는 2과목 6).", "고전원전읽기 1·2 = E52.103/104 → area_codes exception x_classics (학부생 세미나 영역 중 고전원전읽기만 정확 매칭)."]
+}

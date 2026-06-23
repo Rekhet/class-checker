@@ -1,0 +1,72 @@
+{
+  "id": "russ_2023_2024",
+  "major": "노어노문학과",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://russian.snu.ac.kr/졸업이수규정/ (정적 HTML). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 42,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "노어노문학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "러시아문학사 1"
+    },
+    {
+      "name": "러시아문학사 2"
+    },
+    {
+      "name": "러시아어학개론"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 42,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 42,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
+    "⚠ 노문 18학번~ 다전공 병행·복수전공 = 42학점(17학번까지 39) — 인문대 표준(39) 예외. 단일 60 / 부전공 21.",
+    "전공필수 3과목 9학점(러시아문학사1·2·러시아어학개론). 코드 미표기라 required.all 미생성, 전선 학점으로 산입(근사). 선수: 문학사1,2 전 러시아어듣기와쓰기(~25)/미디어로배우는러시아어(26~), 문학사1은 2의 선수.",
+    "외국어진행강좌 ≥3과목(기초/중급러시아어회화·고급러시아어 중 1 포함). 제2외국어 9학점은 교양(hum_2025) 측; 26학번~ 초급폴란드어 필수 포함. 졸업논문 필수교과목 러시아어문학논문쓰기(2025-2~)."
+  ]
+}

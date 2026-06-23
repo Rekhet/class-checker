@@ -1,0 +1,72 @@
+{
+  "id": "earthedu2_2026",
+  "major": "지구과학교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://earthedu.snu.ac.kr/교과목-개요/ (전공교과목 카탈로그·`*`전필; 이수규정 kBoard JS-block) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_earth_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["지구과학교육과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "고체지구물리학 및 실험1", "code": "721.221" },
+    { "name": "고체지구물리학 및 실험2", "code": "721.222" },
+    { "name": "고체지구과학 및 실험1", "code": "721.263" },
+    { "name": "고체지구과학 및 실험2", "code": "721.264" },
+    { "name": "천체지구과학 및 실험1", "code": "721.266" },
+    { "name": "천체지구과학 및 실험2", "code": "721.267" },
+    { "name": "대기지구과학 및 실험1", "code": "721.311" },
+    { "name": "대기지구과학 및 실험2", "code": "721.312" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 24,
+      "required": { "all": [
+        { "name": "고체지구물리학 및 실험1", "code": "721.221", "credits": 3 },
+        { "name": "고체지구물리학 및 실험2", "code": "721.222", "credits": 3 },
+        { "name": "고체지구과학 및 실험1", "code": "721.263", "credits": 3 },
+        { "name": "고체지구과학 및 실험2", "code": "721.264", "credits": 3 },
+        { "name": "천체지구과학 및 실험1", "code": "721.266", "credits": 3 },
+        { "name": "천체지구과학 및 실험2", "code": "721.267", "credits": 3 },
+        { "name": "대기지구과학 및 실험1", "code": "721.311", "credits": 3 },
+        { "name": "대기지구과학 및 실험2", "code": "721.312", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 24,
+      "required": { "all": [
+        { "name": "고체지구물리학 및 실험1", "code": "721.221", "credits": 3 },
+        { "name": "고체지구물리학 및 실험2", "code": "721.222", "credits": 3 },
+        { "name": "고체지구과학 및 실험1", "code": "721.263", "credits": 3 },
+        { "name": "고체지구과학 및 실험2", "code": "721.264", "credits": 3 },
+        { "name": "천체지구과학 및 실험1", "code": "721.266", "credits": 3 },
+        { "name": "천체지구과학 및 실험2", "code": "721.267", "credits": 3 },
+        { "name": "대기지구과학 및 실험1", "code": "721.311", "credits": 3 },
+        { "name": "대기지구과학 및 실험2", "code": "721.312", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 24,
+      "required": { "all": [
+        { "name": "고체지구물리학 및 실험1", "code": "721.221", "credits": 3 },
+        { "name": "고체지구물리학 및 실험2", "code": "721.222", "credits": 3 },
+        { "name": "고체지구과학 및 실험1", "code": "721.263", "credits": 3 },
+        { "name": "고체지구과학 및 실험2", "code": "721.264", "credits": 3 },
+        { "name": "천체지구과학 및 실험1", "code": "721.266", "credits": 3 },
+        { "name": "천체지구과학 및 실험2", "code": "721.267", "credits": 3 },
+        { "name": "대기지구과학 및 실험1", "code": "721.311", "credits": 3 },
+        { "name": "대기지구과학 및 실험2", "code": "721.312", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "⚠ 전공 트랙 총학점·교직 totals = 이수규정 kBoard(category/board-251) JS-render로 미추출 → 사범대 baseline 적용(단일 60 / 다전공 52 / 부전공 21). 정확값은 학과 게시물 브라우저 렌더 또는 직접 확인 권장.",
+    "전공필수 = 교과목개요 페이지 `*` 표시 8과목(각 3학점, 2-2-2), 합 24학점 — HTML 확인 subset. 전체 전필 목록은 이수규정 게시물 확인 필요.",
+    "기타 카탈로그: 034.044 지구과학 · 034.045 지구과학실험 · 700.282 일반지구과학 및 실험2(기본이수, 공통과학) · M1882.000400 지구과학야외답사 · M1882.001200 해양지구과학 빅데이터처리.",
+    "외국어진행강좌: 페이지 명시 없음 → 사범대 baseline 전공 3학점 포함 9학점(english_min_courses=3) 적용(근사).",
+    "부전공 전공필수·이수규정 미명시 → required 비움(근사, baseline 21학점).",
+    "교직과정 ~22학점(전공과 별개; baseline). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 지구과학. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

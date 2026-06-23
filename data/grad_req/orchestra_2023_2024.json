@@ -1,0 +1,73 @@
+{
+  "id": "orchestra_2023_2024",
+  "major": "관현악과",
+  "college": "음악대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/8 (관악전공) + /rule/9 (현악전공). 상세: _scrape/music_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "music_2022",
+  "major_min_credits": 68,
+  "major_double_credits": 62,
+  "minor_credits": 21,
+  "english_min_courses": 2,
+  "major_select_match": {
+    "departments": [
+      "관현악과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "관현악과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 68,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 68
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 68,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 68
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 62,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 62
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",
+    "관악전공 + 현악전공(별도 내규 2건). 전공필수(주전공): 관악 23학번~ 68(07~18 74 / 19~22 72 = pre-window); 현악 주전공 표준 72(23학번 표 68 변형). 본 spec = 2023·2024학번 → major_min_credits = 68(관악 23학번~). ⚠ 현악 주전공·세부전공(색소폰·기타·베이스·하프) 변형은 별표 — 세부전공 분기 시 재산정.",
+    "변형 전공: Saxophone 전필 58(19~ 56)+전선 16; 클래식기타 전필 53+전선 19; 베이스·하프 전필 69+전선 3. 코드 미확보 → required.all 미생성.",
+    "복수전공: 전필 62학점(구 72→62, 23학번~ 타과/우리과 모두). 관현악1,2·실내악앙상블·관악합주2 = 복전 시 전필→전선 해제. → double major_min/required = 62. ⚠ 부전공 학점표 미명시 → 음악대학 baseline 21(근사).",
+    "외국어진행강좌: 전공교과목 2학점 포함 4학점 이상 수강 의무(외국인 교원 전공실기·부전공악기 강좌 불인정) → english_min_courses = 2. 교양 외국어 21학번~ 최소 6학점."
+  ]
+}

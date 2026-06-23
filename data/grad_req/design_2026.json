@@ -1,0 +1,30 @@
+{
+  "id": "design_2026",
+  "major": "디자인과",
+  "college": "미술대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://art.snu.ac.kr/category/design/?catemenu=Courses&type=major (전공과목 이수표준형태, *=전필). ⚠ 졸업총학점·전공 by track = 학과 사이트 미게시, 전필 * 식별 불확실(baseline-assumed). 상세: _scrape/misc.md",
+  "total_credits": 130,
+  "general": "art_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "baseline_assumed": true,
+  "major_select_match": { "departments": ["디자인과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["디자인과"], "classifications": ["전필"] },
+  "major_required_known": [],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "⚠ BASELINE-ASSUMED: 미술대학은 졸업총학점·전공 by track 학점이 학과 사이트에 미게시. 졸업 130 / 단일전공 60 / 복수 39 / 부전공 21은 SNU 학칙 baseline 가정값 — 예체능계 전공학점이 다를 수 있어 미대 행정실 졸업사정표로 확정 필요.",
+    "교양 = art_2025 어댑터(36학점, 5과 공통).",
+    "⚠ 디자인과(산업디자인): 전필 * 마크가 transcript에 거의 안 잡힘(600.228A·M2182.000100 등은 비교과/기초). required.all·major_required_known 미생성 — courses 페이지 * 재확인 필요. 코드 계열 = M1774.*·M3389.*·6125.*(제품/공간/리빙/운송 디자인).",
+    "외국어진행강좌 최소 과목수: 페이지 미명시 — baseline 1과목."
+  ]
+}

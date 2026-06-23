@@ -1,0 +1,29 @@
+{
+  "id": "gukak_2026",
+  "major": "국악과",
+  "college": "음악대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/10 → 「국악과-학사」. 상세: _scrape/music_browser.md",
+  "total_credits": 130,
+  "general": "music_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 38,
+  "minor_credits": 31,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["국악과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["국악과"], "classifications": ["전필"] },
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 43 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 43 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 38, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 31, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터, 25학번~ 25학점 필수) 공통. 전체·전공 평점 각 2.0 이상.",
+    "세부전공: 기악 · 성악 · 이론 · 작곡·지휘. 25학번~ 주전공 계: 기악 60 · 성악 60 · 이론 60 · 작곡·지휘 61. major_min_credits = 60(기악/성악/이론; 작곡·지휘 61). required_credits 43 = 기악 전필(세부전공별 상이).",
+    "단일전공(=심화)은 필수전선 전 과목 이수; 다전공(부·복수·연계·연합)·교직 이수 시 필수전선 최소 6학점(성악/이론/작곡·지휘는 최소 4학점). 전필 공통: 국악개론및감상1·2·시창청음1·2·전통가창실습·국악사1·2 + 세부전공 실기(8학기 반복). 코드 미확보 → required.all 미생성.",
+    "복수전공: 총 38학점(반복이수 20 + 필수이수 11 + 전공선택 7) / 부전공: 총 31학점(반복이수 20 + 필수이수 11). 학사편입 44. 국악과 내 세부전공 상호간 복수(부)전공 불허.",
+    "외국어: 26학번부터 음악대학 내 개설 영어진행강좌 1강좌 이상 필수 → english_min_courses = 1(25학번은 내규상 미적용이나 보수적으로 1 유지)."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "human_child_2022",
+  "college": "생활과학대학 (소비자아동학부 아동가족학전공)",
+  "applies": "2021~2024",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  ]
+}

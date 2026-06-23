@@ -1,0 +1,70 @@
+{
+  "id": "abc_2024",
+  "major": "응용생물화학부",
+  "college": "농업생명과학대학",
+  "batch": [
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://abc.snu.ac.kr/응용생명화학전공-교과과정/ + /응용생물학전공-교과과정/ (학부 내부 교과과정, HTML 표 + * 전필; <전공 이수 규정> 본문 명시). 상세: _scrape/agri.md, _scrape/peryear_agri.md | 2024학번 = 신규정(응용생명화학 단일60/전필30, 응용생물학 단일53/전필18) + OLD 공통교육과정(학문의 기초/세계, agri_sci_2022).",
+  "total_credits": 130,
+  "general": "agri_sci_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 48,
+  "minor_credits": 30,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "응용생물화학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "응용생물화학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    { "name": "유기화학1", "code": "M1678.000400" },
+    { "name": "생화학1", "code": "519.204" },
+    { "name": "생화학실험", "code": "M1678.001200" },
+    { "name": "토양학", "code": "519.203" },
+    { "name": "토양학실험", "code": "M1678.001400" },
+    { "name": "분자생물학", "code": "500.402" },
+    { "name": "분자생물학실험", "code": "M1678.001300" },
+    { "name": "식물영양화학", "code": "5191.303" },
+    { "name": "생명유기화학실험", "code": "5191.308" },
+    { "name": "고급응용생명화학", "code": "M1678.000300" },
+    { "name": "응용생명화학실험1", "code": "5191.413A" },
+    { "name": "응용생명화학실험2", "code": "5191.414A" },
+    { "name": "일반미생물학", "code": "5192.250" },
+    { "name": "곤충학및실험", "code": "519.253" },
+    { "name": "식물병리학총론", "code": "5192.252" },
+    { "name": "임상식물병학및실험", "code": "5192.350" },
+    { "name": "진단곤충학및실험", "code": "5192.358" },
+    { "name": "응용곤충학및실험", "code": "519.354" },
+    { "name": "농업식물생리학", "code": "5192.355" },
+    { "name": "응용생물학실험1", "code": "5192.463" },
+    { "name": "응용생물학논문연구1", "code": "M1677.000200" },
+    { "name": "응용생물학논문연구2", "code": "M1677.000300" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 30 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 48, "general": true, "select_min": 0, "required_credits": 30 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 48, "general": false, "select_min": 0, "required_credits": 30 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 30, "general": false, "select_min": 0, "required_credits": 30 }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 36학점(agri_sci_2022, OLD 공통교육과정). 전체·주전공·복수·부전공 각 평점 2.0 이상. 2024학번부터 신규정(2024학년도 진입/입학생부터 적용).",
+    "학부-level 스펙: 응용생물화학부 = 2개 전공, 단일전공 학점이 상이. major_min_credits=60은 응용생명화학전공(main) 기준. 응용생물학전공 변이값은 아래 명시(agecon식 처리: main=한 전공, 타 전공은 note).",
+    "응용생명화학전공(main, 2024학번~): 단일전공 60학점(전필 30 포함) / 다전공 병행 48 / 복수전공 48 / 부전공 30(전필 30 전부). 전필(*): 유기화학1·생화학1·생화학실험·토양학·토양학실험·분자생물학·분자생물학실험·식물영양화학·생명유기화학실험·고급응용생명화학·응용생명화학실험1·2.",
+    "응용생물학전공(variant, 2024학번~): 단일전공 53학점(전필 18 포함, 병행 시에도 53) / 복수전공 39(전필 18) / 부전공 24. 전필(*): 유기화학1·생화학1·일반미생물학·곤충학및실험·식물병리학총론·임상식물병학및실험·진단곤충학및실험·응용곤충학및실험·농업식물생리학·응용생물학실험1·응용생물학논문연구1·2.",
+    "major_required_known = 두 전공 * 전필 코드 합집합(전공별 적용 set 상이). 과목당 학점 페이지 미표기 → required.all 미생성, required_credits = 응용생명화학 전필 30(main). 전선 min = 단일60−전필30 = 30(생명화학) / 53−18 = 35(생물학).",
+    "외국어진행강좌: 농생대 자연계 baseline 3과목(전공 1과목 포함). 페이지 명시 없어 baseline-assumed."
+  ]
+}

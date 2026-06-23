@@ -1,0 +1,79 @@
+{
+  "id": "naoe_2026",
+  "major": "조선해양공학과",
+  "college": "공과대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "ship.snu.ac.kr/department/rule 「교과목 이수규정(2026학년도).pdf」(bbsidx=13323 학번별 기준표, 2025~2026). 상세: _scrape/review_r1.md",
+  "total_credits": 130,
+  "general": "eng_naoe_2025",
+  "major_min_credits": 63,
+  "major_double_credits": 48,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "조선해양공학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "조선해양공학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 63,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 48,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 48,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 49학점 이상(2025~2026), 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공 63학점 = 전필 30 + 전선 21학점 이상. 타전공 병행이수 48학점 = 전필 30 + 전선 12학점 이상. (병행=major_double_credits 48). 부전공 공대 baseline 21.",
+    "역사 학번(이전)은 단일62/병행39 — 본 spec은 2025~2026 기준 단일63/병행48.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "전공필수 30학점: 이수규정 기준표가 전필 총 30학점만 명시(개별 과목 코드/학점 분리 게시 없음) → required_credits 30 설정, required.all 생략. 전필 식별은 카탈로그(조선해양공학과·전필)에서 파생. 부전공 required_credits 미세분 → 0."
+  ]
+}

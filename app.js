@@ -2090,6 +2090,15 @@ async function _loadAreaCodes() {
   }
   return _gradAreaCodes;
 }
+// 전공 코드 개편(renumber) 대응: sbjt_cd → canonical(동일교과목). 전필 매칭 시 양쪽 정규화.
+let _gradCodeEquiv = null;
+async function _loadCodeEquiv() {
+  if (!_gradCodeEquiv) {
+    try { _gradCodeEquiv = (await fetch("data/grad_req/code_equiv.json").then((r) => r.json())).canon || {}; }
+    catch { _gradCodeEquiv = {}; }
+  }
+  return _gradCodeEquiv;
+}
 // 단대/학부 교양 어댑터(self-contained): 세부영역 → 버킷 할당 + 최저학점.
 const _gyoCache = {};
 async function _loadGyo(id) {
@@ -2212,7 +2221,7 @@ function _renderGradSheets() {
 async function renderGrad() {
   const host = $("#gradBody"); if (!host) return;
   const idx = await _loadGradIndex();
-  const majors = [...new Set(idx.map((e) => e.major))];
+  const majors = [...new Set(idx.map((e) => e.major))].sort((a, b) => a.localeCompare(b, "ko"));
   _gradResolveList(idx, majors);
   _renderGradSheets();
   const taken = _gradTaken(_gradSelectedIds());
@@ -2227,6 +2236,7 @@ async function renderGrad() {
       cls: m.classification || c.classification || [], dept: m.department || c.dept || c.department || "" };
   });
   const areaCodes = await _loadAreaCodes();
+  const codeEquiv = await _loadCodeEquiv();
   const blocks = [], okByIdx = {};
   for (let i = 0; i < _gradState.list.length; i++) {
     const entry = _gradState.list[i];
@@ -2236,20 +2246,22 @@ async function renderGrad() {
     const track = _gradTrackOf(spec, entry, _gradState.list);
     const required = await _gradRequired(spec, entry.year);
     const ruleset = await _loadGyo(spec.general);
-    const r = _gradAuditBlock(spec, track, rows, required, entry, i, ruleset, areaCodes);
+    const r = _gradAuditBlock(spec, track, rows, required, entry, i, ruleset, areaCodes, codeEquiv);
     okByIdx[i] = r.ok; blocks.push(r.node);
   }
   _renderGradList(idx, majors, okByIdx);
   host.replaceChildren(...(blocks.length ? blocks : [el("div", { className: "grad-note" }, "전공을 추가하세요.")]));
 }
-function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, areaCodes) {
+function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, areaCodes, codeEquiv) {
+  const canon = (c) => (codeEquiv || {})[c] || c;   // 코드 개편 정규화: 동일교과목은 같은 canonical로
   const suri = spec.suri || { seq: [], combined: null };
   const suriCodes = new Set([...(suri.seq || []).map((x) => x.code), ...(suri.combined ? [suri.combined.code] : [])]);
 
   const isStat = (d) => spec.major_required_match.departments.some((x) => (d || "").includes(x));
   const isRecog = (d) => (spec.external_recognition.depts || []).some((x) => (d || "").includes(x.replace(/부$/, "")));
   const hasCls = (r, t) => (r.cls || []).includes(t);
-  const takenCodes = new Set(rows.map((r) => r.sbjt_cd));
+  const _takenCanon = new Set(rows.map((r) => canon(r.sbjt_cd)));   // 수강 코드 정규화
+  const takenCodes = { has: (code) => _takenCanon.has(canon(code)) };   // 전필 매칭 시 required 코드도 canon → 개편 전/후 코드 호환
 
   // 수리통계: 주전공·복수전공은 1+2 필수(M1399 불가), 부전공만 M1399로 대체 가능
   const hasBothSeq = (suri.seq || []).length > 0 && (suri.seq || []).every((x) => takenCodes.has(x.code));

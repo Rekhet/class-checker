@@ -1,0 +1,38 @@
+{
+  "id": "pedagogy_2026",
+  "major": "교육학과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://learning.snu.ac.kr/학부-교과과정/ (주전공/복수전공 전공학점·전필·영어·교직 인라인) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_hum_2025",
+  "major_min_credits": 62,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["교육학과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "교육학개론" },
+    { "name": "교육사" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 62, "general": true, "select_min": 0, "required_credits": 6,
+      "required": { "all": [] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 6,
+      "required": { "all": [] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 6,
+      "required": { "all": [] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "주전공(단일) 62 = 전공필수 6 + 전공선택 56. 복수전공 52 = 전공필수 6 + 전공선택 46. (부전공 학점은 페이지 미명시 → 사범대 baseline 21 적용.)",
+    "전공필수 6학점 = 교육학개론 · 교육사 (2과목, 각 3학점). edu.md에 과목코드 미수록 → required.all 비움, required_credits=6만 기록(근사). 교육학 교과교육 과목 9학점 이상(교육학교과 논리 및 논술 / 교육학교과교재 및 연구법 / 교육학교과교육론) 별도.",
+    "외국어진행강좌: 3학점 이상의 전공교과목 포함 9학점 이상(english_min_courses=3).",
+    "학부는 교육학 단일전공이며 세부전공(교육학/교육공학/교육상담/교육행정/평생교육) 구분은 대학원 트랙. 학습과학 연계과정은 별도(전공 21학점, 필수 3 포함).",
+    "교직과정 22학점(전공과 별개; 교직이론은 전공과목 이수로 갈음 + 교직소양 6학점↑ + 교육실습 4학점↑). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 교육학. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

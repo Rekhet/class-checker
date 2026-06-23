@@ -1,0 +1,110 @@
+{
+  "id": "sees_2026",
+  "major": "지구환경과학부",
+  "college": "자연과학대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "https://sees.snu.ac.kr/academics/undergraduate/curriculum-major (졸업요건 전공 학점표) + 자연과학대학 공통교육과정 2026. 상세: _scrape/natsci.md",
+  "total_credits": 130,
+  "general": "natsci_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_required_match": {
+    "departments": [
+      "지구환경과학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "지구환경과학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "지구환경과학논문연구",
+      "code": "M1411.002600"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "지구환경과학논문연구",
+            "code": "M1411.002600",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "지구환경과학논문연구",
+            "code": "M1411.002600",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수·연합전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "지구환경과학논문연구",
+            "code": "M1411.002600",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공·연계전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "지구환경과학논문연구",
+            "code": "M1411.002600",
+            "credits": 1
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전공 by track 심화60/복수39/부전공21 (HTML 졸업표 명시).",
+    "전공필수 코드·학점 = 학번별 '전공교과목 이수 표준형태' 파일(/download/) 미인코딩 — 카탈로그(지구환경과학부·전필) 자동 derivation에 의존. 표준형태 Read 시 known 보강 권장.",
+    "외국어진행강좌 최소 과목수 미명시 — 자연대 baseline 1과목."
+  ]
+}

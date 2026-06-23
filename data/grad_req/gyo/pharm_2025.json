@@ -1,0 +1,16 @@
+{
+  "id": "pharm_2025",
+  "college": "약학대학",
+  "applies": "2025·2026",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "math", "name": "수학", "min": 3, "areas": ["math"] },
+    { "key": "science", "name": "과학", "min": 8, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing", "stat"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] }
+  ],
+  "notes": ["컴퓨팅 3 = 컴퓨팅 과목 또는 생명과학을 위한 통계학(+실험)."]
+}

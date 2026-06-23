@@ -1,0 +1,42 @@
+{
+  "id": "histedu_2026",
+  "major": "역사교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://histoedu.snu.ac.kr/25학번부터/ (현행 트랙·전필·교직·영어 인라인) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_history_2025",
+  "major_min_credits": 65,
+  "major_double_credits": 53,
+  "minor_credits": 36,
+  "english_min_courses": 2,
+  "major_select_match": { "departments": ["역사교육과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "한국고대사" },
+    { "name": "동아시아고중세사" },
+    { "name": "서양고대사" },
+    { "name": "한국근세사" },
+    { "name": "역사교육론" },
+    { "name": "역사논문세미나" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 65, "general": true, "select_min": 0, "required_credits": 18,
+      "required": { "all": [] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 53, "general": true, "select_min": 0, "required_credits": 18,
+      "required": { "all": [] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 53, "general": false, "select_min": 0, "required_credits": 18,
+      "required": { "all": [] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 36, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "25학번 기준: 단일전공 65 / 복수전공 53 / 부전공 36 (본과 내규; 사범대 공통규정의 복수52·부전공34와 다름). 다전공 병행 기준 50학점(교육부 교과내용42+교과교육8)도 별도 존재.",
+    "전공필수 6과목 18학점(코드 미수록 → required.all 비움, required_credits=18 기록): 한국고대사·동아시아고중세사·서양고대사·한국근세사·역사교육론·역사논문세미나. + 역사적 사고와 논술(2) + 교과교육(국사/세계사 교재연구 및 지도법 6학점↑) + 교육강독(국사·서양사·아시아사 9학점) 필수. 시대사 4과목(12) + 분류사·특수사 4과목(12) + 추가 2과목(6). 기본이수 21학점.",
+    "외국어진행강좌: 2021학번~ 3학점 이상 전공교과목 포함 2과목 이상(english_min_courses=2). (2015학번~은 3과목 기준.)",
+    "교직과정 23학점(2024학번 디지털교육 반영; 교직이론 12↑/6과목 + 교직소양 6↑ + 교육실습 4↑)은 전공과 별개. 정기학술답사 6회(복수 4·부전공 3). 교원자격 표시과목 = 역사. schema에 교직 필드 없어 NOTE로만 기록.",
+    "통합사회 교직연계전공 50학점(중복 인정 15학점까지).",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회. ⚠ 구학번(09 등)은 전필 과목 구성 상이 — 학번별 페이지 참조."
+  ]
+}

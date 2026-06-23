@@ -1,0 +1,33 @@
+{
+  "id": "deredu_2026",
+  "major": "독어교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "사범대학 공통교육과정 2026 + 사범대 공통 전공 baseline (독어교육과 학부 졸업요건 페이지 미스크레이프). 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_hum_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["독어교육과"], "classifications": ["전선"] },
+  "major_required_known": [],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0,
+      "required": { "all": [] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0,
+      "required": { "all": [] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0,
+      "required": { "all": [] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "⚠ BASELINE-ASSUMED (전 항목): 독어교육과는 _scrape/edu.md 상세·요약표에 미포함 — 학부 졸업요건 페이지 미스크레이프. 단일 60 / 다전공 52 / 부전공 21 / 전필 / 교직 / 영어 모두 사범대 공통 baseline 추정. 전공필수 코드 미확보 → required.all 비움. 모든 수치 학과 직접 확인 필요.",
+    "외국어진행강좌: 사범대 baseline 전공 3학점 포함 9학점(english_min_courses=3) 적용(근사).",
+    "교직과정 ~22학점(전공과 별개; baseline). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 독일어. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "id": "socwelf_2024",
+  "major": "사회복지학과",
+  "college": "사회과학대학",
+  "batch": ["2024"],
+  "track": "단일전공",
+  "source": "https://socialwelfare.snu.ac.kr/ug-curriculum + /ug-academics (이수학점+전필+표준이수형태). 상세: _scrape/soc.md, _scrape/peryear_soc.md | 2024 batch: OLD 공통교육과정(학문의 기초/세계), 전필 = 2024학번~ set(1과목). liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "soc_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["사회복지학과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["사회복지학과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "인간행동과 사회환경", "code": "209.219" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 3,
+      "required": { "all": [
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 3,
+      "required": { "all": [
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 3,
+      "required": { "all": [
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 3,
+      "required": { "all": [
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
+      ] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수(2024학번~, 1과목): 인간행동과 사회환경 209.219(3학점). (~2023학번 = 6과목.)",
+    "전공 학점 by track: 심화전공(단일) 60 / 다전공 39 / 복수전공 39 / 부전공 21.",
+    "전공선택 최소: 별도 카운트 없음(총학점 − 전필).",
+    "타과 전선 인정: 사회과학대학 개설 모든 전공과목(전필/전선) 최대 9학점(2025-1 수강분~). S/U 인정 불가. 복수전공 사회대 내 타과 9학점 중복인정.",
+    "외국어진행강좌 최소 과목수 명시 없음 — baseline 1과목.",
+    "사회복지현장실습 209.319 포함(표준형태). 졸업논문 제출(별도 안내)."
+  ]
+}

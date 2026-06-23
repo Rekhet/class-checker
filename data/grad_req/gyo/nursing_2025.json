@@ -1,0 +1,14 @@
+{
+  "id": "nursing_2025",
+  "college": "간호대학",
+  "applies": "2025·2026",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "science", "name": "과학(화학·생물)", "min": 8, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 12, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] }
+  ],
+  "notes": ["수과컴 8 = 화학(또는 고급화학)+생물학 등. 지성의 열쇠 12: 문화/역사/과학적사고 중 2개 영역 이상 9학점 + 인간의 이해와 사회 분석 최소 1과목(3학점) 필수."]
+}

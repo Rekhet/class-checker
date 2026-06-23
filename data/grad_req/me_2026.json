@@ -1,0 +1,80 @@
+{
+  "id": "me_2026",
+  "major": "기계공학부",
+  "college": "공과대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "me.snu.ac.kr/학부-졸업규정/?mod=document&uid=21580 첨부 PDF(SNU_ME_학부졸업이수규정_2026공지용260204.pdf, 6p, kboard nonce). 상세: _scrape/eng_browser.md + _scrape/review_r2.md",
+  "total_credits": 130,
+  "general": "eng_mech_2025",
+  "major_min_credits": 62,
+  "major_double_credits": 45,
+  "minor_credits": 48,
+  "english_min_courses": 3,
+  "external_recognition": {
+    "depts": ["공과대학 공통", "공과대학 전공", "자연과학대학 전공", "경영대학 지정과목"],
+    "approval_max_credits": 15
+  },
+  "major_required_match": { "departments": ["기계공학부"], "classifications": ["전필"] },
+  "major_select_match": { "departments": ["기계공학부"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "기계시스템 설계와 로봇 프로그래밍의 기초", "code": "M3228.001300" },
+    { "name": "고체역학", "code": "M2794.001000" },
+    { "name": "열역학", "code": "M2794.001100" },
+    { "name": "동역학", "code": "M2794.001200" },
+    { "name": "유체역학", "code": "M2794.001300" },
+    { "name": "기계공학실험", "code": "M2794.013200" }
+  ],
+  "dept_required_general": [],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 62, "general": true, "select_min": 0, "recog_max": 15,
+      "required_credits": 18,
+      "required": { "all": [
+        { "name": "기계시스템 설계와 로봇 프로그래밍의 기초", "code": "M3228.001300", "credits": 3 },
+        { "name": "고체역학", "code": "M2794.001000", "credits": 3 },
+        { "name": "열역학", "code": "M2794.001100", "credits": 3 },
+        { "name": "동역학", "code": "M2794.001200", "credits": 3 },
+        { "name": "유체역학", "code": "M2794.001300", "credits": 3 },
+        { "name": "기계공학실험", "code": "M2794.013200", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 45, "general": true, "select_min": 0, "recog_max": 15,
+      "required_credits": 18,
+      "required": { "all": [
+        { "name": "기계시스템 설계와 로봇 프로그래밍의 기초", "code": "M3228.001300", "credits": 3 },
+        { "name": "고체역학", "code": "M2794.001000", "credits": 3 },
+        { "name": "열역학", "code": "M2794.001100", "credits": 3 },
+        { "name": "동역학", "code": "M2794.001200", "credits": 3 },
+        { "name": "유체역학", "code": "M2794.001300", "credits": 3 },
+        { "name": "기계공학실험", "code": "M2794.013200", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 45, "general": false, "select_min": 0, "recog_max": 0,
+      "required_credits": 18,
+      "required": { "all": [
+        { "name": "기계시스템 설계와 로봇 프로그래밍의 기초", "code": "M3228.001300", "credits": 3 },
+        { "name": "고체역학", "code": "M2794.001000", "credits": 3 },
+        { "name": "열역학", "code": "M2794.001100", "credits": 3 },
+        { "name": "동역학", "code": "M2794.001200", "credits": 3 },
+        { "name": "유체역학", "code": "M2794.001300", "credits": 3 },
+        { "name": "기계공학실험", "code": "M2794.013200", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 48, "general": false, "select_min": 0, "recog_max": 0,
+      "required_credits": 18,
+      "required": { "all": [
+        { "name": "기계시스템 설계와 로봇 프로그래밍의 기초", "code": "M3228.001300", "credits": 3 },
+        { "name": "고체역학", "code": "M2794.001000", "credits": 3 },
+        { "name": "열역학", "code": "M2794.001100", "credits": 3 },
+        { "name": "동역학", "code": "M2794.001200", "credits": 3 },
+        { "name": "유체역학", "code": "M2794.001300", "credits": 3 },
+        { "name": "기계공학실험", "code": "M2794.013200", "credits": 3 }
+      ] } }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 49학점 이상, 전체·전공 평점 각 2.0 이상. 2026 신입생부터 적용(이전 학번 종전 규정).",
+    "전공 by track: 단일전공 62학점(전공필수 18 + 공대공통 3 + 졸업논문 3 포함). 다른전공 병행이수★ = 복수·연합 45학점 / 부·연계·학생설계 48학점. (복수=major_double_credits 45, 부전공=minor_credits 48).",
+    "전공필수 18학점(6과목): 기계시스템 설계와 로봇 프로그래밍의 기초·고체역학·열역학·동역학·유체역학·기계공학실험. 역학과 설계(M2794.001400)·학제간 캡스톤설계(M3228.003500)는 전선.",
+    "공대공통 필수: 공학개론 영역 3학점(단 400.013 기계공학개론 제외) + M2177계열 3학점(전필 인정).",
+    "전공선택 인정: 공대공통(400.*/M2177.*) + 공대·자연대 전공·경영대 지정과목, 최대 15학점.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상(대학영어 제외). 2024학번~ '권장'으로 완화.",
+    "트랙(로보틱스/모빌리티/스마트제조/에너지환경)별 전선 분포는 카탈로그 참조. 복수/부전공 전필 집합은 단일과 동일 가정(근사)."
+  ]
+}

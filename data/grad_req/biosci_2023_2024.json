@@ -1,0 +1,247 @@
+{
+  "id": "biosci_2023_2024",
+  "major": "생명과학부",
+  "college": "자연과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://biosci.snu.ac.kr/academics/curriculum/undergraduate (학번별 이수규정) + 자연과학대학 공통교육과정 2026. 상세: _scrape/natsci.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "생명과학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "유전학",
+      "code": "300.310"
+    },
+    {
+      "name": "생화학 1",
+      "code": "300.312"
+    },
+    {
+      "name": "생화학 2",
+      "code": "300.313"
+    },
+    {
+      "name": "세포생물학",
+      "code": "3346.205"
+    },
+    {
+      "name": "분자생물학",
+      "code": "300.319"
+    },
+    {
+      "name": "생태학",
+      "code": "3346.415"
+    },
+    {
+      "name": "생명과학학위논문연구",
+      "code": "3346.412A"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 19,
+      "required": {
+        "all": [
+          {
+            "name": "유전학",
+            "code": "300.310",
+            "credits": 3
+          },
+          {
+            "name": "생화학 1",
+            "code": "300.312",
+            "credits": 3
+          },
+          {
+            "name": "생화학 2",
+            "code": "300.313",
+            "credits": 3
+          },
+          {
+            "name": "세포생물학",
+            "code": "3346.205",
+            "credits": 3
+          },
+          {
+            "name": "분자생물학",
+            "code": "300.319",
+            "credits": 3
+          },
+          {
+            "name": "생태학",
+            "code": "3346.415",
+            "credits": 3
+          },
+          {
+            "name": "생명과학학위논문연구",
+            "code": "3346.412A",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 19,
+      "required": {
+        "all": [
+          {
+            "name": "유전학",
+            "code": "300.310",
+            "credits": 3
+          },
+          {
+            "name": "생화학 1",
+            "code": "300.312",
+            "credits": 3
+          },
+          {
+            "name": "생화학 2",
+            "code": "300.313",
+            "credits": 3
+          },
+          {
+            "name": "세포생물학",
+            "code": "3346.205",
+            "credits": 3
+          },
+          {
+            "name": "분자생물학",
+            "code": "300.319",
+            "credits": 3
+          },
+          {
+            "name": "생태학",
+            "code": "3346.415",
+            "credits": 3
+          },
+          {
+            "name": "생명과학학위논문연구",
+            "code": "3346.412A",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 19,
+      "required": {
+        "all": [
+          {
+            "name": "유전학",
+            "code": "300.310",
+            "credits": 3
+          },
+          {
+            "name": "생화학 1",
+            "code": "300.312",
+            "credits": 3
+          },
+          {
+            "name": "생화학 2",
+            "code": "300.313",
+            "credits": 3
+          },
+          {
+            "name": "세포생물학",
+            "code": "3346.205",
+            "credits": 3
+          },
+          {
+            "name": "분자생물학",
+            "code": "300.319",
+            "credits": 3
+          },
+          {
+            "name": "생태학",
+            "code": "3346.415",
+            "credits": 3
+          },
+          {
+            "name": "생명과학학위논문연구",
+            "code": "3346.412A",
+            "credits": 1
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 18,
+      "required": {
+        "all": [
+          {
+            "name": "유전학",
+            "code": "300.310",
+            "credits": 3
+          },
+          {
+            "name": "생화학 1",
+            "code": "300.312",
+            "credits": 3
+          },
+          {
+            "name": "생화학 2",
+            "code": "300.313",
+            "credits": 3
+          },
+          {
+            "name": "세포생물학",
+            "code": "3346.205",
+            "credits": 3
+          },
+          {
+            "name": "분자생물학",
+            "code": "300.319",
+            "credits": 3
+          },
+          {
+            "name": "생태학",
+            "code": "3346.415",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상, 등록 6회 이상.",
+    "전공필수: 주전공 19학점(2024학번 이전) = 유전학·생화학1·2·세포생물학·분자생물학·생태학 6과목 전부(18) + 생명과학학위논문연구(1). 2025학번부터 6과목 중 4과목 필수로 축소(13학점). 부전공 전필 18학점(6과목, 논문 제외). 생화학1·2 코드 = 2024학번 이전 300.312/300.313, 2025-1학기부터 M2173.004600/M2173.004700.",
+    "전선: 분자세포생물학/개체생물학/생물다양성 3개 분야 각 1과목 포함 12학점(4과목) 이상.",
+    "외국어진행강좌: 주전공 1과목 포함 3과목 이상 (대학영어·고급영어 포함, 기초영어 제외).",
+    "졸업논문/학위논문연구 (2016학번~ 전필 포함)."
+  ]
+}

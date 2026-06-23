@@ -1,0 +1,74 @@
+{
+  "id": "piano_2023_2024",
+  "major": "피아노과",
+  "college": "음악대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/7 → 「[현행] 피아노과 내규 2025.07.14 개정」. 상세: _scrape/music_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "music_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 45,
+  "minor_credits": 26,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "피아노과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "피아노과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 50
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 50
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 45,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 27
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 26,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 10
+    }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",
+    "전공 = 전공필수 + 전공선택(학번별): 2023~2024학번 전공필수 50 + 전공선택 10 = 60학점. (2025학번~ = 전필 47+전선 10 = 57; 2019~2022 전필 60; 2018이전 64.) 본 spec = 2023·2024학번 → single major_min = 60, required_credits = 전필 50.",
+    "전필 핵심: 피아노실기(6531.2220, 8학기 반복) + 이론(화성·대위·분석)1~6 + 시창청음1~4 + 서양음악사1~4 + 건반화성 + 연주(650.3307, 4학기) + 실내앙상블. (기악반주·성악반주·피아노문헌은 2024.03.13. 전필→전선.) 전체 코드표 미확보 → required.all 미생성.",
+    "복수전공(음대 내): 최저 45학점(전필 27 + 전선 18, 공통과목 최대 9 중복인정) — 구규정/본교 음대생은 전필 60. 부전공(음대 타전공): 최저 26학점(전필 10 + 전선 16) — 일반/구규정 30 이상. 음대생이 타 단과대로 부전공 시 단일전공 동일(57).",
+    "외국어: 학부 내규에 전용 영어강의 의무 조항 없음 → 교양 외국어 + 대학 공통규정. 전공 영어강의 baseline 1과목(보수적)."
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "aero_2026",
+  "major": "항공우주공학과",
+  "college": "공과대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "aerospace.snu.ac.kr/undergraduate/requirements 첨부 PDF(SNU_AE_학과졸업이수규정_2026.pdf, /download?ac=, Referer 필요). 상세: _scrape/review_r1.md + _scrape/review_r4.md",
+  "total_credits": 130,
+  "general": "eng_aero_2025",
+  "major_min_credits": 62,
+  "major_double_credits": 42,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["항공우주공학과"], "classifications": ["전선"] },
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 62, "general": true, "select_min": 0, "recog_max": 0 },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 42, "general": true, "select_min": 0, "recog_max": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 42, "general": false, "select_min": 0, "recog_max": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "recog_max": 0 }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 49학점 이상, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공이수 62학점 이상 / 다른전공병행이수★ 42학점 이상(★복수·부·연합·연계·학생설계). 복수전공·부전공 세부는 학과내규(병행이수 42가 다전공 학점) → major_double_credits 42, minor_credits 공대 baseline 21.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "전공필수: 학과졸업이수규정 PDF가 전공 총학점만 명시하고 전필 과목 코드/학점을 별도 분리 게시하지 않음 → required.all 생략, required_credits 미설정. 전필 식별은 카탈로그(항공우주공학과·전필)에서 파생."
+  ]
+}
