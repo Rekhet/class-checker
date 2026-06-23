@@ -1458,57 +1458,97 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Export/import carry only the *connection* to a class (year|term|sbjt_cd|lt_no), never a
+// frozen copy of its data. Re-importing rebuilds each entry from the CURRENT catalog, so a
+// file exported before a class's time was set (or while it differed) reflects today's time
+// on import instead of the stale state captured at export. Manual entries have no catalog
+// row to resolve against, so they're carried in full.
+function classRef(c) {
+  return c.manual ? cleanManual(c)
+    : { year: c.year, term: c.term, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no };
+}
+function cleanManual(c) {
+  return { year: c.year ?? "", term: c.term || "MANUAL", name: c.name,
+    sbjt_cd: c.sbjt_cd, lt_no: c.lt_no, professor: c.professor,
+    credits: c.credits ?? null, slots: c.slots || [], manual: true };
+}
+// shape a stored entry from a fresh catalog row (mirrors addToTT/toggleWish)
+function entryFrom(c) {
+  return { year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
+    professor: c.professor, credits: c.credits, slots: c.slots || [] };
+}
+// label a dropped ref for the import notice. New (connection-only) files carry no name,
+// so fall back to the course/section codes; old full-data files still show the name.
+function dropLabel(c) { return c.name || `${c.sbjt_cd}-${c.lt_no}`; }
+// Rebuild exported entries against today's catalog. Returns {entries, dropped}, where
+// dropped lists refs no longer in the catalog (e.g. cancelled — nothing to rebuild from).
+// Returns null if the catalog lookup fails (offline) so callers abort without wiping data.
+async function resolveEntries(arr) {
+  const valid = arr.filter((c) => c && c.sbjt_cd && c.lt_no);
+  const refs = valid.filter((c) => !c.manual);
+  let cur;
+  try {
+    cur = new Map((await lookupLocal(refs.map((c) => [c.year, c.term, c.sbjt_cd, c.lt_no])))
+      .map((c) => [classKey(c), c]));
+  } catch { alert("강좌 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."); return null; }
+  const entries = [], dropped = [];
+  for (const c of valid) {                  // preserve original order
+    if (c.manual) { if (c.name) entries.push(cleanManual(c)); continue; }
+    const now = cur.get(classKey(c));
+    if (now) entries.push(entryFrom(now)); else dropped.push(c);   // ref gone from catalog
+  }
+  return { entries, dropped };
+}
+
 // loadable timetable file: our own JSON, re-imported by importTTJson below
 function exportTTJson() {
   if (!timetable.length) { alert("시간표가 비어 있습니다."); return; }
-  const blob = new Blob([JSON.stringify({ version: 1, timetable }, null, 2)],
+  const blob = new Blob([JSON.stringify({ version: 2, timetable: timetable.map(classRef) }, null, 2)],
     { type: "application/json" });
   downloadBlob(blob, "timetable.json");
 }
-function importTTJson(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const arr = Array.isArray(data) ? data : data.timetable;
-      if (!Array.isArray(arr)) throw new Error("bad shape");
-      pushUndo();
-      timetable = arr.filter((c) => c && c.sbjt_cd && c.lt_no && c.name);
-      saveTT(); renderSheets(); renderTT(); refreshCardStates();
-    } catch { alert("불러올 수 없는 시간표 파일입니다."); }
-  };
-  reader.readAsText(file);
+async function importTTJson(file) {
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch { alert("불러올 수 없는 시간표 파일입니다."); return; }
+  const arr = Array.isArray(data) ? data : data.timetable;
+  if (!Array.isArray(arr)) { alert("불러올 수 없는 시간표 파일입니다."); return; }
+  const res = await resolveEntries(arr);
+  if (!res) return;                         // lookup failed — keep current timetable
+  pushUndo();
+  timetable = res.entries;
+  saveTT(); renderSheets(); renderTT(); refreshCardStates();
+  if (detailClass) renderDetail();
+  if (res.dropped.length)
+    alert(`현재 강의 목록에 없어 제외된 강좌 ${res.dropped.length}개:\n${res.dropped.map(dropLabel).join(", ")}`);
 }
 function exportWishlist() {
   if (!wishlist.length) { alert("찜한 강좌가 없습니다."); return; }
-  const blob = new Blob([JSON.stringify({ version: 1, wishlist }, null, 2)], { type: "application/json" });
+  const blob = new Blob([JSON.stringify({ version: 2, wishlist: wishlist.map(classRef) }, null, 2)], { type: "application/json" });
   downloadBlob(blob, "wishlist.json");
 }
 // merge (dedupe by classKey) rather than replace, so importing on another device adds
 // to — never wipes — the local list.
-function importWishlist(file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const data = JSON.parse(reader.result);
-      const arr = Array.isArray(data) ? data : data.wishlist;
-      if (!Array.isArray(arr)) throw new Error("bad shape");
-      const have = new Set(wishlist.map(classKey));
-      let added = 0;
-      for (const c of arr) {
-        if (!(c && c.sbjt_cd && c.lt_no && c.name)) continue;
-        const k = classKey(c);
-        if (have.has(k)) continue;
-        have.add(k);
-        wishlist.push({ year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,
-          professor: c.professor, credits: c.credits, slots: c.slots || [], manual: c.manual || undefined });
-        added++;
-      }
-      saveWishlist(); renderWishlist(); refreshCardStates();
-      alert(`${added}개 추가됨 (총 ${wishlist.length}개).`);
-    } catch { alert("불러올 수 없는 찜 목록 파일입니다."); }
-  };
-  reader.readAsText(file);
+async function importWishlist(file) {
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch { alert("불러올 수 없는 찜 목록 파일입니다."); return; }
+  const arr = Array.isArray(data) ? data : data.wishlist;
+  if (!Array.isArray(arr)) { alert("불러올 수 없는 찜 목록 파일입니다."); return; }
+  const res = await resolveEntries(arr);
+  if (!res) return;
+  const have = new Set(wishlist.map(classKey));
+  let added = 0;
+  for (const c of res.entries) {
+    const k = classKey(c);
+    if (have.has(k)) continue;
+    have.add(k); wishlist.push(c); added++;
+  }
+  saveWishlist(); renderWishlist(); refreshCardStates();
+  const tail = res.dropped.length
+    ? `\n현재 강의 목록에 없어 제외된 강좌 ${res.dropped.length}개: ${res.dropped.map(dropLabel).join(", ")}`
+    : "";
+  alert(`${added}개 추가됨 (총 ${wishlist.length}개).${tail}`);
 }
 
 function roundRect(ctx, x, y, w, h, r) {
