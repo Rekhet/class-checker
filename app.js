@@ -1001,15 +1001,15 @@ function _seedActiveChanges() {
   if (chg.length || rm.length) _sheetChanges[activeId()] = { chg, rm, sig: _changeSig(chg, rm) };
   else delete _sheetChanges[activeId()];
 }
-// reconcile EVERY sheet against the latest catalog in one pass: one catalog scan
-// (lookupLocal is term-batched) + reading each sheet from storage (no LRU churn).
-// Best-effort (skips silently if offline).
+// reconcile EVERY sheet AND the wishlist against the latest catalog in one pass: one
+// catalog scan (lookupLocal is term-batched) + reading each sheet from storage (no LRU
+// churn). Best-effort (skips silently if offline).
 async function reconcileAll() {
   const ids = meta.ids.slice();
   const aid = activeId();
   const lists = ids.map((id) => (id === aid ? timetable : _readSheet(id)));
   const keys = [];
-  for (const list of lists)
+  for (const list of [...lists, wishlist])   // wishlist shares the same staleness gap
     for (const c of list) if (!c.manual) keys.push([c.year, c.term, c.sbjt_cd, c.lt_no]);
   if (!keys.length) { _sheetChanges = {}; renderSheets(); renderTT(); return; }
   let cur;
@@ -1022,6 +1022,7 @@ async function reconcileAll() {
     if (changed) { if (id === aid) saveTT(); else _writeSheet(id, lists[i]); }
   });
   _sheetChanges = next;
+  if (_reconcileClasses(wishlist, cur).changed) saveWishlist();  // refreshCardStates re-renders it
   renderSheets(); renderTT(); refreshCardStates();
 }
 
