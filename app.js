@@ -2259,7 +2259,7 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   const hasSuriReq = (suri.seq || []).length > 0;
 
   const totalCr = rows.reduce((s, r) => s + r.credits, 0);
-  const reqBase = required.filter((c) => !suriCodes.has(c.code));   // 수리통계는 아래에서 트랙별로 처리
+  const reqBase = required.filter((c) => c.code && !suriCodes.has(c.code));   // 코드 없는 항목(이름만) 제외; 수리통계는 아래에서 트랙별로 처리
   const reqBaseTaken = reqBase.filter((c) => takenCodes.has(c.code));
   // 부전공: 수리통계는 1과목(대체 가능). 주전공·복수전공: 수리통계 1·2 = 2과목 별도.
   const suriCount = track.suri_sub ? 1 : (suri.seq || []).length;
@@ -2293,6 +2293,10 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     reqTotalN = tr.min_courses || tr.pool.length;
     reqDoneN = Math.min(chkItems.filter((i) => i.done).length, reqTotalN);
     reqCreditsFixed = track.required_credits != null ? track.required_credits : (tr.min_credits || 0);
+  } else if (track.required_credits != null && !hasSuriReq) {
+    // 전필 학점만 spec에 명시(개별 과목 코드 미수집): 노이즈 큰 카탈로그 추정 대신 학점만 차감, 과목 체크리스트 생략
+    reqTotalN = 0; reqDoneN = 0;
+    reqCreditsFixed = track.required_credits;
   } else {
     reqBase.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code) }));
     if (hasSuriReq) {
@@ -2341,7 +2345,12 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     el("span", { className: "chk-i" }, done ? "✓" : "○"),
     el("span", {}, `${label} `), code ? el("span", { className: "chk-code" }, code) : document.createTextNode(""));
   const major = el("section", { className: "grad-sec" }, el("h3", {}, "전공"));
-  major.append(_gradBar(`전공필수 (${reqDoneN}/${reqTotalN}과목)`, reqDoneN, reqTotalN, "과목"));
+  // 전필 과목 목록이 있으면 과목 바, 없고 학점만 알면 안내 노트(0/0 거짓 충족 방지)
+  if (reqTotalN > 0)
+    major.append(_gradBar(`전공필수 (${reqDoneN}/${reqTotalN}과목)`, reqDoneN, reqTotalN, "과목"));
+  else if ((track.required_credits || 0) > 0)
+    major.append(el("div", { className: "grad-note" },
+      `전공필수 ${track.required_credits}학점 — 개별 과목 코드 미수집, 직접 확인 (전공선택 학점은 차감 반영)`));
   const chk = el("div", { className: "grad-chklist" });
   if (track.required && track.required.pool)
     chk.append(el("div", { className: "grad-note" }, `아래 ${track.required.pool.length}과목 중 ${reqTotalN}과목 이상 이수`));
