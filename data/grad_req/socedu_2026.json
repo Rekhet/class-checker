@@ -1,0 +1,75 @@
+{
+  "id": "socedu_2026",
+  "major": "사회교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://socialedu.snu.ac.kr/sub_department/{major.php,dubmajor.php} (주전공·이수표준형태 `*`전필 · 복수·부전공) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_hum_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 30,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["사회교육과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "정치와 사회", "code": "M1855.001500" },
+    { "name": "일반사회교육론", "code": "711.116" },
+    { "name": "경제와 사회", "code": "M1855.001600" },
+    { "name": "인간과 사회", "code": "711.241A" },
+    { "name": "시민교육과 사회윤리", "code": "711.476" },
+    { "name": "사회과학방법론", "code": "711.479" },
+    { "name": "통합사회교육론", "code": "M1855.001200" },
+    { "name": "사회과교재연구 및 지도법", "code": "711.302" },
+    { "name": "사회문화교육연습", "code": "711.373" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0,
+      "required": { "all": [
+        { "name": "정치와 사회", "code": "M1855.001500", "credits": 3 },
+        { "name": "일반사회교육론", "code": "711.116", "credits": 3 },
+        { "name": "경제와 사회", "code": "M1855.001600", "credits": 3 },
+        { "name": "인간과 사회", "code": "711.241A", "credits": 3 },
+        { "name": "시민교육과 사회윤리", "code": "711.476", "credits": 3 },
+        { "name": "사회과학방법론", "code": "711.479", "credits": 3 },
+        { "name": "통합사회교육론", "code": "M1855.001200", "credits": 3 },
+        { "name": "사회과교재연구 및 지도법", "code": "711.302", "credits": 3 },
+        { "name": "사회문화교육연습", "code": "711.373", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0,
+      "required": { "all": [
+        { "name": "정치와 사회", "code": "M1855.001500", "credits": 3 },
+        { "name": "일반사회교육론", "code": "711.116", "credits": 3 },
+        { "name": "경제와 사회", "code": "M1855.001600", "credits": 3 },
+        { "name": "인간과 사회", "code": "711.241A", "credits": 3 },
+        { "name": "시민교육과 사회윤리", "code": "711.476", "credits": 3 },
+        { "name": "사회과학방법론", "code": "711.479", "credits": 3 },
+        { "name": "통합사회교육론", "code": "M1855.001200", "credits": 3 },
+        { "name": "사회과교재연구 및 지도법", "code": "711.302", "credits": 3 },
+        { "name": "사회문화교육연습", "code": "711.373", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0,
+      "required": { "all": [
+        { "name": "정치와 사회", "code": "M1855.001500", "credits": 3 },
+        { "name": "일반사회교육론", "code": "711.116", "credits": 3 },
+        { "name": "경제와 사회", "code": "M1855.001600", "credits": 3 },
+        { "name": "인간과 사회", "code": "711.241A", "credits": 3 },
+        { "name": "시민교육과 사회윤리", "code": "711.476", "credits": 3 },
+        { "name": "사회과학방법론", "code": "711.479", "credits": 3 },
+        { "name": "통합사회교육론", "code": "M1855.001200", "credits": 3 },
+        { "name": "사회과교재연구 및 지도법", "code": "711.302", "credits": 3 },
+        { "name": "사회문화교육연습", "code": "711.373", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 30, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "단일전공 총학점은 HTML 미표기(page_info 이미지) → 사범대 baseline 60 적용. 복수전공 52 = 전공필수 과목 전체(25학번 이후 39학점) + 사회과 논리 및 논술(2) 필수. 부전공 30 = 전공필수 과목 30학점 이상.",
+    "전공필수 = 이수표준형태 `*` 표시 9과목(코드 확인, 각 3학점 가정; 25학번부터 통합사회교육론 전필 편입). 711.261 사회와 철학·M1855.001700 사회와 법률·711.381 시민교육과 사회문제는 23학번부터 전선. 복수전공 전필 합 39학점은 학번별 이수표 확인 권장.",
+    "외국어진행강좌: 3학점을 사회교육과 전공으로 이수(복수전공 명시) → 사범대 baseline 전공 3학점 포함 9학점(english_min_courses=3) 적용.",
+    "통합사회 연계전공: 사회·역사·지리·윤리 4과 통합사회영역 50학점 이수 시 통합사회 정교사 2급 추가 취득(주전공과 15학점 이내 중복 인정).",
+    "교직과정 22학점(전공과 별개). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 일반사회. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

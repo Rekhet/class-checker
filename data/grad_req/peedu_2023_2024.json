@@ -1,0 +1,109 @@
+{
+  "id": "peedu_2023_2024",
+  "major": "체육교육과",
+  "college": "사범대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://sports.snu.ac.kr/교과과정/ (학부 이수 내규 2024~ 누적) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "edu_hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "체육교육과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "육상1(트랙)"
+    },
+    {
+      "name": "육상2(필드)"
+    },
+    {
+      "name": "기계체조1(마루운동)"
+    },
+    {
+      "name": "기계체조2(뜀틀,철봉)"
+    },
+    {
+      "name": "건강체조"
+    },
+    {
+      "name": "수영1"
+    },
+    {
+      "name": "체육교육론"
+    },
+    {
+      "name": "체육교육과정"
+    },
+    {
+      "name": "체육교재연구 및 지도법"
+    },
+    {
+      "name": "체육논리 및 논술"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": []
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 52,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": []
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 52,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": []
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": []
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. (2013학번 이후.)",
+    "전공 60학점 이상(체육교육과 내규 전공필수 포함) / 타전공 이수(다전공·복수·부전공) 52학점 이상. 부전공 학점은 페이지 미명시 → 사범대 baseline 21 적용.",
+    "전공필수(2024~ 내규, 코드 미수록 → required.all 비움): 육상1(트랙)·육상2(필드)·기계체조1(마루운동)·기계체조2(뜀틀,철봉)·건강체조·수영1·체육교육론·체육교육과정·체육교재연구 및 지도법·체육논리 및 논술 (학번별 약간 상이, 전필 단일 총학점 미명시 → required_credits 생략).",
+    "기본이수: [체육사철학·스포츠사회학·무용교육·여가레크리에이션] 중 3과목 + [운동생리학·운동역학·건강교육·운동학습및심리·체육측정평가·특수체육] 중 5과목. 전공 실기과목 총 21개 이상 + 특별활동 5회 + 하계/동계스포츠 각 1회.",
+    "외국어진행강좌: 전공교과목 3학점 포함 10학점 이상 필수(체육은 사범대 9학점 baseline보다 높은 10학점) → english_min_courses=3 (전공 포함 과목수 근사, 총 10학점 요건).",
+    "교양 36학점(edu_pe_2025; 예술과체육 영역 면제) + 교양체육1·2 필수(졸업학점 미포함).",
+    "교직과정 22학점(전공과 별개; 교직이론 12↑ + 교직소양 6↑ + 교육실습 4↑, 2013학번~). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 체육. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

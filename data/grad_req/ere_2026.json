@@ -1,0 +1,79 @@
+{
+  "id": "ere_2026",
+  "major": "에너지자원공학과",
+  "college": "공과대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "ere.snu.ac.kr/sub4_3_a.php 졸업규정(browser render, JS) + board sub4_1_d. 상세: _scrape/review_r1.md",
+  "total_credits": 130,
+  "general": "eng_energy_2025",
+  "major_min_credits": 62,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "에너지자원공학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "에너지자원공학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 62,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 33
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 33
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 49학점 이상, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공 62학점 = 전필 33 + 전선 26. 복수/부전공 세부는 학과내규(2025.11) → major_double_credits·minor_credits는 공대 baseline(39/21) 적용(근사).",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "졸업논문 필수.",
+    "전공필수 33학점: 졸업규정 페이지가 전필 총 33학점만 명시(개별 과목 코드/학점 분리 게시 없음) → required_credits 33 설정, required.all 생략. 전필 식별은 카탈로그(에너지자원공학과·전필)에서 파생. 복수/부전공 required_credits는 내규 미게시 → 0."
+  ]
+}

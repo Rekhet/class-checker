@@ -1,0 +1,284 @@
+{
+  "id": "ie_2023_2024",
+  "major": "산업공학과",
+  "college": "공과대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "ie.snu.ac.kr/undergrad_regulation 「산업공학과 학부 교과목 이수·졸업 학과내규 2026.04」.pdf(2014~2021이후 표). 상세: _scrape/review_r1.md + _scrape/review_r2.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "eng_ie_2022",
+  "major_min_credits": 59,
+  "major_double_credits": 49,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "산업공학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "산업공학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 59,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 28,
+      "required": {
+        "all": [
+          {
+            "name": "과학적 관리",
+            "code": "406.211",
+            "credits": 3
+          },
+          {
+            "name": "데이터관리와 분석",
+            "code": "406.426B",
+            "credits": 3
+          },
+          {
+            "name": "인간공학",
+            "code": "406.304",
+            "credits": 3
+          },
+          {
+            "name": "인간공학실험",
+            "code": "406.305A",
+            "credits": 1
+          },
+          {
+            "name": "경영과학 1",
+            "code": "406.315",
+            "credits": 3
+          },
+          {
+            "name": "경영과학 2",
+            "code": "406.317",
+            "credits": 3
+          },
+          {
+            "name": "산업공학통계",
+            "code": "406.432",
+            "credits": 3
+          },
+          {
+            "name": "생산관리",
+            "code": "406.310",
+            "credits": 3
+          },
+          {
+            "name": "경제성공학",
+            "code": "406.314",
+            "credits": 3
+          },
+          {
+            "name": "최적화 알고리즘",
+            "code": "M1505.002000",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 49,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 28,
+      "required": {
+        "all": [
+          {
+            "name": "과학적 관리",
+            "code": "406.211",
+            "credits": 3
+          },
+          {
+            "name": "데이터관리와 분석",
+            "code": "406.426B",
+            "credits": 3
+          },
+          {
+            "name": "인간공학",
+            "code": "406.304",
+            "credits": 3
+          },
+          {
+            "name": "인간공학실험",
+            "code": "406.305A",
+            "credits": 1
+          },
+          {
+            "name": "경영과학 1",
+            "code": "406.315",
+            "credits": 3
+          },
+          {
+            "name": "경영과학 2",
+            "code": "406.317",
+            "credits": 3
+          },
+          {
+            "name": "산업공학통계",
+            "code": "406.432",
+            "credits": 3
+          },
+          {
+            "name": "생산관리",
+            "code": "406.310",
+            "credits": 3
+          },
+          {
+            "name": "경제성공학",
+            "code": "406.314",
+            "credits": 3
+          },
+          {
+            "name": "최적화 알고리즘",
+            "code": "M1505.002000",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 49,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 27,
+      "required": {
+        "all": [
+          {
+            "name": "과학적 관리",
+            "code": "406.211",
+            "credits": 3
+          },
+          {
+            "name": "데이터관리와 분석",
+            "code": "406.426B",
+            "credits": 3
+          },
+          {
+            "name": "인간공학",
+            "code": "406.304",
+            "credits": 3
+          },
+          {
+            "name": "인간공학실험",
+            "code": "406.305A",
+            "credits": 1
+          },
+          {
+            "name": "경영과학 1",
+            "code": "406.315",
+            "credits": 3
+          },
+          {
+            "name": "경영과학 2",
+            "code": "406.317",
+            "credits": 3
+          },
+          {
+            "name": "산업공학통계",
+            "code": "406.432",
+            "credits": 3
+          },
+          {
+            "name": "생산관리",
+            "code": "406.310",
+            "credits": 3
+          },
+          {
+            "name": "경제성공학",
+            "code": "406.314",
+            "credits": 3
+          },
+          {
+            "name": "최적화 알고리즘",
+            "code": "M1505.002000",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 12
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 52학점(글쓰기 7 포함), 전체·전공 평점 각 2.0 이상.",
+    "⚠ 단일전공 59학점 = 전필 28 + 학과전선 21학점 이상 (cse 63 baseline에서 divergence — 학과내규 2014~2021이후 확정값).",
+    "복수·연합전공 = 전필 28 + 학과전선 21 충족(주전공학점). 부전공·다전공 세부는 학과내규 + 주전공 학점. major_double_credits 49(=전필28+전선21)는 근사, minor_credits 공대 baseline 21.",
+    "대학원 세미나 1과목 필수.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "전공선택 인정: 2026학번~ cse(컴퓨터공학부) 전선 인정 리스트에서 산업공학과 제외 → 본 학과 recog 없음(보수적).",
+    "전공필수 28학점: 학과내규가 전필 총 28학점만 표로 명시(개별 과목 코드/학점 분리 게시 없음) → required_credits 28 설정, required.all 생략. 전필 식별은 카탈로그(산업공학과·전필)에서 파생. 부전공 required_credits는 미세분 → 0."
+  ],
+  "major_required_known": [
+    {
+      "name": "과학적 관리",
+      "code": "406.211"
+    },
+    {
+      "name": "데이터관리와 분석",
+      "code": "406.426B"
+    },
+    {
+      "name": "인간공학",
+      "code": "406.304"
+    },
+    {
+      "name": "인간공학실험",
+      "code": "406.305A"
+    },
+    {
+      "name": "경영과학 1",
+      "code": "406.315"
+    },
+    {
+      "name": "경영과학 2",
+      "code": "406.317"
+    },
+    {
+      "name": "산업공학통계",
+      "code": "406.432"
+    },
+    {
+      "name": "생산관리",
+      "code": "406.310"
+    },
+    {
+      "name": "경제성공학",
+      "code": "406.314"
+    },
+    {
+      "name": "최적화 알고리즘",
+      "code": "M1505.002000"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "mathedu2_2026",
+  "major": "수학교육과",
+  "college": "사범대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://mathed.snu.ac.kr/2023학번도-입학생/ (학부 졸업규정, 2025·26학번 표시) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md",
+  "total_credits": 130,
+  "general": "edu_math_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["수학교육과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "해석개론1" },
+    { "name": "선형대수학1" },
+    { "name": "현대대수학1" },
+    { "name": "수학교육론" },
+    { "name": "위상수학1" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 15,
+      "required": { "all": [] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상, 교직 평점 2.4 이상, 졸업논문.",
+    "단일전공 60 / 다른 전공 병행(복수·부·연합·연계·학생설계) 52. 부전공 학점은 페이지 미명시 → 사범대 baseline 21 적용.",
+    "전공필수 15학점 5과목(코드 미수록 → required.all 비움, required_credits=15): 해석개론1·선형대수학1·현대대수학1·수학교육론·위상수학1 (5과목 모두 이수). 교과교육 10학점↑: 수학교육론·수학 논리 및 논술·수학교재연구 및 지도법 필수 + (수학사와 수학교육·수학교육과 교육공학) 중 1↑. (2023.9.1. 개정 = 9학점 경과규정.) 기본이수 21학점 이상.",
+    "외국어진행강좌: 3학점 이상 전공교과목 포함 9학점 이상 수강 권장(english_min_courses=3).",
+    "교직과정 22학점(전공과 별개; 교직이론 12↑/6과목[교육학개론 필수] + 교직소양 6↑/3과목[특수교육학개론·교직실무·학교폭력예방 및 학생의 이해] + 교육실습 4↑). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 수학. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

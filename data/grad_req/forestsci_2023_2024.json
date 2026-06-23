@@ -1,0 +1,70 @@
+{
+  "id": "forestsci_2023_2024",
+  "major": "산림과학부",
+  "college": "농업생명과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://forestry.snu.ac.kr/ (학부 포털; 산림환경학전공·환경재료과학전공 = 소개 prose만, 교과과정/졸업요건 사이트 미게시). 농생대 공통 130/36/48 적용(baseline). 전필 = cals.snu.ac.kr/교과과정편람 소관. 상세: _scrape/agri.md + _scrape/partial_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "agri_sci_2022",
+  "major_min_credits": 48,
+  "major_double_credits": 48,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "산림과학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "산림과학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 48,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 48,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 48,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 24,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 36학점(agri_sci_2025), 주전공 48학점. 전체·주전공·복수·부전공 각 평점 2.0 이상.",
+    "학부-level 스펙. 산림과학부 = 2개 전공(산림환경학전공·환경재료과학전공) — 구 '산림과학' 단일에서 분리. 전공 구분은 스키마보다 세분.",
+    "BASELINE-ASSUMED: forestry.snu.ac.kr WordPress 사이트가 교과과정·졸업요건·이수규정 미게시(두 전공 모두 소개 prose뿐, 0 tables). 졸업표 130/36/48/복수48/부전공24 = 농생대 공통 추론, 전필 코드 = 미상(교과과정편람 또는 cals.snu.ac.kr 확인 필요).",
+    "전필 코드 미확보 → required_credits·major_required_known 생략. 전선 min = 48−전필(미상).",
+    "외국어진행강좌: 농생대 자연계 baseline 3과목(전공 1과목 포함). 페이지 명시 없어 baseline-assumed."
+  ]
+}

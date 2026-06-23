@@ -1,0 +1,211 @@
+{
+  "id": "cee_2023_2024",
+  "major": "건설환경공학부",
+  "college": "공과대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://cee.snu.ac.kr/sub3_1_b.php (학사안내>교과과정, 2026학번 표준이수형태 inline) + 공과대학 공통과목. 상세: _scrape/eng_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "eng_civil_2022",
+  "major_min_credits": 62,
+  "major_double_credits": 48,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "건설환경공학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "건설환경공학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "건설환경 디지털 공학설계",
+      "code": "M1586.003400"
+    },
+    {
+      "name": "건설환경공학 입문",
+      "code": "M1586.003300"
+    },
+    {
+      "name": "재료역학 및 실험",
+      "code": "457.201"
+    },
+    {
+      "name": "기초유체역학 및 실험",
+      "code": "457.204"
+    },
+    {
+      "name": "건설환경통계학",
+      "code": "457.212"
+    },
+    {
+      "name": "건설시스템종합설계",
+      "code": "457.408"
+    }
+  ],
+  "dept_required_general": [],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 62,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 16,
+      "required": {
+        "all": [
+          {
+            "name": "건설환경 디지털 공학설계",
+            "code": "M1586.003400",
+            "credits": 3
+          },
+          {
+            "name": "건설환경공학 입문",
+            "code": "M1586.003300",
+            "credits": 1
+          },
+          {
+            "name": "재료역학 및 실험",
+            "code": "457.201",
+            "credits": 3
+          },
+          {
+            "name": "기초유체역학 및 실험",
+            "code": "457.204",
+            "credits": 3
+          },
+          {
+            "name": "건설환경통계학",
+            "code": "457.212",
+            "credits": 3
+          },
+          {
+            "name": "건설시스템종합설계",
+            "code": "457.408",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 48,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 16,
+      "required": {
+        "all": [
+          {
+            "name": "건설환경 디지털 공학설계",
+            "code": "M1586.003400",
+            "credits": 3
+          },
+          {
+            "name": "건설환경공학 입문",
+            "code": "M1586.003300",
+            "credits": 1
+          },
+          {
+            "name": "재료역학 및 실험",
+            "code": "457.201",
+            "credits": 3
+          },
+          {
+            "name": "기초유체역학 및 실험",
+            "code": "457.204",
+            "credits": 3
+          },
+          {
+            "name": "건설환경통계학",
+            "code": "457.212",
+            "credits": 3
+          },
+          {
+            "name": "건설시스템종합설계",
+            "code": "457.408",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 48,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 16,
+      "required": {
+        "all": [
+          {
+            "name": "건설환경 디지털 공학설계",
+            "code": "M1586.003400",
+            "credits": 3
+          },
+          {
+            "name": "건설환경공학 입문",
+            "code": "M1586.003300",
+            "credits": 1
+          },
+          {
+            "name": "재료역학 및 실험",
+            "code": "457.201",
+            "credits": 3
+          },
+          {
+            "name": "기초유체역학 및 실험",
+            "code": "457.204",
+            "credits": 3
+          },
+          {
+            "name": "건설환경통계학",
+            "code": "457.212",
+            "credits": 3
+          },
+          {
+            "name": "건설시스템종합설계",
+            "code": "457.408",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공(심화) 62학점 = 학부 전공교과 54 + 공대공통 3 등. 다른전공 병행이수(복수·부·연합·연계·학생설계) 48학점. 부전공은 공대 baseline 21(학부 미세분 → required_credits 0, 학과내규).",
+    "전공필수 = 전공소양(필수) 13학점 + 전공심화(필수) 건설시스템종합설계 3학점. required.all에 6과목(=16학점) 등재. 전공핵심(선택적필수) 21학점은 8과목 중 선택 → 전선으로 처리(select_min 일부).",
+    "전공핵심(선택적필수, 21학점): 도시계획(457.203)·공간정보공학(457.205)·토질역학(457.206)·교통공학 및 실험(457.208)·수문학(457.207A)·환경공학(457.210A)·구조해석1(M1586.002000)·건설계획 및 관리(457.307). 전공심화(선택) 15학점은 8개 분야 중 4개 분야 이상 + 1개 분야 2과목 이상.",
+    "추가규정: 학부 전공교과 총 54학점 충족 위해 전공핵심/전공심화 중 추가 2학점 이수.",
+    "공과대학 공통과목 3학점 필수(전필 인정, 400.*** / M2177.00****).",
+    "외국어진행강좌 3과목 이상(전공 1과목 이상 포함; 대학영어·고급영어 등 외국어교과목 제외).",
+    "기타: 생명존중(자살예방) 교육 의무; 졸업논문 발표; 매학기 지도교수 면담.",
+    "select_min(전공심화 선택 15학점)·전공핵심 선택은 근사 — 분야 선택 규칙은 카탈로그 참조."
+  ]
+}

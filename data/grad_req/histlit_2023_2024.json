@@ -1,0 +1,61 @@
+{
+  "id": "histlit_2023_2024",
+  "major": "역사학부",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://history.snu.ac.kr/major_tracks/ (세부전공 이수학점표, 정적 HTML). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "역사학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점). 2023학번~ 역사학부 통합(한국사학·동양사학·서양사학 세부전공) — 본 spec은 학부 단위(dept '역사학부').",
+    "track 학점: 주전공·복수 39 / 심화 60 / 부전공 21 (공통12+세부전공 분배+선택3 구조). 세부전공별 분배표는 본인 전공이 27/9/9 자리 차지(한국사학 view 기준).",
+    "전공필수 = 과목군 + track별 조건(코드 미표기, track-conditional substitution): 공통①역사공부의기초/역사학세미나 중1 ②역사학논문쓰기1·2·3 중1 ③한문사료강독1·2 중1, 전공④한국사를보는관점과자료 ⑤시대사 중2. 주전공/복수=①~④, 심화=①~⑤, 부전공=①③④. 동양사·서양사는 ④⑤가 해당 전공 입문·시대사로 치환 → required 자동검증 밖, 미생성.",
+    "외국어진행강좌 ≥3과목(공통 '영어로역사읽기' M3533.000100 활용 가능). 제2외국어 9학점은 교양(hum_2025) 측. 세부 학번별 표는 koreanhistory/asianhistory/whistory.snu.ac.kr 참조."
+  ]
+}

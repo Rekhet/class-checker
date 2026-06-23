@@ -1,0 +1,79 @@
+{
+  "id": "naoe_2023_2024",
+  "major": "조선해양공학과",
+  "college": "공과대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "ship.snu.ac.kr/department/rule 「교과목 이수규정(2026학년도).pdf」(bbsidx=13323 학번별 졸업이수학점 기준표 '2021~2024' 행 + 2023·2024 이수규정 본문). 상세: _scrape/review_r1.md, _scrape/peryear_eng.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계) + 단일66/병행45.",
+  "total_credits": 130,
+  "general": "eng_naoe_2022",
+  "major_min_credits": 66,
+  "major_double_credits": 45,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "조선해양공학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "조선해양공학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 66,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 45,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 30
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 53학점 이상(2023~2024, eng_naoe_2022), 전체·전공 평점 각 2.0 이상.",
+    "전공 by track(2021~2024학번 기준표): 단일전공 66학점 = 전필 30 + 전선 21학점 이상. 타전공 병행이수(부·복수·연계) 45학점 = 전필 30 + 전선 충당. 부전공 공대 baseline 21.",
+    "2025학번부터 단일 66→63·병행 45→48·교양 53→49로 변경(naoe_2026.json). 전필 30학점은 불변.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "전공필수 30학점: 이수규정 기준표가 전필 총 30학점만 명시(개별 과목 코드/학점 분리 게시 없음) → required_credits 30 설정, required.all 생략. 전필 식별은 카탈로그(조선해양공학과·전필)에서 파생. 부전공 required_credits 미세분 → 0."
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "geog_2025",
+  "major": "지리학과",
+  "college": "사회과학대학",
+  "batch": ["2025"],
+  "track": "단일전공",
+  "source": "https://geog.snu.ac.kr/sub02/sub02.php (학점 이수규정 표 + 전공필수 + 학위취득요건). 상세: _scrape/soc.md, _scrape/peryear_soc.md",
+  "total_credits": 130,
+  "general": "soc_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["지리학과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["지리학과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "자연지리학개론", "code": "208.219" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 3 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 3 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 3 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 3 }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수(2024~2025학번, 1과목): 자연지리학개론 208.219. (2008~2023학번 = 공간정보분석 1:통계모형 M0000.029300 + 지리공간의 역사와 사상 208.421A 2과목; 2026학번~ = 전공필수 없음.) required_credits=3은 1과목×3 가정 baseline.",
+    "전공 학점: 심화 60 / 다전공(복수·부·연합·연계·학생설계) 39. 부전공 학점 표 미표기 — 사회대 표준 21 적용(baseline 가정).",
+    "전공선택 최소: 별도 카운트 없음(전공학점 − 전필).",
+    "외국어진행강좌 최소 과목수 페이지 명시 없음 — baseline 1과목.",
+    "졸업논문 제출 필수."
+  ]
+}

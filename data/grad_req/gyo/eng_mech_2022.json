@@ -1,0 +1,14 @@
+{
+  "id": "eng_mech_2022",
+  "college": "공과대학 기계공학부",
+  "applies": "2021~2024",
+  "total_min": 49,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "math", "name": "수학", "min": 12, "areas": ["math", "stat"] },
+    { "key": "science", "name": "과학", "min": 12, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
+  ]
+}

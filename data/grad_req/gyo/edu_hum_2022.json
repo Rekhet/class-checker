@@ -1,0 +1,14 @@
+{
+  "id": "edu_hum_2022",
+  "college": "사범대학 (윤리·국어·외국어·사회교육계·체육교육과)",
+  "applies": "2021~2024",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "msc", "name": "컴퓨터와 정보 활용", "min": 3, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] },
+    { "key": "arts", "name": "예술과 체육", "min": 2, "areas": ["x_arts"] }
+  ],
+  "notes": ["컴퓨터와 정보 활용: 컴퓨팅 기초/핵심/응용, 컴퓨터의 개념 및 실습 중 택 1.", "대학 글쓰기 2는 '교과 논리 및 논술' 이수로 대체 가능(대체 시에도 총 36학점 충족 필요).", "선택 교양: 체육계열과목 2학점 필수 이수(체육교육과 해당없음).", "전체 교양 교과목 중 9학점 자유 선택."]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "sees_2023",
+  "major": "지구환경과학부",
+  "college": "자연과학대학",
+  "batch": [
+    "2023"
+  ],
+  "track": "단일전공",
+  "source": "https://sees.snu.ac.kr/academics/undergraduate/curriculum-major (졸업요건 전공 학점표) + 학번별 전공교과목 이수 표준형태 PDF(seqidx=35) + 자연과학대학 공통교육과정 2026. 상세: _scrape/peryear_natsci.md | 2023학번: OLD 공통교육과정(학문의 기초/세계). 2023학번 표준형태에 ＊필수이수 과목 0개 → 전공필수 없음.",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "지구환경과학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수·연합전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공·연계전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전공 by track 심화60/복수39/부전공21 (HTML 졸업표 명시).",
+    "전공필수 없음: 2023학번 전공교과목 이수 표준형태(seqidx=35)에 ＊필수이수 과목 0개. 60/39/21은 전공선택 학점요건만. 지구환경과학논문연구(M1411.002600)는 2024학번 신입생부터 필수 → 2023학번 미적용.",
+    "외국어진행강좌 최소 과목수 미명시 — 자연대 baseline 1과목."
+  ]
+}

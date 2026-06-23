@@ -1,0 +1,29 @@
+{
+  "id": "vet_2026",
+  "major": "수의예과",
+  "college": "수의과대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://vet.snu.ac.kr/prevet1,prevet2/ 교과과정 이미지(예과1·2, 2025.05) + 수의과대학 공통교육과정 2026. 이미지 vision 판독.",
+  "total_credits": 72,
+  "general": "vet_2025",
+  "major_min_credits": 26,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["수의예과"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "수의생명의학 1 (생물학개론)", "code": "M2180.002300" },
+    { "name": "수의생명의학 3 (수의분자세포생물학)", "code": "M2180.002500" },
+    { "name": "수의전문직업성 1 (수의역사와 직업정체성)", "code": "M2180.002800" },
+    { "name": "수의전문직업성 3 (인간동물관계와 원헬스)", "code": "M2180.003000" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "수의예과(2년)", "major_min_credits": 26, "general": true, "select_min": 0, "required_credits": 26 }
+  ],
+  "notes": [
+    "수의예과 = 2년 예과 과정. 전공 26학점 전부 필수 = 예과1(12): 수의생명의학1·2, 수의전문직업성1·2, 기초유기화학 + 예과2(14): 수의생명의학3·4·실습, 수의전문직업성3·4, 수의통계학.",
+    "교양 = vet_2025 (수강편람 42; 학과 교과과정 이미지엔 46 권장 — 공식 42 적용).",
+    "total 72 = 학과 교과과정 권장이수(예과1 38 + 예과2 34) 합. 학칙상 수료 총학점은 별도일 수 있음.",
+    "전공 전부 필수라 전공선택 0. 본과(수의학과)는 별도 4년 임상과정. 복수·부전공 없음.",
+    "출처 = vet.snu.ac.kr 예과1/2 교과과정 JPG (졸업규정 텍스트 페이지 부재 → 이미지 vision 판독)."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "edu_physics_2025",
+  "college": "사범대학 (물리교육과)",
+  "applies": "2025·2026",
+  "total_min": 39,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "science", "name": "과학", "min": 16, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] },
+    { "key": "arts", "name": "예술과 체육", "min": 1, "areas": ["x_arts"] }
+  ]
+}

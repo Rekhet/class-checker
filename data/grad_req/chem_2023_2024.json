@@ -1,0 +1,179 @@
+{
+  "id": "chem_2023_2024",
+  "major": "화학부",
+  "college": "자연과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://chem.snu.ac.kr/academics/undergraduate/{degree,courses} (2021학번~ 이수규정 + 표준형태) + 자연과학대학 공통교육과정 2026. 상세: _scrape/natsci.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "화학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "유기화학 1",
+      "code": "3343.205"
+    },
+    {
+      "name": "물리화학 1",
+      "code": "3343.207"
+    },
+    {
+      "name": "물리분석실험",
+      "code": "3343.312"
+    },
+    {
+      "name": "유기무기실험",
+      "code": "3343.313"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 12,
+      "required": {
+        "all": [
+          {
+            "name": "유기화학 1",
+            "code": "3343.205",
+            "credits": 3
+          },
+          {
+            "name": "물리화학 1",
+            "code": "3343.207",
+            "credits": 3
+          },
+          {
+            "name": "물리분석실험",
+            "code": "3343.312",
+            "credits": 3
+          },
+          {
+            "name": "유기무기실험",
+            "code": "3343.313",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 12,
+      "required": {
+        "all": [
+          {
+            "name": "유기화학 1",
+            "code": "3343.205",
+            "credits": 3
+          },
+          {
+            "name": "물리화학 1",
+            "code": "3343.207",
+            "credits": 3
+          },
+          {
+            "name": "물리분석실험",
+            "code": "3343.312",
+            "credits": 3
+          },
+          {
+            "name": "유기무기실험",
+            "code": "3343.313",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 12,
+      "required": {
+        "all": [
+          {
+            "name": "유기화학 1",
+            "code": "3343.205",
+            "credits": 3
+          },
+          {
+            "name": "물리화학 1",
+            "code": "3343.207",
+            "credits": 3
+          },
+          {
+            "name": "물리분석실험",
+            "code": "3343.312",
+            "credits": 3
+          },
+          {
+            "name": "유기무기실험",
+            "code": "3343.313",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 12,
+      "required": {
+        "all": [
+          {
+            "name": "유기화학 1",
+            "code": "3343.205",
+            "credits": 3
+          },
+          {
+            "name": "물리화학 1",
+            "code": "3343.207",
+            "credits": 3
+          },
+          {
+            "name": "물리분석실험",
+            "code": "3343.312",
+            "credits": 3
+          },
+          {
+            "name": "유기무기실험",
+            "code": "3343.313",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수 = 2021학번 reform 후 ＊표시 핵심(유기화학1·물리화학1·물리분석실험·유기무기실험, 12학점). 전체 표준형태·복수/부전공 전필 차이는 화학부 졸업요건 PDF 참조(근사).",
+    "외국어진행강좌 최소 과목수 페이지 미명시 — 자연대 baseline 1과목.",
+    "졸업논문 필수."
+  ]
+}

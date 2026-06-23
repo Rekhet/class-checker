@@ -1,0 +1,12 @@
+{
+  "id": "human_food_2022",
+  "college": "생활과학대학 (식품영양학과)",
+  "applies": "2021~2024",
+  "total_min": 40,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 7, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "msc", "name": "수량적 분석·과학적 사고·컴퓨터", "min": 15, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  ]
+}

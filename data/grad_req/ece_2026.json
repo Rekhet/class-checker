@@ -1,0 +1,284 @@
+{
+  "id": "ece_2026",
+  "major": "전기·정보공학부",
+  "college": "공과대학",
+  "batch": [
+    "2025",
+    "2026"
+  ],
+  "track": "단일전공",
+  "source": "ece.snu.ac.kr/academics/undergraduate/requirements 2026 졸업사정 이수과목 확인 카드 PDF(?md=download&seqidx=30, Referer 필요). 상세: _scrape/review_r1.md + _scrape/review_r4.md",
+  "total_credits": 130,
+  "general": "eng_ee_2025",
+  "major_min_credits": 63,
+  "major_double_credits": 45,
+  "minor_credits": 48,
+  "english_min_courses": 3,
+  "major_required_match": {
+    "departments": [
+      "전기·정보공학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "전기·정보공학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 63,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 32,
+      "required": {
+        "all": [
+          {
+            "name": "논리설계 및 실험",
+            "code": "430.201A",
+            "credits": 4
+          },
+          {
+            "name": "기초전자기학 및 연습",
+            "code": "430.202B",
+            "credits": 4
+          },
+          {
+            "name": "기초전자회로 및 실험",
+            "code": "430.207B",
+            "credits": 4
+          },
+          {
+            "name": "기초회로이론 및 실험",
+            "code": "430.213A",
+            "credits": 4
+          },
+          {
+            "name": "전기·정보세미나 1",
+            "code": "M2608.001400",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 2",
+            "code": "M2608.001500",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 3",
+            "code": "M2608.001600",
+            "credits": 1
+          },
+          {
+            "name": "신호 및 시스템",
+            "code": "430.306",
+            "credits": 3
+          },
+          {
+            "name": "프로그래밍방법론",
+            "code": "430.211",
+            "credits": 4
+          },
+          {
+            "name": "전기공학설계프로젝트",
+            "code": "430.405",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 32,
+      "required": {
+        "all": [
+          {
+            "name": "논리설계 및 실험",
+            "code": "430.201A",
+            "credits": 4
+          },
+          {
+            "name": "기초전자기학 및 연습",
+            "code": "430.202B",
+            "credits": 4
+          },
+          {
+            "name": "기초전자회로 및 실험",
+            "code": "430.207B",
+            "credits": 4
+          },
+          {
+            "name": "기초회로이론 및 실험",
+            "code": "430.213A",
+            "credits": 4
+          },
+          {
+            "name": "전기·정보세미나 1",
+            "code": "M2608.001400",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 2",
+            "code": "M2608.001500",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 3",
+            "code": "M2608.001600",
+            "credits": 1
+          },
+          {
+            "name": "신호 및 시스템",
+            "code": "430.306",
+            "credits": 3
+          },
+          {
+            "name": "프로그래밍방법론",
+            "code": "430.211",
+            "credits": 4
+          },
+          {
+            "name": "전기공학설계프로젝트",
+            "code": "430.405",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 45,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 28,
+      "required": {
+        "all": [
+          {
+            "name": "논리설계 및 실험",
+            "code": "430.201A",
+            "credits": 4
+          },
+          {
+            "name": "기초전자기학 및 연습",
+            "code": "430.202B",
+            "credits": 4
+          },
+          {
+            "name": "기초전자회로 및 실험",
+            "code": "430.207B",
+            "credits": 4
+          },
+          {
+            "name": "기초회로이론 및 실험",
+            "code": "430.213A",
+            "credits": 4
+          },
+          {
+            "name": "전기·정보세미나 1",
+            "code": "M2608.001400",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 2",
+            "code": "M2608.001500",
+            "credits": 1
+          },
+          {
+            "name": "전기·정보세미나 3",
+            "code": "M2608.001600",
+            "credits": 1
+          },
+          {
+            "name": "신호 및 시스템",
+            "code": "430.306",
+            "credits": 3
+          },
+          {
+            "name": "프로그래밍방법론",
+            "code": "430.211",
+            "credits": 4
+          },
+          {
+            "name": "전기공학설계프로젝트",
+            "code": "430.405",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 48,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 24
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 53학점 이상, 전체·전공 평점 각 2.0 이상.",
+    "전공 by track: 단일전공 63학점(전필 32 + 선택전선 13학점 이상 포함). 타과 복수·연합·학생설계 전공 45학점 / 부·연계전공 48학점. (복수=major_double_credits 45, 부·연계=minor_credits 48).",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
+    "공과대학 공통과목 3학점(전필 인정).",
+    "전공필수 32학점: 졸업사정 카드가 전필 총 32학점만 명시하고 개별 과목 코드/학점을 분리 게시하지 않음 → required_credits 32 설정, required.all 생략. 전필 식별은 카탈로그(전기·정보공학부·전필)에서 파생.",
+    "부전공 required_credits는 학부 미세분 → 0(학과내규).",
+    "기타: 생명존중 교육·졸업논문."
+  ],
+  "major_required_known": [
+    {
+      "name": "논리설계 및 실험",
+      "code": "430.201A"
+    },
+    {
+      "name": "기초전자기학 및 연습",
+      "code": "430.202B"
+    },
+    {
+      "name": "기초전자회로 및 실험",
+      "code": "430.207B"
+    },
+    {
+      "name": "기초회로이론 및 실험",
+      "code": "430.213A"
+    },
+    {
+      "name": "전기·정보세미나 1",
+      "code": "M2608.001400"
+    },
+    {
+      "name": "전기·정보세미나 2",
+      "code": "M2608.001500"
+    },
+    {
+      "name": "전기·정보세미나 3",
+      "code": "M2608.001600"
+    },
+    {
+      "name": "신호 및 시스템",
+      "code": "430.306"
+    },
+    {
+      "name": "프로그래밍방법론",
+      "code": "430.211"
+    },
+    {
+      "name": "전기공학설계프로젝트",
+      "code": "430.405"
+    }
+  ]
+}

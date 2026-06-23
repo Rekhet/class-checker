@@ -1,0 +1,39 @@
+{
+  "id": "foodnut_2026",
+  "major": "식품영양학과",
+  "college": "생활과학대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://foodnutrition.snu.ac.kr/졸업-이수-학점/ (졸업이수학점표) + 전공 이수규정 https://foodnutrition.snu.ac.kr/전공-이수-규정/. 상세: _scrape/misc.md",
+  "total_credits": 130,
+  "general": "human_food_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": { "departments": ["식품영양학과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["식품영양학과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "생활과학신입생세미나", "code": "M2174.001600" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 1,
+      "required": { "all": [
+        { "name": "생활과학신입생세미나", "code": "M2174.001600", "credits": 1 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 48, "general": true, "select_min": 0, "required_credits": 1,
+      "required": { "all": [
+        { "name": "생활과학신입생세미나", "code": "M2174.001600", "credits": 1 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 24, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = human_food_2025 어댑터(40학점, 15학번~).",
+    "전공 학점 by track(15학번~ 표): 단일전공 60 · 다른전공 병행이수 48 · 복수전공 39 · 부전공 24.",
+    "전공필수: 생활과학신입생세미나(구 생활과학의이해) 주전공생 필수(코드 = 생활대 공통 M2174.001600 적용; 페이지 코드 미표기). 복수·부전공자는 제외하고 각 39/24.",
+    "전공선택 인정: 기초유기화학 886.031 = 전선 3학점(유기화학 325.209와 중복불가). 타과 과목 학과장 인정 시 9학점 이내 전선 인정.",
+    "외국어진행강좌: 전공 1과목 포함 3과목 이상(2009학번~). 졸업논문 제출 필수(논문제출자격시험 별도).",
+    "재이수 자동대체: 식품화학 352.322=352.217(A/B), 영양학 352.214=352.327(A/B 기초영양학) 등 알파벳 suffix."
+  ]
+}

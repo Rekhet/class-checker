@@ -1,0 +1,72 @@
+{
+  "id": "musicology_2024",
+  "major": "음악학과",
+  "college": "음악대학",
+  "batch": [
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/6 → 「음악학과 내규 2026.02.09 개정」. 상세: _scrape/music_browser.md | 2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공필수 = 음악학24+기초공통22 = 46(24학번~ 동일). liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "music_2022",
+  "major_min_credits": 46,
+  "major_double_credits": 46,
+  "minor_credits": 30,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "음악학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "음악학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 46,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 46
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 46,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 46
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 46,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 46
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 30,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",
+    "전공필수 = 음악학 + 기초공통(학번별): 24학번~ 음악학 24학점 + 기초공통 22학점 = 전공필수 46학점(25학번 동일). (23학번 24+28=52; ~22학번 30+32.) 본 spec = 2024학번 → major_min_credits = 46. 경계 @2024(52→46).",
+    "전필 구성: 음악학개론·음악미학·음악학세미나1~4·음악연구방법론·전공이론(반복)·음악이론사1 / 기초공통 서양음악사1~4·화성법3·4·대위법3·4·시창청음3·4·음악분석1~4. 코드 미확보 → required.all 미생성.",
+    "복수전공: 최소 46학점 / 부전공: 최소 30학점(필수 이수 교과목 기준). ※ 2023학년도 기준 표는 복수 39 / 부전공 21로도 명시(진입유형별 분기) — major_double/minor는 내규 최소값 46/30 채택.",
+    "외국어: 내규에 전용 영어강의 의무 조항 없음 → 교양 외국어 + 대학 공통규정. 전공 영어강의 baseline 1과목(보수적)."
+  ]
+}

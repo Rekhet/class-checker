@@ -1,0 +1,149 @@
+{
+  "id": "psir_2023_2024",
+  "major": "정치외교학부",
+  "college": "사회과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://psir.snu.ac.kr/view/undergraduate/advanced-major + /view/undergraduate/liberal-arts + /undergraduate/majorreq (2025학번~ 이수규정). 상세: _scrape/soc.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "soc_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "정치외교학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "정치외교학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "정치학원론",
+      "code": "200.103"
+    },
+    {
+      "name": "국제정치학개론",
+      "code": "200.104"
+    },
+    {
+      "name": "정치학연습(정치학전공)",
+      "code": "216A.416"
+    },
+    {
+      "name": "국제정치연습(외교학전공)",
+      "code": "216B.420"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 9,
+      "required": {
+        "all": [
+          {
+            "name": "정치학원론",
+            "code": "200.103",
+            "credits": 3
+          },
+          {
+            "name": "국제정치학개론",
+            "code": "200.104",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "정치학원론",
+            "code": "200.103",
+            "credits": 3
+          },
+          {
+            "name": "국제정치학개론",
+            "code": "200.104",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "정치학원론",
+            "code": "200.103",
+            "credits": 3
+          },
+          {
+            "name": "국제정치학개론",
+            "code": "200.104",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 6,
+      "required": {
+        "all": [
+          {
+            "name": "정치학원론",
+            "code": "200.103",
+            "credits": 3
+          },
+          {
+            "name": "국제정치학개론",
+            "code": "200.104",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수 공통: 정치학원론(200.103)·국제정치학개론(200.104). 추가로 정치학전공=정치학연습(216A.416), 외교학전공=국제정치연습(216B.420) 4학년 이수(전공별 1과목). required_credits=공통 6학점 기준이며 심화는 전공별 연습 포함 9학점 근사.",
+    "심화전공(단일): 전공선택 총 51학점 이상 — 가군(사상·역사·기초) ≥6, 나군(각국정치·외교·지역) ≥6, 다군(세부전공 소속전공 개설) ≥6 포함. select_min=51은 전선 학점 하한.",
+    "타과 전선 인정: 전공 39학점 미만 6학점 / 39학점 이상 9학점(분야분류 미산입). 해외수학 ≤15학점 전선 인정.",
+    "부전공: 공통 전필 포함 부전공 개설 전선 21학점 이상.",
+    "외국어진행강좌 최소 과목수 페이지 미명시 — 사회대 baseline 1과목."
+  ]
+}

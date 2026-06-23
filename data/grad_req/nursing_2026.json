@@ -1,0 +1,23 @@
+{
+  "id": "nursing_2026",
+  "major": "간호학과",
+  "college": "간호대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://nursing.snu.ac.kr 학사 졸업요건 + 간호대학 공통교육과정 2026. 상세: _scrape/misc.md",
+  "total_credits": 130,
+  "general": "nursing_2025",
+  "major_min_credits": 85,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["간호학과"], "classifications": ["전선"] },
+  "major_required_known": [],
+  "tracks": [
+    { "key": "single", "name": "단일전공(간호학)", "major_min_credits": 85, "general": true, "select_min": 0, "required_credits": 76 }
+  ],
+  "notes": [
+    "간호학과 = 단일전공만 (복수·부전공 트랙 없음, 전문직 학위). 전공 85학점 = 전공필수 76 + 전공 자유선택 9.",
+    "전공필수 76학점 = 간호학 핵심·실습 다수 — 개별 코드 미인코딩(required_credits로만 반영). nursing.snu.ac.kr 교과과정표 Read 시 보강.",
+    "2019학번 이전 = 졸업 140 / 전공 96.",
+    "교양 = nursing_2025 (과학8·지성12 인간1과목 필수)."
+  ]
+}

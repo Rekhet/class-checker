@@ -1,0 +1,74 @@
+{
+  "id": "vocal_2023_2024",
+  "major": "성악과",
+  "college": "음악대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://music.snu.ac.kr/rule/4 → 「서울대학교 성악과 내규 개정 2025.04.19」. 상세: _scrape/music_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "music_2022",
+  "major_min_credits": 68,
+  "major_double_credits": 68,
+  "minor_credits": 68,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "성악과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "성악과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 68,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 68
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 68,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 68
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 68,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 68
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 68,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 68
+    }
+  ],
+  "notes": [
+    "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",
+    "전공 = 전공필수 실기 중심: ~2024학번 전필 68학점 / 2025학번~ 전필 70학점(나머지는 교양·전선 충당). 본 spec = 2023·2024학번 → major_min_credits = 전필 68(~2024).",
+    "전필 구성 = 전공실기(성악) 반복이수 + 딕션(이태리어·독일어1,2·프랑스어1,2·영어딕션) + 기초공통(음악사·이론·시청). 코드 미확보 → required.all 미생성.",
+    "복수전공·부전공: 학점 명시 없이 전공필수 교과목 전체 이수(전공실기 최소 4학기). 자격 = 2정규학기+33학점. → double/minor major_min = 전필 68(근사, ~2024).",
+    "외국어: 교양 학문의기초 외국어 2과목, 입학 시 TEPS 900(New 525) 이하 → 영어 1과목 필수. 전공 영어강의 의무는 내규 미명시 — baseline 1과목(보수적). 영어딕션은 전공과목(외국어강의 의무와 별개)."
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "soc_2022",
+  "college": "사회과학대학",
+  "applies": "2021~2024 (학문의 기초/학문의 세계)",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
+  ],
+  "notes": ["학문의 세계: 자연과 기술 또는 생명과 환경에서 최소 3학점 포함, 7개 영역 중 4개 영역 이상에서 최소 12학점.", "전체 교양 14학점은 자유 선택(total에 포함)."]
+}

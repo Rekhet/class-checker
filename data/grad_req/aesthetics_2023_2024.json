@@ -1,0 +1,75 @@
+{
+  "id": "aesthetics_2023_2024",
+  "major": "미학과",
+  "college": "인문대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://meehak.snu.ac.kr/졸업이수요건/ (정적 HTML 표, 비표준 구조). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "미학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "미학원론"
+    },
+    {
+      "name": "고중세미학"
+    },
+    {
+      "name": "근대미학"
+    },
+    {
+      "name": "동양미학개론"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점). 다전공 12학번~ 39(11학번까지 42).",
+    "⚠ 미학 = 전필/전선 학점이 표에 분리 명시(비표준). 전공필수 9학점: 19학번~ 미학원론·고중세미학·근대미학·동양미학개론 중 3과목(코드 미표기 → required.all 미생성). 18학번까지는 미학원론/미학사+현대영미미학 조합(학번 분기).",
+    "전공선택 30학점 이상(18학번~) 중 18학점은 반드시 미학과 개설, 인정과목 12학점까지 — '학점 기반 + 학과개설 하한 + 인정 상한' 구조로 select_min(과목수) 모델 밖이라 자동 미반영. 부전공 21 중 12학점 미학과 개설 필수, 인정 9까지.",
+    "외국어진행강좌 ≥3과목(08학번~). 제2외국어 9학점은 교양(hum_2025) 측; 복수전공(타단대) 1과목. 소그룹고전원전읽기 1, 삶과인문학(신입생). 교과목 중복인정은 주·복수·연합만(부전공 불가)."
+  ]
+}

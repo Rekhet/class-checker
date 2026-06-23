@@ -1,0 +1,90 @@
+{
+  "id": "cls_2023_2024",
+  "major": "자유전공학부",
+  "college": "학부대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "자유전공학부-졸업-규정(2019학번~2024학번).pdf (cls.snu.ac.kr/졸업규정/). 상세: _scrape/soc.md, _scrape/peryear_soc.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 자체전공 18학점(전필 4과목 7학점). liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "ub_free_2022",
+  "major_min_credits": 18,
+  "major_double_credits": 18,
+  "minor_credits": 18,
+  "english_min_courses": 1,
+  "major_select_match": {
+    "departments": [
+      "자유전공학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "자유전공학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "주제탐구세미나1"
+    },
+    {
+      "name": "전공설계1"
+    },
+    {
+      "name": "주제탐구세미나2"
+    },
+    {
+      "name": "종합설계(학생설계전공)"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "자유전공(자체전공) 단일",
+      "major_min_credits": 18,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 7
+    },
+    {
+      "key": "multi",
+      "name": "자유전공(자체전공) 주전공",
+      "major_min_credits": 18,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 7
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 18,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 7
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 18,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 7
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 ub_free_2022(OLD 공통교육과정: 학문의 기초/세계).",
+    "2-tier 구조: 자유전공학부 자체전공(자유전공) 18학점 + 전공선택(기존전공/주전공: 타 학과·연합·학생설계전공) 별도 이수. major_min_credits=18은 자체전공만.",
+    "자유전공학부 전공 이수(2019~2024학번, 18학점) = 전공필수 4(7) [주제탐구세미나1 + 전공설계1 (+종합설계 *학생설계전공만)] + 선택필수 3(6) [주제탐구세미나2] + 전공선택 8(11). (2025학번~ = 15학점: 전필 5(8) + 필수전선 3(3) + 전공선택 4(7).) required_credits=7은 전공필수 7학점 기준(주제탐구세미나1·전공설계1, +종합설계 학생설계전공). 전필 코드 미게시 — 카탈로그(자유전공학부) 파생 필요.",
+    "전공선택(기존전공) 이수: 해당 전공(학과) 홈페이지 기준 — 전공이수학점·전필·영어강의·졸업논문은 그 학과 규정 따름. 이전 이수 전공교과목은 21학점까지만 전공학점 인정(학생설계 제외). 2개 이상 기존전공 중복 ≤9학점.",
+    "제2전공(부전공/연계/학생설계부전공): 해당 학과 기준.",
+    "영어강의: 자체엔 없음; TEPS 900↓ 영어 1과목 이수. (선택 전공이 인문대면 외국어진행 3과목 등 — 그 학과 규정.)",
+    "졸업논문 제출. 첫 전공선택 후 4학기 경과. 8학기 이상 등록."
+  ]
+}

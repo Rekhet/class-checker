@@ -1,0 +1,87 @@
+{
+  "id": "math_2023_2024",
+  "major": "수리과학부",
+  "college": "자연과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://www.math.snu.ac.kr/bbs/page.php?hid=criteria&wr_id=46 (2026 졸업이수규정) + 자연과학대학 공통교육과정. 상세: web/data/grad_req/SOURCES.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "english_min_courses": 1,
+  "external_recognition": {
+    "depts": [],
+    "approval_max_credits": 0
+  },
+  "major_required_match": {
+    "departments": [
+      "수리과학"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "수리과학"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "해석개론 및 연습 1",
+      "code": "M1407.000600"
+    },
+    {
+      "name": "해석개론 및 연습 2",
+      "code": "M1407.000700"
+    },
+    {
+      "name": "현대대수학 1",
+      "code": "881.301"
+    }
+  ],
+  "dept_required_general": [],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공/연계전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업이수학점표 통계학과와 동일: 졸업130·교양46·주전공(단일)60·다전공 병행39·복수39·부전공21.",
+    "교양 = 자연과학대학 공통교육과정 46 (수학 6-8 + 과학·컴퓨팅 16 세분; 본 spec은 수과컴 24로 통합).",
+    "외국어진행강좌(영어강의) 최소 1과목 (자연대).",
+    "전공필수(*): 해석개론 및 연습 1·2, 현대대수학 1 등 — 전체 전필/전선·복수/부전공 세부는 졸업이수규정 이미지(미추출) 참조. 전필 집합은 카탈로그(수리과학부·전필)에서 산출.",
+    "전공선택 인정과목(타 학과 전선 인정)·세부 트랙 전필은 미확정 — 필요 시 졸업이수규정 이미지 확인."
+  ]
+}

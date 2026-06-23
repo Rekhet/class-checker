@@ -1,0 +1,13 @@
+{
+  "id": "nursing_2022",
+  "college": "간호대학",
+  "applies": "2021~2024 (학문의 기초/학문의 세계)",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "msc", "name": "수량적 분석·과학적 사고", "min": 8, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 3 }
+  ],
+  "notes": ["과학적 사고와 실험 8 = 화학(또는 고급화학)(3)+화학실험(1)+생물학(3)+생물학실험(1).", "학문의 세계: 3개 영역 이상에서 12학점 + 언어와문학/문화와예술 권장과목(*) 1과목 필수 + 인간과 사회 1과목(3) 필수.", "전체 교양 3학점은 자유 선택(total에 포함)."]
+}

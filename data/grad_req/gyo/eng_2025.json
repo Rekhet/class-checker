@@ -1,0 +1,15 @@
+{
+  "id": "eng_2025",
+  "college": "공과대학",
+  "applies": "2025·2026 (공과대학 표준 — 학부별 수과컴 학점은 다를 수 있음)",
+  "total_min": 49,
+  "buckets": [
+    { "key": "writing", "min": 4 },
+    { "key": "foreign", "min": 6 },
+    { "key": "math", "min": 16 },
+    { "key": "science", "min": 8 },
+    { "key": "computing", "min": 3 },
+    { "key": "claves", "min": 9 },
+    { "key": "veritas", "min": 3 }
+  ]
+}

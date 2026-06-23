@@ -1,0 +1,32 @@
+{
+  "id": "math_2021_2022",
+  "major": "수리과학부",
+  "college": "자연과학대학",
+  "batch": ["2021", "2022"],
+  "track": "단일전공",
+  "source": "https://www.math.snu.ac.kr/bbs/page.php?hid=criteria (wr_id=39 2022, wr_id=38 2021 졸업이수규정) + 자연과학대학 교양 이수기준. 상세: web/data/grad_req/SOURCES.md",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "english_min_courses": 1,
+  "external_recognition": { "depts": [], "approval_max_credits": 0 },
+  "major_required_match": { "departments": ["수리과학"], "classifications": ["전필"] },
+  "major_select_match": { "departments": ["수리과학"], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "해석개론 및 연습 1", "code": "M1407.000600" },
+    { "name": "해석개론 및 연습 2", "code": "M1407.000700" },
+    { "name": "현대대수학 1", "code": "881.301" }
+  ],
+  "dept_required_general": [],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 39, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공/연계전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "졸업이수학점표: 졸업130·교양46·주전공(단일)60·다전공39·복수39·부전공21.",
+    "교양 = 자연과학대학 교양 이수기준 46 (struct B, 학문의 기초/학문의 세계).",
+    "외국어진행강좌 ≥1. 수리통계 대체 규칙 없음. 전공선택 인정과목 미게시 → recog 없음."
+  ]
+}

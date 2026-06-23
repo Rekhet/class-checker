@@ -1,0 +1,13 @@
+{
+  "id": "ub_free_2022",
+  "college": "학부대학 (자유전공학부)",
+  "applies": "2021~2024 (학문의 기초/학문의 세계)",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "msc", "name": "수량적 분석·과학적 사고", "min": 6, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
+  ],
+  "notes": ["수과컴 6 = 수량적 분석과 추론(수학1+수학연습1 / 고급수학1+고급수학연습1 / 수학의 기초와 응용1 중 1과목, 3) + 과학적 사고와 실험·컴퓨터와 정보 활용(3).", "학문의 세계: 4개 영역 이상 포함 12학점.", "전체 교양 8학점은 자유 선택(total에 포함)."]
+}

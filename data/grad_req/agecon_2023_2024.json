@@ -1,0 +1,110 @@
+{
+  "id": "agecon_2023_2024",
+  "major": "농경제사회학부",
+  "college": "농업생명과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "농업·자원경제학 https://are.snu.ac.kr/wp-content/uploads/2024/03/학사-학위과정ARE_2024.03.25..pdf (학사 학위과정, 단일60/다전공39) + 지역정보학 https://ris.snu.ac.kr/wp-content/uploads/2021/05/Undergraduate-ProgramRIS.pdf + /en/curriculum/undergraduate-course/ (CALS 48/48/24). 인문/사회계 → 교양 agri_econ_2025. 상세: _scrape/agri.md + _scrape/partial_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "agri_econ_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "농경제사회학부"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "농경제사회학부"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "경제수학",
+      "code": "M2649.001600"
+    },
+    {
+      "name": "미시경제이론",
+      "code": "M2649.001300"
+    },
+    {
+      "name": "거시경제이론",
+      "code": "M2649.001400"
+    },
+    {
+      "name": "농업경제학",
+      "code": "5201.201"
+    },
+    {
+      "name": "농경제계량분석",
+      "code": "5201.301"
+    },
+    {
+      "name": "지역개발론",
+      "code": "5202.202"
+    },
+    {
+      "name": "공간경제의 이해",
+      "code": "5202.205"
+    },
+    {
+      "name": "지역정보학연구",
+      "code": "5202.415"
+    },
+    {
+      "name": "농식품산업정보시스템",
+      "code": "M1683.000400"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 0
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 24,
+      "general": false,
+      "select_min": 0
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 교양 36학점(agri_econ_2025 인문/사회계), 평점 전공·전과목 각 2.0 이상.",
+    "EXCEPTION: 농경제사회학부는 CALS 48 공통이 아님 — 전공별 track 학점 상이. 본 스펙은 농업·자원경제학전공(경제학 학위, 인문계 모델 단일60/다전공39) 기준. 지역정보학전공은 CALS 표준 단일48/복수48/부전공24(다전공 신청자격 2정규학기+33학점). 학부-level 스키마라 두 전공을 단일 트랙으로 합칠 수 없어 농업자원경제 60/39를 main으로 기록.",
+    "학부-level 스펙. 농경제사회학부 = 2개 전공(농업·자원경제학전공·지역정보학전공). major_required_known = 두 전공 전필 합집합.",
+    "농업·자원경제학 전필 5과목: 경제수학·미시경제이론·거시경제이론·농업경제학·농경제계량분석(경제원론1·2 M2649.001100/001200·농경제사회학입문 500.165 = 표준이수 1학년, 전필 아님). 전선 min = 60−전필 15 ≈ 45.",
+    "지역정보학 전필 7과목(2012학번~): 경제수학·미시경제이론·거시경제이론·지역개발론(농촌개발 5202.202)·공간경제의 이해(공간경제학기초 5202.205)·지역정보학연구 5202.415(2학점)·농식품산업정보시스템 M1683.000400. 전선 min = 48−전필 20 ≈ 28. 부전공 24(전필 포함).",
+    "외국어진행강좌: 전공 교과목 1개 포함 3과목 이상(기초영어 미포함, 대학영어·고급영어 포함) — 농업자원경제 PDF 명시.",
+    "과목당 학점 PDF 일부만 명시 → required.all/required_credits 생략. 학사졸업논문 심사 합격 / 6학기 이상 등록 / 학기당 18학점(직전 2학기 평점 3.3↑ 시 21)."
+  ]
+}

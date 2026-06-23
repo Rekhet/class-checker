@@ -1,0 +1,48 @@
+{
+  "id": "orient_2026",
+  "major": "동양화과",
+  "college": "미술대학",
+  "batch": ["2025", "2026"],
+  "track": "단일전공",
+  "source": "https://art.snu.ac.kr/category/oriental-painting/?catemenu=Courses&type=major (전공과목 이수표준형태, *=전필). ⚠ 졸업총학점·전공 by track = 학과 사이트 미게시(baseline-assumed). 상세: _scrape/misc.md",
+  "total_credits": 130,
+  "general": "art_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "baseline_assumed": true,
+  "major_select_match": { "departments": ["동양화과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["동양화과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "미술이론", "code": "600.228A" },
+    { "name": "미술이론(공통)", "code": "M2182.000100" },
+    { "name": "동양화 전공실기", "code": "M1765.000200" },
+    { "name": "동양화 전공실기", "code": "M1765.000300" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 10,
+      "required": { "all": [
+        { "name": "미술이론", "code": "600.228A", "credits": 3 },
+        { "name": "미술이론(공통)", "code": "M2182.000100", "credits": 3 },
+        { "name": "동양화 전공실기", "code": "M1765.000200", "credits": 2 },
+        { "name": "동양화 전공실기", "code": "M1765.000300", "credits": 2 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 10,
+      "required": { "all": [
+        { "name": "미술이론", "code": "600.228A", "credits": 3 },
+        { "name": "미술이론(공통)", "code": "M2182.000100", "credits": 3 },
+        { "name": "동양화 전공실기", "code": "M1765.000200", "credits": 2 },
+        { "name": "동양화 전공실기", "code": "M1765.000300", "credits": 2 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+  ],
+  "notes": [
+    "⚠ BASELINE-ASSUMED: 미술대학은 졸업총학점·전공 by track 학점이 학과 사이트에 미게시. 졸업 130 / 단일전공 60 / 복수 39 / 부전공 21은 SNU 학칙 baseline 가정값 — 예체능계 전공학점이 다를 수 있어 미대 행정실 졸업사정표로 확정 필요.",
+    "교양 = art_2025 어댑터(36학점, 5과 공통).",
+    "전공필수(courses 페이지 * 마크): 미술이론 600.228A · M2182.000100(공통 이론) · 동양화 전공실기 M1765.000200/000300. 전선: 600.225A·600.230·601.* 계열.",
+    "전공필수/전공선택 학점 분리값 미게시 — required_credits 10은 확보된 * 코드 4과목 합산(근사).",
+    "외국어진행강좌 최소 과목수: 페이지 미명시 — baseline 1과목(부록7 미대 기준 확인 필요)."
+  ]
+}

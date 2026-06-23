@@ -1,0 +1,131 @@
+{
+  "id": "consumer_2023_2024",
+  "major": "소비자학과",
+  "college": "생활과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://consumer.snu.ac.kr/졸업요건/ (학사과정 이수규정 표) + 교과과정 https://consumer.snu.ac.kr/교과과정/ (전공 표준이수형태). 상세: _scrape/misc.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "human_consumer_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 24,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "소비자학과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_match": {
+    "departments": [
+      "소비자학과"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "생활과학신입생세미나",
+      "code": "M2174.001600"
+    },
+    {
+      "name": "소비자학의 이해",
+      "code": "M1471.001300"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 4,
+      "required": {
+        "all": [
+          {
+            "name": "생활과학신입생세미나",
+            "code": "M2174.001600",
+            "credits": 1
+          },
+          {
+            "name": "소비자학의 이해",
+            "code": "M1471.001300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 48,
+      "general": true,
+      "select_min": 0,
+      "required_credits": 4,
+      "required": {
+        "all": [
+          {
+            "name": "생활과학신입생세미나",
+            "code": "M2174.001600",
+            "credits": 1
+          },
+          {
+            "name": "소비자학의 이해",
+            "code": "M1471.001300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 3,
+      "required": {
+        "all": [
+          {
+            "name": "소비자학의 이해",
+            "code": "M1471.001300",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 24,
+      "general": false,
+      "select_min": 0,
+      "required_credits": 3,
+      "required": {
+        "all": [
+          {
+            "name": "소비자학의 이해",
+            "code": "M1471.001300",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = human_consumer_2025 어댑터(40학점, 19학번~).",
+    "전공 학점 by track(페이지 표): 단일전공 60 · 다른전공 병행이수 48 · 복수전공 39 · 부전공 24.",
+    "전공필수: 생활과학신입생세미나 M2174.001600(1학점, 생활대 공통) + 소비자학의 이해 M1471.001300. 복수/부전공자는 생활과학신입생세미나 제외(주전공생 전용).",
+    "졸업논문 = 소비자학연구 357.416A 수강(2023-1~ 연구방법론 선이수). 전공선택 min은 학점 기반(단일 60−전필).",
+    "외국어진행강좌: 주전공 1과목 포함 3과목 이상(2009학번~; 학문의기초-외국어 영어 교과목 제외).",
+    "생활대 교직 개설과목(가정교육론 등)은 교직미이수자 전공 불인정."
+  ]
+}

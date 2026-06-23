@@ -1,0 +1,125 @@
+{
+  "id": "stat_2023_2024",
+  "major": "통계학과",
+  "college": "자연과학대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://stat.snu.ac.kr/ (2026학번 교과목 이수규정) + 자연과학대학 공통교육과정 이수규정 2026 | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "natsci_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "major_select_min_courses": 5,
+  "english_min_courses": 1,
+  "external_recognition": {
+    "depts": [
+      "수리과학부",
+      "컴퓨터공학부"
+    ],
+    "approval_max_credits": 9
+  },
+  "major_required_match": {
+    "departments": [
+      "통계"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "수리통계 1",
+      "code": "326.311"
+    },
+    {
+      "name": "수리통계 2",
+      "code": "326.312"
+    },
+    {
+      "name": "회귀분석 및 실습",
+      "code": "326.313"
+    }
+  ],
+  "major_select_match": {
+    "departments": [
+      "통계"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "dept_required_general": [
+    {
+      "name": "통계학",
+      "area": "msc"
+    },
+    {
+      "name": "통계학실험",
+      "area": "msc"
+    }
+  ],
+  "suri": {
+    "seq": [
+      {
+        "name": "수리통계 1",
+        "code": "326.311",
+        "credits": 3
+      },
+      {
+        "name": "수리통계 2",
+        "code": "326.312",
+        "credits": 3
+      }
+    ],
+    "combined": {
+      "name": "수리통계",
+      "code": "M1399.000900",
+      "credits": 3
+    }
+  },
+  "tracks": [
+    {
+      "key": "single",
+      "name": "심화전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 5,
+      "suri_sub": false
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공)",
+      "major_min_credits": 39,
+      "general": true,
+      "select_min": 5,
+      "suri_sub": false
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 5,
+      "suri_sub": false
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "suri_sub": true
+    }
+  ],
+  "notes": [
+    "통계학 주전공·복수전공 학생은 수리통계(M1399.000900) 이수 불가 (수리통계 1·2로 이수).",
+    "통계학과: 통계학 및 통계학실험 필수, 미적분학 1·2 원칙.",
+    "외국어진행강좌(영어강의) 최소 1과목 권장.",
+    "전공선택인정: 수리과학부·컴퓨터공학부 전 교과목 + 학과장 사전승인 과목 최대 9학점.",
+    "기초수학과학 진단평가 면제 시 수과컴/총 교양 최소학점이 차감될 수 있음(면제분 반영 안 됨)."
+  ]
+}

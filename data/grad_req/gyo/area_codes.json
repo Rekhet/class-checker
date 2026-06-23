@@ -1,0 +1,28 @@
+{
+  "note": "SNU 공통교육과정 교과목 코드 접두사 → 세부영역(fine-area). sbjt_cd의 '.' 앞부분으로 조회. 출처: 2026-1 기초교양 수강편람 p24~. 2025학년도부터 F/C/V/E 체계; 2014~2024 = L04xx; 2014 이전 = 0xx.",
+  "codes": {
+    "F11": "writing", "F12": "writing",
+    "F21": "foreign", "F22": "foreign", "F23": "foreign", "F24": "foreign", "F25": "foreign",
+    "F26": "foreign", "F27": "foreign", "F28": "foreign", "F29": "foreign",
+    "F31": "math", "F32": "stat", "F33": "physics", "F34": "chem", "F35": "bio", "F36": "earth", "F37": "computing",
+    "C10": "culture", "C20": "history", "C30": "human", "C40": "scisense",
+    "V10": "veritas", "V20": "veritas", "V30": "veritas",
+    "E11": "x_knowledge", "E12": "x_knowledge", "E20": "x_engage",
+    "E31": "x_creative", "E32": "x_creative", "E41": "x_arts", "E42": "x_arts", "E43": "x_arts",
+    "E51": "x_seminar", "E52": "x_seminar",
+
+    "L0440": "writing", "L0441": "foreign", "L0442": "math", "L0443": "science", "L0444": "computing",
+    "L0545": "culture", "L0546": "history", "L0547": "human", "L0549": "scisense", "L0550": "scisense", "L0551": "scisense",
+    "L0655": "veritas",
+    "L0652": "x_knowledge", "L0653": "x_engage", "L0654": "x_creative", "L0656": "x_arts",
+
+    "031": "writing", "032": "foreign", "033": "math", "034": "science", "035": "computing",
+    "041": "culture", "042": "history", "043": "human", "044": "human", "045": "scisense", "046": "scisense", "047": "scisense",
+    "051": "x_knowledge", "052": "x_engage", "053": "x_creative", "054": "x_arts", "055": "x_seminar"
+  },
+  "exceptions": {
+    "_note": "sbjt_cd → fine-area, for courses needing finer split than the prefix. Takes priority over `codes`. sbjt_cd matches catalog number exactly (verified vs class data, e.g. 'E52.103').",
+    "E52.103": "x_classics",
+    "E52.104": "x_classics"
+  }
+}

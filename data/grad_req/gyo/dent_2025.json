@@ -1,0 +1,16 @@
+{
+  "id": "dent_2025",
+  "college": "치의학대학원 학·석사 통합과정 (학사과정)",
+  "applies": "2025·2026",
+  "total_min": 44,
+  "buckets": [
+    { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "math", "name": "수학", "min": 3, "areas": ["math"] },
+    { "key": "science", "name": "과학", "min": 12, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing"] },
+    { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
+    { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] }
+  ],
+  "notes": ["2025학년도 입학생부터 적용.", "전체 교양 4학점에 체육 2과목·사회봉사 1 포함 (체육은 실기만 인정)."]
+}

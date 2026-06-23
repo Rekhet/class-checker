@@ -1,0 +1,252 @@
+{
+  "id": "koredu_2023_2024",
+  "major": "국어교육과",
+  "college": "사범대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://koredu.snu.ac.kr/{입학-및-졸업,교과과정} (이수표준형태·`*`전필; 트랙 학점은 내규) + 사범대학 공통교육과정 2026. 상세: _scrape/edu.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "edu_hum_2022",
+  "major_min_credits": 60,
+  "major_double_credits": 52,
+  "minor_credits": 21,
+  "english_min_courses": 3,
+  "major_select_match": {
+    "departments": [
+      "국어교육과"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "국어교육학개론",
+      "code": "705.151"
+    },
+    {
+      "name": "국어학교육론",
+      "code": "705.209A"
+    },
+    {
+      "name": "문학교육론",
+      "code": "M1844.002500"
+    },
+    {
+      "name": "국어문법교육론",
+      "code": "705.218B"
+    },
+    {
+      "name": "국어사교육론",
+      "code": "705.220A"
+    },
+    {
+      "name": "한국고전문학사교육론",
+      "code": "705.221"
+    },
+    {
+      "name": "한국현대문학사교육론",
+      "code": "705.222"
+    },
+    {
+      "name": "국어교수학습론",
+      "code": "705.313"
+    },
+    {
+      "name": "국어사고와 논술교육론",
+      "code": "705.327"
+    }
+  ],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 60,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "국어교육학개론",
+            "code": "705.151",
+            "credits": 3
+          },
+          {
+            "name": "국어학교육론",
+            "code": "705.209A",
+            "credits": 3
+          },
+          {
+            "name": "문학교육론",
+            "code": "M1844.002500",
+            "credits": 3
+          },
+          {
+            "name": "국어문법교육론",
+            "code": "705.218B",
+            "credits": 3
+          },
+          {
+            "name": "국어사교육론",
+            "code": "705.220A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사교육론",
+            "code": "705.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사교육론",
+            "code": "705.222",
+            "credits": 3
+          },
+          {
+            "name": "국어교수학습론",
+            "code": "705.313",
+            "credits": 3
+          },
+          {
+            "name": "국어사고와 논술교육론",
+            "code": "705.327",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 52,
+      "general": true,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "국어교육학개론",
+            "code": "705.151",
+            "credits": 3
+          },
+          {
+            "name": "국어학교육론",
+            "code": "705.209A",
+            "credits": 3
+          },
+          {
+            "name": "문학교육론",
+            "code": "M1844.002500",
+            "credits": 3
+          },
+          {
+            "name": "국어문법교육론",
+            "code": "705.218B",
+            "credits": 3
+          },
+          {
+            "name": "국어사교육론",
+            "code": "705.220A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사교육론",
+            "code": "705.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사교육론",
+            "code": "705.222",
+            "credits": 3
+          },
+          {
+            "name": "국어교수학습론",
+            "code": "705.313",
+            "credits": 3
+          },
+          {
+            "name": "국어사고와 논술교육론",
+            "code": "705.327",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 52,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "국어교육학개론",
+            "code": "705.151",
+            "credits": 3
+          },
+          {
+            "name": "국어학교육론",
+            "code": "705.209A",
+            "credits": 3
+          },
+          {
+            "name": "문학교육론",
+            "code": "M1844.002500",
+            "credits": 3
+          },
+          {
+            "name": "국어문법교육론",
+            "code": "705.218B",
+            "credits": 3
+          },
+          {
+            "name": "국어사교육론",
+            "code": "705.220A",
+            "credits": 3
+          },
+          {
+            "name": "한국고전문학사교육론",
+            "code": "705.221",
+            "credits": 3
+          },
+          {
+            "name": "한국현대문학사교육론",
+            "code": "705.222",
+            "credits": 3
+          },
+          {
+            "name": "국어교수학습론",
+            "code": "705.313",
+            "credits": 3
+          },
+          {
+            "name": "국어사고와 논술교육론",
+            "code": "705.327",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": []
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "⚠ 입학·졸업 페이지의 '학부 전공 50학점'은 교육부 교원자격 최저기준(주전공 50: 교과내용 42 + 교과교육 8)이며 졸업 전공 총학점이 아님 → major_min_credits는 사범대 단일전공 baseline 60 적용. 정확한 학번별 졸업 전공 총학점은 이수표준형태 확인 권장.",
+    "전공필수 = 이수표준형태 `*` 표시 9과목(코드 확인, 각 3학점 가정). 단일 전필 총학점 단일 수치 미명시 → required_credits 생략.",
+    "전공선택 인정교과목·복수·부전공 이수규정 = 학과내규에 의함(수치 비공개) → 다전공 52 / 부전공 21 baseline 적용.",
+    "외국어진행강좌: 페이지 명시 없음 → 사범대 baseline 전공 3학점 포함 9학점(english_min_courses=3) 적용(근사).",
+    "교직과정 22학점(전공과 별개; 입학·졸업 페이지 명시). 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 국어. schema에 교직 필드 없어 NOTE로만 기록.",
+    "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
+  ]
+}

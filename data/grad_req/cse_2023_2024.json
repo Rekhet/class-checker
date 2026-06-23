@@ -1,0 +1,283 @@
+{
+  "id": "cse_2023_2024",
+  "major": "컴퓨터공학부",
+  "college": "공과대학",
+  "batch": [
+    "2023",
+    "2024"
+  ],
+  "track": "단일전공",
+  "source": "https://cse.snu.ac.kr/en/academics/undergraduate/{curriculum,general-studies-requirements,degree-requirements} + 졸업규정 트랙 PDF 주전공(단일전공).pdf [2021~2024학번 블록]. 상세 추출값: web/data/grad_req/SOURCES.md, _scrape/peryear_eng.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공 전필 = 2021~2024학번 set(9과목 30학점). liberaledu_2024.pdf.",
+  "total_credits": 130,
+  "general": "eng_cse_2022",
+  "major_min_credits": 63,
+  "english_min_courses": 3,
+  "external_recognition": {
+    "depts": [
+      "전기",
+      "정보공학",
+      "수리과학",
+      "통계",
+      "인공지능"
+    ],
+    "approval_max_credits": 12
+  },
+  "major_required_match": {
+    "departments": [
+      "컴퓨터공학"
+    ],
+    "classifications": [
+      "전필"
+    ]
+  },
+  "major_select_match": {
+    "departments": [
+      "컴퓨터공학"
+    ],
+    "classifications": [
+      "전선"
+    ]
+  },
+  "major_required_known": [
+    {
+      "name": "이산수학",
+      "code": "4190.101"
+    },
+    {
+      "name": "논리설계",
+      "code": "M1522.000700"
+    },
+    {
+      "name": "컴퓨터프로그래밍",
+      "code": "M1522.000600"
+    },
+    {
+      "name": "전기전자회로",
+      "code": "4190.206A"
+    },
+    {
+      "name": "자료구조",
+      "code": "M1522.000900"
+    },
+    {
+      "name": "컴퓨터구조",
+      "code": "4190.308"
+    },
+    {
+      "name": "시스템프로그래밍",
+      "code": "M1522.000800"
+    },
+    {
+      "name": "알고리즘",
+      "code": "4190.407"
+    }
+  ],
+  "dept_required_general": [],
+  "tracks": [
+    {
+      "key": "single",
+      "name": "주전공(단일전공)",
+      "major_min_credits": 63,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 12,
+      "required_credits": 30,
+      "required": {
+        "all": [
+          {
+            "name": "이산수학",
+            "code": "4190.101",
+            "credits": 3
+          },
+          {
+            "name": "논리설계",
+            "code": "M1522.000700",
+            "credits": 4
+          },
+          {
+            "name": "컴퓨터프로그래밍",
+            "code": "M1522.000600",
+            "credits": 4
+          },
+          {
+            "name": "전기전자회로",
+            "code": "4190.206A",
+            "credits": 3
+          },
+          {
+            "name": "자료구조",
+            "code": "M1522.000900",
+            "credits": 3
+          },
+          {
+            "name": "컴퓨터구조",
+            "code": "4190.308",
+            "credits": 3
+          },
+          {
+            "name": "시스템프로그래밍",
+            "code": "M1522.000800",
+            "credits": 4
+          },
+          {
+            "name": "알고리즘",
+            "code": "4190.407",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "multi",
+      "name": "주전공(다전공 병행)",
+      "major_min_credits": 45,
+      "general": true,
+      "select_min": 0,
+      "recog_max": 12,
+      "required_credits": 30,
+      "required": {
+        "all": [
+          {
+            "name": "이산수학",
+            "code": "4190.101",
+            "credits": 3
+          },
+          {
+            "name": "논리설계",
+            "code": "M1522.000700",
+            "credits": 4
+          },
+          {
+            "name": "컴퓨터프로그래밍",
+            "code": "M1522.000600",
+            "credits": 4
+          },
+          {
+            "name": "전기전자회로",
+            "code": "4190.206A",
+            "credits": 3
+          },
+          {
+            "name": "자료구조",
+            "code": "M1522.000900",
+            "credits": 3
+          },
+          {
+            "name": "컴퓨터구조",
+            "code": "4190.308",
+            "credits": 3
+          },
+          {
+            "name": "시스템프로그래밍",
+            "code": "M1522.000800",
+            "credits": 4
+          },
+          {
+            "name": "알고리즘",
+            "code": "4190.407",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "double",
+      "name": "복수전공",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 6,
+      "required_credits": 27,
+      "required": {
+        "all": [
+          {
+            "name": "이산수학",
+            "code": "4190.101",
+            "credits": 3
+          },
+          {
+            "name": "논리설계",
+            "code": "M1522.000700",
+            "credits": 4
+          },
+          {
+            "name": "컴퓨터프로그래밍",
+            "code": "M1522.000600",
+            "credits": 4
+          },
+          {
+            "name": "전기전자회로",
+            "code": "4190.206A",
+            "credits": 3
+          },
+          {
+            "name": "자료구조",
+            "code": "M1522.000900",
+            "credits": 3
+          },
+          {
+            "name": "컴퓨터구조",
+            "code": "4190.308",
+            "credits": 3
+          },
+          {
+            "name": "시스템프로그래밍",
+            "code": "M1522.000800",
+            "credits": 4
+          },
+          {
+            "name": "알고리즘",
+            "code": "4190.407",
+            "credits": 3
+          }
+        ]
+      }
+    },
+    {
+      "key": "minor",
+      "name": "부전공",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "recog_max": 0,
+      "required_credits": 9,
+      "required": {
+        "min_courses": 3,
+        "min_credits": 9,
+        "pool": [
+          {
+            "name": "자료구조",
+            "code": "M1522.000900",
+            "credits": 3
+          },
+          {
+            "name": "컴퓨터구조",
+            "code": "4190.308",
+            "credits": 3
+          },
+          {
+            "name": "시스템프로그래밍",
+            "code": "M1522.000800",
+            "credits": 4
+          },
+          {
+            "name": "알고리즘",
+            "code": "4190.407",
+            "credits": 3
+          }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공필수 = 2021~2024학번 set: 9과목 30학점(이산수학3·논리설계4·컴퓨터프로그래밍4·전기전자회로3·자료구조3·컴퓨터구조3·시스템프로그래밍4·알고리즘3·공과대학 공통교과목3). 2025학번부터 7과목 24학점으로 축소(전기전자회로·공대공통 제외, 논리설계·컴프·시스프 4→3학점) = cse_2026.json.",
+    "외국어진행강좌 3과목 이상 (전공 1과목 포함; 2012학번부터 대학영어 제외).",
+    "전공선택 인정과목: 전기·정보공학부/수리과학부/통계학과/연합전공 인공지능 등 학부장 인정 → 주전공 12학점, 복수전공 6학점까지. (트랙 인정 상한 자동 반영)",
+    "공과대학 공통과목 3학점 필수(전필 인정) — 별도 리스트. code=ENG_COMMON는 카탈로그 단일 코드가 아닌 인정 리스트 placeholder(2021~2024학번 전필 산입).",
+    "전기전자회로(4190.201)는 cse.snu.ac.kr 단일전공 PDF가 코드 미표기 → 카탈로그 best-match. 복수전공 전필은 공대공통 제외(8과목 27학점), 부전공은 4과목 중 3과목.",
+    "단일전공 전선 내규필수: 소프트웨어 개발의 원리와 실습 + (컴퓨터공학세미나 또는 컴퓨팅 살펴보기). 다전공 병행은 2차 전공 유형에 따라 주전공 45(복수·연합)/48(부·연계).",
+    "전공필수 학점은 카탈로그(컴퓨터공학부·전필)에서 산출 — 공대공통(전필 인정) 등 일부는 전선 학점으로 잡힐 수 있음(근사).",
+    "교양: 2023·2024학번 OLD 공통교육과정(학문의 기초·세계) = eng_cse_2022 어댑터."
+  ]
+}

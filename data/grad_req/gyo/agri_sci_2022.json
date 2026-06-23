@@ -1,0 +1,14 @@
+{
+  "id": "agri_sci_2022",
+  "college": "농업생명과학대학 자연계 (식물생산·산림·응용생물화학·식품동물생명·바이오시스템·조경지역시스템·스마트시스템)",
+  "applies": "2021~2024",
+  "total_min": 36,
+  "buckets": [
+    { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
+    { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
+    { "key": "math", "name": "수량적 분석과 추론", "min": 6, "areas": ["math", "stat"] },
+    { "key": "science", "name": "과학적 사고와 실험", "min": 8, "areas": ["physics", "chem", "bio", "earth", "science"] },
+    { "key": "world", "name": "학문의 세계", "min": 9, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  ],
+  "notes": ["수량적 분석과 추론: 생명과학을 위한 수학 1·2 / 수학 1·2(연습 포함) / 고급수학 1·2(연습 포함) 중 택 1.", "과학적 사고와 실험: 물리학·화학(또는 고급화학)·생물학·대기과학·지구시스템과학(실험 포함) 중 택 2.", "전체 교양 교과목 중 자유 선택 포함."]
+}

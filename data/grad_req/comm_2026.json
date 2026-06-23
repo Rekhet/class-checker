@@ -1,0 +1,59 @@
+{
+  "id": "comm_2026",
+  "major": "언론정보학과",
+  "college": "사회과학대학",
+  "batch": ["2026"],
+  "track": "단일전공",
+  "source": "https://communication.snu.ac.kr/학부/교과과정/이수규정/ (전 학번 이수규정 인라인, 2026학번 경과조치). 상세: _scrape/soc.md, _scrape/peryear_soc.md",
+  "total_credits": 130,
+  "general": "soc_2025",
+  "major_min_credits": 60,
+  "major_double_credits": 39,
+  "minor_credits": 21,
+  "english_min_courses": 1,
+  "major_select_match": { "departments": ["언론정보학과"], "classifications": ["전선"] },
+  "major_required_match": { "departments": ["언론정보학과"], "classifications": ["전필"] },
+  "major_required_known": [
+    { "name": "커뮤니케이션학 입문", "code": "M1312.002900" },
+    { "name": "커뮤니케이션이론 1", "code": "M1312.003000" },
+    { "name": "커뮤니케이션 양적연구방법론", "code": "M1312.004100" },
+    { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100" }
+  ],
+  "tracks": [
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 12,
+      "required": { "all": [
+        { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
+        { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
+        { "name": "커뮤니케이션 양적연구방법론", "code": "M1312.004100", "credits": 3 },
+        { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 12,
+      "required": { "all": [
+        { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
+        { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
+        { "name": "커뮤니케이션 양적연구방법론", "code": "M1312.004100", "credits": 3 },
+        { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 12,
+      "required": { "all": [
+        { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
+        { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
+        { "name": "커뮤니케이션 양적연구방법론", "code": "M1312.004100", "credits": 3 },
+        { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 9,
+      "required": { "all": [
+        { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
+        { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
+        { "name": "커뮤니케이션 양적연구방법론", "code": "M1312.004100", "credits": 3 }
+      ] } }
+  ],
+  "notes": [
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
+    "전공 학점 by track (2026학번~): 심화전공(단일) 60 / 주전공(다전공) 39 / 복수전공 39 / 부전공 21.",
+    "전공필수(주전공·복수, 2026학번~, 12학점/4과목): 커뮤니케이션학 입문 M1312.002900 · 커뮤니케이션이론 1 M1312.003000 · 커뮤니케이션 양적연구방법론 M1312.004100 · 커뮤니케이션 데이터 분석 M1312.003100. 부전공 전필 = 위 3과목(데이터분석 제외) 9학점.",
+    "(종전 2025-2학기~/2024학번 = 전필 16학점: 위 4 + 언론정보문화특강 211.230 + 정보문화기술입문 2114.304. 2026부터 211.230 폐지·정보문화기술입문 전필 해제.)",
+    "타과 전선 인정: ≤9학점(주/복수); 심화 시 ≤18(정보문화학 제외 타과 ≤12); 부전공 불인정. 정보문화학 개설과목은 12학점 내 전공인정.",
+    "외국어진행강좌 최소 과목수 이수규정 명시 없음 — baseline 1과목."
+  ]
+}
