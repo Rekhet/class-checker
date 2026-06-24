@@ -14,6 +14,7 @@
   "major_double_credits": 53,
   "minor_credits": 36,
   "english_min_courses": 2,
+  "major_required_match": { "departments": ["역사교육과"], "classifications": ["전필"] },
   "major_select_match": {
     "departments": [
       "역사교육과"

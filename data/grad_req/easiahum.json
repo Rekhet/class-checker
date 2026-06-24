@@ -1,0 +1,33 @@
+{
+  "id": "easiahum",
+  "major": "동아시아비교인문학연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://easia.snu.ac.kr/이수규정/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "동아시아 비교문학론", "code": "M3563.000100", "credits": 3 },
+          { "name": "동아시아 비교인문학 연구지도", "code": "M3563.000300", "credits": 3 }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상(전공필수 6학점 + 전선 약 33), 평점평균 2.0 이상.",
+    "전필 6학점(2과목) = 동아시아 비교문학론(M3563.000100) + 동아시아 비교인문학 연구지도(M3563.000300). easia.snu.ac.kr 교과목 페이지 명시(\"전필과목인 …\"). 코드 alias M3563.*=구 M2927.*. 카탈로그 전필 확인.",
+    "진입: 2정규학기+33학점, 정원 30/학기. 2019-1~2024-1 진입생 제2외국어 1과목 C-↑. 학위논문 제출. 중복인정 공통9+타학과3."
+  ]
+}

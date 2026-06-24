@@ -14,6 +14,7 @@
   "major_double_credits": 52,
   "minor_credits": 21,
   "english_min_courses": 3,
+  "major_required_match": { "departments": ["불어교육과"], "classifications": ["전필"] },
   "major_select_match": {
     "departments": [
       "불어교육과"

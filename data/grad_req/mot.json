@@ -1,0 +1,92 @@
+{
+  "id": "mot",
+  "major": "기술경영연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://mot.snu.ac.kr/course_regulation/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "① 경제·경영원론 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "경제원론1", "code": "200.105", "credits": 3 },
+            { "name": "경제원론2", "code": "200.106", "credits": 3 },
+            { "name": "미시경제이론", "code": "212.201", "credits": 3 },
+            { "name": "거시경제이론", "code": "212.202", "credits": 3 },
+            { "name": "경제경영원론과목", "code": "251.332", "credits": 3 },
+            { "name": "경영을 위한 경제학", "code": "M2171.001900", "credits": 3 },
+            { "name": "경제경영원론과목", "code": "400.015", "credits": 3 }
+          ] },
+          { "label": "② 재무·회계 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "재무회계과목", "code": "251.204A", "credits": 3 },
+            { "name": "재무회계과목", "code": "251.205", "credits": 3 },
+            { "name": "재무관리", "code": "251.301", "credits": 3 },
+            { "name": "재무회계과목", "code": "251.323", "credits": 3 },
+            { "name": "재무회계과목", "code": "406.314", "credits": 3 },
+            { "name": "재무회계과목", "code": "406.433", "credits": 3 }
+          ] },
+          { "label": "③ 제품·서비스전략 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "전략과목", "code": "251.321", "credits": 3 },
+            { "name": "전략과목", "code": "251.327", "credits": 3 },
+            { "name": "전략과목", "code": "251.411A", "credits": 3 },
+            { "name": "전략과목", "code": "406.304", "credits": 3 },
+            { "name": "전략과목", "code": "406.326", "credits": 3 },
+            { "name": "전략과목", "code": "M1505.001500", "credits": 3 }
+          ] },
+          { "label": "④ 조직과 리더십 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "조직리더십과목", "code": "212.317", "credits": 3 },
+            { "name": "조직리더십과목", "code": "212.472", "credits": 3 },
+            { "name": "조직리더십과목", "code": "M1338.004000", "credits": 3 },
+            { "name": "조직리더십과목", "code": "M1338.004100", "credits": 3 },
+            { "name": "조직리더십과목", "code": "251.303", "credits": 3 },
+            { "name": "조직리더십과목", "code": "251.424", "credits": 3 },
+            { "name": "조직리더십과목", "code": "406.211", "credits": 3 }
+          ] },
+          { "label": "⑤ 의사결정방법론 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "의사결정과목", "code": "212.301", "credits": 3 },
+            { "name": "경영과학", "code": "251.207A", "credits": 3 },
+            { "name": "의사결정과목", "code": "326.311", "credits": 3 },
+            { "name": "의사결정과목", "code": "406.311", "credits": 3 },
+            { "name": "경영과학1", "code": "406.315", "credits": 3 },
+            { "name": "의사결정과목", "code": "406.317", "credits": 3 },
+            { "name": "의사결정과목", "code": "406.426B", "credits": 3 },
+            { "name": "의사결정과목", "code": "406.429", "credits": 3 },
+            { "name": "의사결정과목", "code": "406.432", "credits": 3 }
+          ] },
+          { "label": "⑥ 기술경영 택2", "min_courses": 2, "min_credits": 6, "pool": [
+            { "name": "기술경영과목", "code": "4251.002A", "credits": 3 },
+            { "name": "생산서비스운영", "code": "M1338.003000", "credits": 3 },
+            { "name": "기술경영과목", "code": "251.744", "credits": 3 },
+            { "name": "기술경영과목", "code": "400.310", "credits": 3 },
+            { "name": "생산관리", "code": "406.310", "credits": 3 },
+            { "name": "기술경영과목", "code": "406.319", "credits": 3 },
+            { "name": "기술경영과목", "code": "406.322", "credits": 3 },
+            { "name": "기술경영과목", "code": "406.324A", "credits": 3 },
+            { "name": "기술경영과목", "code": "M1522.002700", "credits": 3 },
+            { "name": "기술경영과목", "code": "463.509", "credits": 3 },
+            { "name": "기술경영과목", "code": "M1338.000400", "credits": 3 },
+            { "name": "기술경영과목", "code": "M1540.000100", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점(전필 21=7과목 + 전선 18=6과목), 평점평균 2.0 이상. 학사논문 필수.",
+    "data grade: mot.snu.ac.kr 이수규정 prose+코드. 출처검증 20/20.",
+    "전필 = 6영역 택N(①~⑤ 각 택1 + ⑥ 택2 = 7과목/21학점) → required.groups로 인코딩. (재무회계·전략·조직·의사결정·기술경영 풀의 일부 과목명은 일반표기 — 코드 기준 매칭.)",
+    "중복 캡: 경제원론1/2/경영을위한경제학 3과목 중 2만 인정; 생산서비스운영(M1338.003000)+생산관리(406.310) 중 1만; 경영과학(251.207A)+경영과학1(406.315) 중 1만.",
+    "2024 이전 선발자는 종전규정 선택 가능(현 spec은 2025 선발자~ 기준)."
+  ]
+}

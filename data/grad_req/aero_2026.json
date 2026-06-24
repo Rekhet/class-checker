@@ -11,6 +11,7 @@
   "major_double_credits": 42,
   "minor_credits": 21,
   "english_min_courses": 3,
+  "major_required_match": { "departments": ["항공우주공학과"], "classifications": ["전필"] },
   "major_select_match": { "departments": ["항공우주공학과"], "classifications": ["전선"] },
   "tracks": [
     { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 62, "general": true, "select_min": 0, "recog_max": 0 },

@@ -2147,14 +2147,19 @@ function _gradBar(label, have, need, unit) {
     el("div", { className: "gc-track" }, el("div", { className: "gc-fill", style: `width:${pct}%` })));
 }
 // ----- 전공 구성(major list): entries typed 주전공/복수전공/부전공. Track auto-derived. -----
-const GRAD_TYPE_LABEL = { main: "주전공", double: "복수전공", minor: "부전공" };
+const GRAD_TYPE_LABEL = { main: "주전공", double: "복수전공", minor: "부전공", union: "연합·연계전공" };
+const _GRAD_INTER_RE = /(연합전공|연계전공)$/;            // 연합·연계전공 식별: major 명 접미사
+const _gradIsInter = (m) => _GRAD_INTER_RE.test(m || "");
 function _gradYears(idx, major) {
   return idx.filter((e) => e.major === major).map((e) => String(e.batch)).sort().reverse();
 }
 function _gradTrackKey(entry, list) {           // entry type + composition -> track key
   if (entry.type === "double") return "double";
   if (entry.type === "minor") return "minor";
-  return list.some((e) => e.type === "double") ? "multi" : "single";   // 주전공: 복수 있으면 다전공
+  if (entry.type === "union") return "double";   // 연합·연계 = 제2전공 → spec track key "double"
+  // 주전공: 복수전공 또는 연합전공(제2전공급) 있으면 다전공(multi); 부전공·연계전공만이면 심화(single)
+  const hasMajor2 = list.some((e) => e.type === "double" || (e.type === "union" && /연합전공$/.test(e.major)));
+  return hasMajor2 ? "multi" : "single";
 }
 function _gradTrackOf(spec, entry, list) {
   const key = _gradTrackKey(entry, list);
@@ -2163,24 +2168,31 @@ function _gradTrackOf(spec, entry, list) {
     || { key, name: "전공", major_min_credits: spec.major_min_credits, general: true, select_min: 0 };
 }
 function _gradResolveList(idx, majors) {
+  const dept = majors.filter((m) => !_gradIsInter(m));     // 주/복수/부전공 = 일반학과만
+  const inter = majors.filter((m) => _gradIsInter(m));     // 연합·연계전공 슬롯 = interdept만
   let list = Array.isArray(_gradState.list) ? _gradState.list.filter((e) => majors.includes(e.major)) : [];
+  // 슬롯-풀 정합: union 항목은 반드시 interdept, 그 외(main/double/minor)는 일반학과
+  list = list.filter((e) => e.type === "union" ? inter.includes(e.major) : dept.includes(e.major));
   if (!list.some((e) => e.type === "main"))
-    list.unshift({ type: "main", major: majors[0], year: _gradYears(idx, majors[0])[0] });
+    list.unshift({ type: "main", major: dept[0], year: _gradYears(idx, dept[0])[0] });
   // exactly one main: extra mains -> drop
   let seenMain = false;
-  list = list.filter((e) => e.type !== "main" || !seenMain && (seenMain = true));
+  list = list.filter((e) => e.type !== "main" || (!seenMain && (seenMain = true)));
   list.forEach((e) => { const ys = _gradYears(idx, e.major); if (!ys.includes(String(e.year))) e.year = ys[0]; });
   _gradState.list = list;
 }
 function _renderGradList(idx, majors, okByIdx) {
   const box = $("#gradMajorList"); if (!box) return;
   okByIdx = okByIdx || {};
+  const dept = majors.filter((m) => !_gradIsInter(m));
+  const inter = majors.filter((m) => _gradIsInter(m));
   const save = () => { _gradSave(GRAD_STATE_KEY, _gradState); renderGrad(); };
   const rows = _gradState.list.map((e, i) => {
+    const pool = e.type === "union" ? inter : dept;       // 슬롯 유형별 선택 가능 전공 풀
     const years = _gradYears(idx, e.major);
     const mSel = el("select", { className: "gm-major",
       onchange: (ev) => { e.major = ev.target.value; e.year = _gradYears(idx, e.major)[0]; save(); } },
-      ...majors.map((m) => el("option", { value: m }, m)));
+      ...pool.map((m) => el("option", { value: m }, m)));
     mSel.value = e.major;
     const ySel = el("select", { className: "gm-year",
       onchange: (ev) => { e.year = ev.target.value; save(); } },
@@ -2189,15 +2201,20 @@ function _renderGradList(idx, majors, okByIdx) {
     const met = okByIdx[i];
     const mark = el("span", { className: "gm-mark " + (met === true ? "ok" : met === false ? "no" : "") },
       met === true ? "✓" : met === false ? "✗" : "·");
-    const kids = [mark, el("span", { className: "gm-type gm-" + e.type }, GRAD_TYPE_LABEL[e.type] || e.type), mSel, ySel];
+    const label = e.type === "union"
+      ? (e.major.endsWith("연합전공") ? "연합전공" : "연계전공")    // 슬롯 칩은 실제 분류 표기
+      : (GRAD_TYPE_LABEL[e.type] || e.type);
+    const kids = [mark, el("span", { className: "gm-type gm-" + e.type }, label), mSel, ySel];
     if (e.type !== "main")
       kids.push(el("button", { type: "button", className: "gm-del", title: "제외",
         onclick: () => { _gradState.list.splice(i, 1); save(); } }, "×"));
     return el("div", { className: "gm-row" }, ...kids);
   });
-  const addBtn = (type, label) => el("button", { type: "button", className: "gm-add",
-    onclick: () => { _gradState.list.push({ type, major: majors[0], year: _gradYears(idx, majors[0])[0] }); save(); } }, label);
-  box.replaceChildren(...rows, el("div", { className: "gm-adds" }, addBtn("double", "+ 복수전공"), addBtn("minor", "+ 부전공")));
+  const addBtn = (type, label, pool) => el("button", { type: "button", className: "gm-add",
+    onclick: () => { _gradState.list.push({ type, major: pool[0], year: _gradYears(idx, pool[0])[0] }); save(); } }, label);
+  box.replaceChildren(...rows, el("div", { className: "gm-adds" },
+    addBtn("double", "+ 복수전공", dept), addBtn("minor", "+ 부전공", dept),
+    inter.length ? addBtn("union", "+ 연합·연계전공", inter) : document.createTextNode("")));
 }
 function _renderGradSheets() {
   const box = $("#gradSheetPick"); if (!box) return;
@@ -2257,8 +2274,8 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   const suri = spec.suri || { seq: [], combined: null };
   const suriCodes = new Set([...(suri.seq || []).map((x) => x.code), ...(suri.combined ? [suri.combined.code] : [])]);
 
-  const isStat = (d) => spec.major_required_match.departments.some((x) => (d || "").includes(x));
-  const isRecog = (d) => (spec.external_recognition.depts || []).some((x) => (d || "").includes(x.replace(/부$/, "")));
+  const isStat = (d) => (spec.major_required_match?.departments || []).some((x) => (d || "").includes(x));
+  const isRecog = (d) => (spec.external_recognition?.depts || []).some((x) => (d || "").includes(x.replace(/부$/, "")));
   const hasCls = (r, t) => (r.cls || []).includes(t);
   const _takenCanon = new Set(rows.map((r) => canon(r.sbjt_cd)));   // 수강 코드 정규화
   const takenCodes = { has: (code) => _takenCanon.has(canon(code)) };   // 전필 매칭 시 required 코드도 canon → 개편 전/후 코드 호환
@@ -2295,20 +2312,33 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   const chkItems = [];
   let reqTotalN, reqDoneN, reqCreditsFixed;
   const tr = track.required;
-  if (tr && tr.all) {
-    tr.all.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code) }));
-    reqTotalN = tr.all.length;
-    reqDoneN = chkItems.filter((i) => i.done).length;
-    reqCreditsFixed = track.required_credits != null ? track.required_credits : tr.all.reduce((s, c) => s + (c.credits || 0), 0);
-  } else if (tr && tr.pool) {
-    tr.pool.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code) }));
-    reqTotalN = tr.min_courses || tr.pool.length;
-    reqDoneN = Math.min(chkItems.filter((i) => i.done).length, reqTotalN);
-    reqCreditsFixed = track.required_credits != null ? track.required_credits : (tr.min_credits || 0);
+  // 전공필수 = 고정 이수(all) + 택N 그룹(groups[] | 단일 pool). 셋 다 합산해 한 전필 바로 집계.
+  const fixedAll = (tr && tr.all) || [];
+  const groupList = [];
+  if (tr && tr.groups) groupList.push(...tr.groups);
+  if (tr && tr.choose) groupList.push(...tr.choose);   // 'choose' = 기존 biz 스키마의 택N 그룹(동의어)
+  if (tr && tr.pool) groupList.push({ label: tr.label, min_courses: tr.min_courses, min_credits: tr.min_credits, pool: tr.pool });
+  if (fixedAll.length || groupList.length) {
+    fixedAll.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code) }));
+    let gN = 0, gDone = 0, gCred = 0;
+    groupList.forEach((g, gi) => {
+      const pool = g.pool || [];
+      const n = g.min_courses != null ? g.min_courses : pool.length;
+      const doneN = pool.filter((c) => c.code && takenCodes.has(c.code)).length;
+      pool.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: !!(c.code && takenCodes.has(c.code)),
+        gkey: "g" + gi, group: g.label || `택${n}`, groupSize: pool.length, groupN: n }));   // gkey = 그룹별 고유키(라벨 없어도 분리)
+      gN += n; gDone += Math.min(doneN, n); gCred += (g.min_credits || 0);
+    });
+    reqTotalN = fixedAll.length + gN;
+    reqDoneN = fixedAll.filter((c) => takenCodes.has(c.code)).length + gDone;
+    reqCreditsFixed = track.required_credits != null ? track.required_credits
+      : (fixedAll.reduce((s, c) => s + (c.credits || 0), 0) + gCred);
   } else if (track.required_credits != null && !hasSuriReq) {
-    // 전필 학점만 spec에 명시(개별 과목 코드 미수집): 노이즈 큰 카탈로그 추정 대신 학점만 차감, 과목 체크리스트 생략
+    // 전필 학점만 권위값(required_credits로 차감). 카탈로그/known 전필 과목은 참고용(ref, 비게이팅)으로 표시 — 학과별 택N/초과태깅 가능성 때문에 과목 수로 졸업 판정하지 않음
     reqTotalN = 0; reqDoneN = 0;
     reqCreditsFixed = track.required_credits;
+    if (track.required_credits > 0)   // rc===0("없음")일 땐 참고 과목도 표시하지 않음
+      reqBase.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code), ref: true }));
   } else {
     reqBase.forEach((c) => chkItems.push({ label: c.name, code: c.code, done: takenCodes.has(c.code) }));
     if (hasSuriReq) {
@@ -2318,6 +2348,11 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     reqTotalN = reqBase.length + (hasSuriReq ? suriCount : 0);
     reqDoneN = reqBaseTaken.length + (hasSuriReq ? suriDoneN : 0);
     reqCreditsFixed = reqBaseCredits + suriReqCredits;
+    // 카탈로그 파생 전필이 트랙 전공학점 초과(초과태깅·부전공 축소 등) → 게이팅 해제, 과목은 참고로만 표시
+    if (reqCreditsFixed > track.major_min_credits) {
+      chkItems.forEach((it) => { it.ref = true; });
+      reqTotalN = 0; reqDoneN = 0;
+    }
   }
   const selectMinCredits = Math.max(0, track.major_min_credits - reqCreditsFixed);
   // 수리과학부·컴퓨터공학부 인정과목은 전공선택 '학점'에 포함(과목 수에는 미포함)
@@ -2361,12 +2396,21 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   if (reqTotalN > 0)
     major.append(_gradBar(`전공필수 (${reqDoneN}/${reqTotalN}과목)`, reqDoneN, reqTotalN, "과목"));
   else if ((track.required_credits || 0) > 0)
-    major.append(el("div", { className: "grad-note" },
-      `전공필수 ${track.required_credits}학점 — 개별 과목 코드 미수집, 직접 확인 (전공선택 학점은 차감 반영)`));
+    major.append(el("div", { className: "grad-note" }, chkItems.some((it) => it.ref)
+      ? `전공필수 ${track.required_credits}학점 (졸업 판정 기준) — 아래는 카탈로그 전필 과목(참고), 학과 택N·초과태깅 가능 → 직접 확인`
+      : `전공필수 ${track.required_credits}학점 — 개별 과목 코드 미수집, 직접 확인 (전공선택 학점은 차감 반영)`));
+  else if (track.required_credits === 0)
+    major.append(el("div", { className: "grad-note" }, "전공필수 없음 — 전공선택으로 전공학점 충족"));
+  else if (chkItems.some((it) => it.ref))
+    major.append(el("div", { className: "grad-note" }, "전공필수 — 카탈로그 파생 과목(참고). 전필 학점이 전공 총학점을 초과(초과태깅 가능) → 실제 전필은 학과 확인"));
   const chk = el("div", { className: "grad-chklist" });
-  if (track.required && track.required.pool)
-    chk.append(el("div", { className: "grad-note" }, `아래 ${track.required.pool.length}과목 중 ${reqTotalN}과목 이상 이수`));
-  chkItems.forEach((it) => chk.append(chkItem(it.label, it.done, it.code)));
+  // 무조건 이수(고정) 먼저, 그다음 택N 그룹별 안내문 + 후보 과목
+  chkItems.filter((it) => !it.gkey).forEach((it) => chk.append(chkItem(it.label, it.done, it.code)));
+  [...new Set(chkItems.filter((it) => it.gkey).map((it) => it.gkey))].forEach((gk) => {
+    const gi = chkItems.filter((it) => it.gkey === gk);
+    chk.append(el("div", { className: "grad-note grp" }, `${gi[0].group} — 아래 ${gi[0].groupSize}과목 중 ${gi[0].groupN}과목 이상`));
+    gi.forEach((it) => chk.append(chkItem(it.label, it.done, it.code)));
+  });
   major.append(chk);
   if (suriIllegal)
     major.append(el("div", { className: "grad-flag warn" },

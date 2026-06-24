@@ -1,0 +1,38 @@
+{
+  "id": "aisemicon",
+  "major": "인공지능반도체공학연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://ssai.snu.ac.kr/이수규정/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "전공필수 택2 (설계프로젝트)", "min_courses": 2, "min_credits": 4, "pool": [
+            { "name": "인공지능시스템 설계 프로젝트", "code": "M3238.000100", "credits": 2 },
+            { "name": "인공지능 반도체 회로 설계 프로젝트", "code": "M3238.000200", "credits": 2 },
+            { "name": "인공지능 반도체 소자 설계 프로젝트", "code": "M3238.000300", "credits": 2 },
+            { "name": "인공지능 하드웨어 설계프로젝트", "code": "M3238.000400", "credits": 2 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상, 평점평균 2.0 이상.",
+    "data grade: ssai.snu.ac.kr HTML표. 출처검증 20/20.",
+    "전필 = 설계프로젝트 4과목(각 2학점) 중 택2(4학점) → required.groups로 인코딩.",
+    "M3238.000300(소자 설계프로젝트)은 선이수 430.312 반도체소자 필요. 전선 35↑(430.213A 기초회로이론및실험, 430.211 프로그래밍방법론, 430.201A 논리설계및실험, 430.312 반도체소자, M1522.000800 시스템프로그래밍 등 19과목). 타과 1과목(≤3학점)."
+  ]
+}

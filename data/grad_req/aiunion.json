@@ -1,0 +1,51 @@
+{
+  "id": "aiunion",
+  "major": "인공지능연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://imai.snu.ac.kr/academics/requirements/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "인공지능 이론 및 응용 세미나", "code": "M3244.000200", "credits": 1 }
+        ],
+        "groups": [
+          { "label": "전공선택필수 택2", "min_courses": 2, "min_credits": 6, "pool": [
+            { "name": "전기시스템선형대수", "code": "430.216", "credits": 3 },
+            { "name": "기계학습 개론", "code": "4190.428", "credits": 3 },
+            { "name": "기계학습 기초", "code": "M2608.002900", "credits": 3 },
+            { "name": "인공지능", "code": "4190.408", "credits": 3 },
+            { "name": "딥러닝의 기초", "code": "M2177.004300", "credits": 3 }
+          ] },
+          { "label": "전공필수 택1 (택1군)", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "데이터베이스", "code": "M1522.001800", "credits": 3 },
+            { "name": "컴퓨터비전의 기초", "code": "M2608.001900", "credits": 3 },
+            { "name": "컴퓨터비전", "code": "M1522.001000", "credits": 3 },
+            { "name": "데이터마이닝", "code": "406.429", "credits": 3 },
+            { "name": "데이터마이닝 방법 및 실습", "code": "326.413", "credits": 3 },
+            { "name": "데이터마이닝 개론", "code": "M1522.001400", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점(심화단일 60) = 전공필수 10(11)학점 + 전공선택 29(28)학점(전공선택필수 6↑ 포함), 평점평균 2.0 이상. 인턴보고서=졸논.",
+    "data grade: imai.snu.ac.kr requirements 본문. 표 캡션 '12학점'은 오기, 본문 확정값 10(11)학점. 출처검증 20/20.",
+    "전필 10(11)학점 = 무조건 세미나 1 + 전공선택필수 택2(6학점) + 전필 택1군 택1(3학점) → required.all + groups로 인코딩.",
+    "전공선택필수: 전기시스템선형대수(=산업경영수리기법/선형대수1, 430.216)·기계학습 개론/기초(4190.428/M2608.002900)·인공지능(4190.408)·딥러닝의 기초(M2177.004300) 4과목 중 2↑.",
+    "유사과목 중복수강 시 1과목만 인정. 전선 타과 인정 최대 6학점(3+3 OK, 3+4는 1과목만)."
+  ]
+}

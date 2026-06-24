@@ -1,0 +1,42 @@
+{
+  "id": "sts",
+  "major": "과학기술학연계전공",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://sts.snu.ac.kr/전체-교과목-및-이수-규정/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "탐색영역 (≥9학점)", "min_courses": 3, "min_credits": 9, "pool": [
+            { "name": "과학혁명과 근대과학의 탄생", "code": "300.301A", "credits": 3 },
+            { "name": "과학과 근대사회", "code": "300.302", "credits": 3 },
+            { "name": "테크노사이언스의 역사와 철학", "code": "300.306", "credits": 3 },
+            { "name": "과학기술과 법", "code": "300.307", "credits": 3 },
+            { "name": "과학철학", "code": "113.463", "credits": 3 },
+            { "name": "과학기술정책", "code": "M2888.000100", "credits": 3 },
+            { "name": "과학기술학의 이해", "code": "M2888.000700", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연계전공 21학점 = 탐색 ≥9 + 심화선택 ≥9 + 기타(탐색·심화·관련 중 ≥3), 졸업 평점 2.0 이상.",
+    "data grade: sts.snu.ac.kr prose(규정 2023~2026 versioned). 출처검증 20/20.",
+    "탐색영역 = 7과목 pool 중 ≥9학점(≈3과목) → required.groups로 인코딩. 심화 ≥9 + 기타 ≥3 = 전공선택 학점(21−9=12)으로 반영.",
+    "심화(택): 300.308·M2173.000200·M2888.000200/000300/001000/000400/000600/000800/000900·M2173.004200·M3563.000600·M1312.004300·M2173.005000. 관련: 205.334·M3544.000800.",
+    "진입: 2정규학기+33학점, 연 50명(≤25/학기)."
+  ]
+}

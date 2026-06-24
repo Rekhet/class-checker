@@ -1,0 +1,43 @@
+{
+  "id": "gem",
+  "major": "글로벌환경경영학연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "snuc.snu.ac.kr 연합전공 글로벌환경경영학 course-map + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "환경정책입문", "code": "538.402" },
+    { "name": "글로벌환경경영 특강", "code": "M3713.000400" },
+    { "name": "환경경영과 지속가능성 분석", "code": "M1729.001100" },
+    { "name": "환경경영학", "code": "538.301" },
+    { "name": "환경경영 실습(인턴과정)", "code": "538.404" }
+  ],
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "환경정책입문", "code": "538.402", "credits": 3 },
+          { "name": "글로벌환경경영 특강", "code": "M3713.000400", "credits": 3 },
+          { "name": "환경경영과 지속가능성 분석", "code": "M1729.001100", "credits": 3 },
+          { "name": "환경경영학", "code": "538.301", "credits": 3 },
+          { "name": "환경경영 실습(인턴과정)", "code": "538.404", "credits": 3 }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상, 평점평균 2.0 이상.",
+    "data grade: 학부대학 snuc.snu.ac.kr course-map JSON에서 전필 코드 추출(자체 도메인 gem.snu.ac.kr DNS 미존재). 출처검증 20/20.",
+    "전선 인정과목(course-map): 538.305 지구환경과 에너지문제, 538.403 생활속의 생태학, M1729.001300 환경경영을 위한 경제원론1, M1729.001400 개발경제학과 환경경영, M1729.001500 환경경영을 위한 효과성평가, M1729.001600 건설환경시스템 지속가능공학, 538.401 기후변화협약과 환경기술, 538.302A 생태철학과 환경윤리, M1729.000900 환경경영과 경관계획, 538.309 환경분석 및 계획, M1729.000500 기후경제의 이해, 538.405 산업생태학."
+  ]
+}
