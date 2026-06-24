@@ -11,6 +11,7 @@
   "major_double_credits": 42,
   "minor_credits": 21,
   "english_min_courses": 3,
+  "major_required_match": { "departments": ["노어노문학과"], "classifications": ["전필"] },
   "major_select_match": { "departments": ["노어노문학과"], "classifications": ["전선"] },
   "major_required_known": [
     { "name": "러시아문학사 1" },

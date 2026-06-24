@@ -28,28 +28,32 @@
       "name": "심화전공",
       "major_min_credits": 60,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "required_credits": 0
     },
     {
       "key": "multi",
       "name": "주전공(다전공)",
       "major_min_credits": 39,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "required_credits": 0
     },
     {
       "key": "double",
       "name": "복수·연합전공",
       "major_min_credits": 39,
       "general": false,
-      "select_min": 0
+      "select_min": 0,
+      "required_credits": 0
     },
     {
       "key": "minor",
       "name": "부전공·연계전공",
       "major_min_credits": 21,
       "general": false,
-      "select_min": 0
+      "select_min": 0,
+      "required_credits": 0
     }
   ],
   "notes": [

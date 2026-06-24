@@ -7,7 +7,7 @@
     "2024"
   ],
   "track": "단일전공",
-  "source": "https://spanish.snu.ac.kr/graduation-major/ · /graduation-minor/ · /standard-course-completion/ (정적 HTML). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "source": "https://spanish.snu.ac.kr/graduation-major/ · /graduation-minor/ · /standard-course-completion/ (정적 HTML). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable, 졸업표 2014학번~ 공통). liberaledu_2024.pdf.",
   "total_credits": 130,
   "general": "hum_2022",
   "major_min_credits": 60,
@@ -23,39 +23,68 @@
     ]
   },
   "tracks": [
-    {
-      "key": "single",
-      "name": "심화전공(단일전공)",
-      "major_min_credits": 60,
-      "general": true,
-      "select_min": 0
-    },
-    {
-      "key": "multi",
-      "name": "주전공(다전공)",
-      "major_min_credits": 42,
-      "general": true,
-      "select_min": 0
-    },
-    {
-      "key": "double",
-      "name": "복수전공",
-      "major_min_credits": 42,
-      "general": false,
-      "select_min": 0
-    },
-    {
-      "key": "minor",
-      "name": "부전공",
-      "major_min_credits": 21,
-      "general": false,
-      "select_min": 0
-    }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "스페인소설", "code": "107.328A", "credits": 3 },
+          { "name": "중남미소설", "code": "107.327A", "credits": 3 }
+        ],
+        "choose": [
+          { "label": "선택필수 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "스페인문학사", "code": "107.242", "credits": 3 },
+            { "name": "중남미문학사", "code": "107.243", "credits": 3 },
+            { "name": "스페인어학개론", "code": "107.306", "credits": 3 }
+          ] }
+        ]
+      } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 42, "general": true, "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "스페인소설", "code": "107.328A", "credits": 3 },
+          { "name": "중남미소설", "code": "107.327A", "credits": 3 }
+        ],
+        "choose": [
+          { "label": "선택필수 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "스페인문학사", "code": "107.242", "credits": 3 },
+            { "name": "중남미문학사", "code": "107.243", "credits": 3 },
+            { "name": "스페인어학개론", "code": "107.306", "credits": 3 }
+          ] }
+        ]
+      } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 42, "general": false, "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "스페인소설", "code": "107.328A", "credits": 3 },
+          { "name": "중남미소설", "code": "107.327A", "credits": 3 }
+        ],
+        "choose": [
+          { "label": "선택필수 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "스페인문학사", "code": "107.242", "credits": 3 },
+            { "name": "중남미문학사", "code": "107.243", "credits": 3 },
+            { "name": "스페인어학개론", "code": "107.306", "credits": 3 }
+          ] }
+        ]
+      } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "스페인소설", "code": "107.328A", "credits": 3 },
+          { "name": "중남미소설", "code": "107.327A", "credits": 3 }
+        ],
+        "choose": [
+          { "label": "선택필수 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "스페인문학사", "code": "107.242", "credits": 3 },
+            { "name": "중남미문학사", "code": "107.243", "credits": 3 },
+            { "name": "스페인어학개론", "code": "107.306", "credits": 3 }
+          ] }
+        ]
+      } }
   ],
   "notes": [
-    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2022 어댑터(구 공통교육과정).",
     "⚠ 서문 2017학번~ 제2전공 병행·복수전공 = 42학점(~2016학번 39) — 인문대 표준 예외. 단일 60 / 부전공 21.",
-    "전공필수 6학점 + 선택필수(학과내규) 3학점(2014학번~) — 전 학번 공통이나 hum.md에 과목명·코드 미게시 → required 미생성, 전선 학점으로 산입(근사). 스페인어 진행 전공 필수(2015~), 포르투갈어입문1 이수(2014~).",
-    "외국어진행강좌 ≥3과목(스페인어 진행 서문 전공 1과목 포함). 제2외국어 9학점은 교양(hum_2025) 측. 학사논문 제출자격 DELE/SNULT(2024.2~)."
+    "전필 6학점(2과목) = 스페인소설(107.328A) + 중남미소설(107.327A). 선택필수 3학점 = 스페인문학사(107.242)·중남미문학사(107.243)·스페인어학개론(107.306) 중 택1. spanish.snu.ac.kr 졸업표 2014학번~ 공통.",
+    "⚠ 카탈로그상 영화 언어의 이해(M3699.000100)·영화의 역사(M3699.000200)는 영화영상학 연계전공 cross-list → 서문 전필 아님(제외). major_required_match 미사용(curated).",
+    "추가 졸업조건: 스페인어 진행 전공 1과목 필수(2015~), 포르투갈어입문1 이수(2014~). 외국어진행강좌 ≥3과목. 학사논문 제출자격 DELE/SNULT(2024.2~)."
   ]
 }

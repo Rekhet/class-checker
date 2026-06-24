@@ -1,0 +1,38 @@
+{
+  "id": "filmstudies",
+  "major": "영화영상학연계전공",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://filmstudies.snu.ac.kr/standard_completion_track/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "전공필수 택2", "min_courses": 2, "min_credits": 6, "pool": [
+            { "name": "영화 언어의 이해", "code": "M3699.000100", "credits": 3 },
+            { "name": "영화의 역사", "code": "M3699.000200", "credits": 3 },
+            { "name": "영상미학 (코드 미검증)", "code": null, "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연계전공 21학점 이상, 졸업논문 없음. 진입: 2정규학기+33학점, 15명/학기.",
+    "data grade: filmstudies.snu.ac.kr HTML표+prose. 출처검증 20/20.",
+    "전필 = 3과목(영화 언어의 이해·영화의 역사·영상미학) 중 택2(6학점) → required.groups로 인코딩.",
+    "영상미학은 자체 개설과목으로 sbjt_cd 미표기 → 코드 미검증(카탈로그 부재), 과목명만 수록.",
+    "전선(자체): M3699.000300 영화비평세미나·M3699.000400 영화제작론특강·M3699.000500 현대영화의 쟁점. (타학과): M1262.000600·M1262.000500·M1236.002500·M1236.001200·M3500.000700 + cross-listed pool."
+  ]
+}

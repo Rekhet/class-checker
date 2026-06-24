@@ -1,0 +1,36 @@
+{
+  "id": "venture",
+  "major": "벤처경영학연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://ect.snu.ac.kr/venture/curriculum + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "벤처창업론", "code": null },
+    { "name": "기술트렌드와 사업기회분석", "code": null },
+    { "name": "창조와 혁신", "code": null },
+    { "name": "사회적 기업의 창업", "code": null },
+    { "name": "창업론실습1/창업론실습2", "code": null }
+  ],
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": { "all": [] }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점(전필 15=5과목 + 전선 24, 그중 연합개설 9↑), 평점평균 2.0 이상. (2023 선발자~.)",
+    "data grade: ect.snu.ac.kr HTML표 — 전필 과목명만, sbjt_cd 미표기. 코드 미검증(카탈로그 부재)으로 required.all에서 제외, major_required_known에 과목명만 수록.",
+    "전필 5과목(각 3학점): 벤처창업론, 기술트렌드와 사업기회분석, 창조와 혁신, 사회적 기업의 창업, 창업론실습1/창업론실습2(둘 다 이수 시 1과목만 전필·나머지 전선).",
+    "참여 4개 학과: 철학·경영·컴공·식품동물생명. 졸업논문 = 창업사례보고서/창업계획서(S/U)."
+  ]
+}

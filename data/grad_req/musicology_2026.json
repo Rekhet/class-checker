@@ -14,10 +14,10 @@
   "major_select_match": { "departments": ["음악학과"], "classifications": ["전선"] },
   "major_required_match": { "departments": ["음악학과"], "classifications": ["전필"] },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 46, "general": true, "select_min": 0, "required_credits": 46 },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 46, "general": true, "select_min": 0, "required_credits": 46 },
-    { "key": "double", "name": "복수전공", "major_min_credits": 46, "general": false, "select_min": 0, "required_credits": 46 },
-    { "key": "minor", "name": "부전공", "major_min_credits": 30, "general": false, "select_min": 0 }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 46, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 46, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 46, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 30, "general": false, "select_min": 0, "required_credits": 0 }
   ],
   "notes": [
     "음악대학 = 실기 중심 비표준 모델. 졸업 130 / 교양 36(music_2025 어댑터) 공통. 전체·전공 평점 각 2.0 이상.",

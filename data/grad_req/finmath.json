@@ -1,0 +1,39 @@
+{
+  "id": "finmath",
+  "major": "금융수학연계전공",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://finance.math.snu.ac.kr/content/a1_3 + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "전공필수 택3", "min_courses": 3, "min_credits": 9, "pool": [
+            { "name": "금융수학 1", "code": "3341.451", "credits": 3 },
+            { "name": "금융수학 2", "code": "3341.452", "credits": 3 },
+            { "name": "측도이론과 확률", "code": "M1407.002500", "credits": 3 },
+            { "name": "확률미분방정식", "code": "M1407.002600", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연계전공 21학점 이상, 평점평균 2.0 이상.",
+    "data grade: finance.math.snu.ac.kr HTML표+prose(TLS rejectUnauthorized:false). 출처검증 20/20.",
+    "전필 = 4과목(금융수학 1·2·측도이론과 확률·확률미분방정식) 중 택3(9학점) → required.groups로 인코딩.",
+    "전선(내부): 881.319 수치선형대수·881.320 수치해석개론·881.425 실변수함수론·881.424 응용편미분방정식·M1407.000700/3341.454 해석개론및연습2. (외부인정): M1505.001300·M1522.001400·326.413·M2177.004300·326.411·326.415·251.420·251.422·326.513/516·406.315/317·406.433 등.",
+    "2026-1 이전 선발자는 5과목풀 종전규정."
+  ]
+}

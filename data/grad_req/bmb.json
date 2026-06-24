@@ -1,0 +1,40 @@
+{
+  "id": "bmb",
+  "major": "뇌-마음-행동연계전공",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://bmb.psych.snu.ac.kr/sub02/sub01.php + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "뇌-마음-행동", "code": "2071.301" },
+    { "name": "뇌-마음-행동 세미나", "code": "2071.302" },
+    { "name": "뇌-마음-행동 개별연구", "code": "2071.401" }
+  ],
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "뇌-마음-행동", "code": "2071.301", "credits": 3 },
+          { "name": "뇌-마음-행동 세미나", "code": "2071.302", "credits": 1 },
+          { "name": "뇌-마음-행동 개별연구", "code": "2071.401", "credits": 2 }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연계전공 21학점(전필 6 + 전선 15), 평점평균 2.0 이상. (2024-2학기 선발자~ 현행.)",
+    "data grade: bmb.psych.snu.ac.kr HTML표. 출처검증 20/20.",
+    "전선 15↑: 3군(심리/생명 · 언어/철학 · 계산/통계) 각 1↑. 인정학과: 심리·언어·생명과학·철학·컴공·통계·화학.",
+    "주/복수전공 학점 중복분 제외. 졸업논문 = 개별연구 보고서 대체. (구 규정 = 7개 학과군 중 3↑ 각1, 동일 21학점.)"
+  ]
+}

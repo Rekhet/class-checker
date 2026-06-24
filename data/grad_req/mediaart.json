@@ -1,0 +1,36 @@
+{
+  "id": "mediaart",
+  "major": "영상매체예술연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://art.snu.ac.kr/category/program-in-media-art/?catemenu=Courses&type=major + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "major_required_known": [
+    { "name": "현대매체예술사", "code": "613.302" }
+  ],
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "현대매체예술사", "code": "613.302", "credits": 3 }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상, 평점평균 2.0 이상.",
+    "data grade: art.snu.ac.kr 이수표준형태 HTML표. 출처검증 20/20.",
+    "전필 1과목(현대매체예술사) — 이수표준형태에서 전필 표기(*) 유일. 학점 미표기, 카탈로그 기준 3학점.",
+    "전선은 613.### 영상매체 개설과목. 졸업작품 전시(심사) 필수. 중복인정: 공통 9학점 + 타학과공통 3학점."
+  ]
+}

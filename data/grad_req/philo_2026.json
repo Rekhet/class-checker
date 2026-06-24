@@ -11,6 +11,7 @@
   "major_double_credits": 39,
   "minor_credits": 21,
   "english_min_courses": 3,
+  "major_required_match": { "departments": ["철학과"], "classifications": ["전필"] },
   "major_select_match": { "departments": ["철학과"], "classifications": ["전선"] },
   "tracks": [
     { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },

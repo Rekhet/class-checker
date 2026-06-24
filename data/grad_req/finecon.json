@@ -1,0 +1,42 @@
+{
+  "id": "finecon",
+  "major": "금융경제연계전공",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://finecon.snu.ac.kr/이수-요건/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "미시경제이론", "code": "212.201", "credits": 3 },
+          { "name": "거시경제이론", "code": "212.202", "credits": 3 },
+          { "name": "계량경제학", "code": "212.301", "credits": 3 }
+        ],
+        "groups": [
+          { "label": "전공필수 택1 (재무)", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "주식, 채권, 파생금융상품 1: 이론", "code": "212.338A", "credits": 3 },
+            { "name": "재무관리", "code": "251.301", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연계전공 21학점(7과목↑), 평점평균 2.0 이상. (2019-1 진입자~ 현행.)",
+    "data grade: finecon.snu.ac.kr HTML표. 출처검증 20/20.",
+    "전필 12학점(4과목) = 무조건 3(미시·거시·계량경제학) + 택1(주식·채권·파생금융상품-1 이론 212.338A 또는 재무관리 251.301) → required.all + groups로 인코딩.",
+    "주의: 미시·거시경제이론은 주전공 학점으로만 인정 → 연계전공 학점 불인정. 해당자는 연계 인정과목 2개 추가 수강해 21학점 별도 충족. 금융윤리특강(무학점 워크샵) 졸업 전 필참.",
+    "전선: 경제·경영·수리·통계. 파생금융상품론(251.420)↔대학원 252.615 택1. 진입: 2정규학기+33학점."
+  ]
+}

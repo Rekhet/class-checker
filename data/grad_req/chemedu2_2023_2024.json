@@ -23,339 +23,79 @@
     ]
   },
   "major_required_known": [
-    {
-      "name": "유기화학1",
-      "code": "718.201"
-    },
-    {
-      "name": "유기화학2",
-      "code": "718.202"
-    },
-    {
-      "name": "물리화학1",
-      "code": "718.208"
-    },
-    {
-      "name": "물리화학2",
-      "code": "718.214"
-    },
-    {
-      "name": "분석화학1",
-      "code": "718.215"
-    },
-    {
-      "name": "분석화학2",
-      "code": "718.305"
-    },
-    {
-      "name": "무기화학1",
-      "code": "718.319"
-    },
-    {
-      "name": "무기화학2",
-      "code": "718.309"
-    },
-    {
-      "name": "유기화학실험",
-      "code": "718.311"
-    },
-    {
-      "name": "물리화학실험",
-      "code": "718.312"
-    },
-    {
-      "name": "무기화학실험",
-      "code": "718.456"
-    },
-    {
-      "name": "분석화학실험",
-      "code": "718.308"
-    },
-    {
-      "name": "화학교육론",
-      "code": "718.316"
-    },
-    {
-      "name": "화학교재연구 및 지도법",
-      "code": "718.419"
-    },
-    {
-      "name": "화학교육연구",
-      "code": "718.442"
-    }
+    { "name": "유기화학1", "code": "718.201" },
+    { "name": "유기화학2", "code": "718.202" },
+    { "name": "물리화학1", "code": "718.208" },
+    { "name": "물리화학2", "code": "718.309" },
+    { "name": "분석화학1", "code": "718.214" },
+    { "name": "분석화학2", "code": "718.215" },
+    { "name": "무기화학1", "code": "718.311" },
+    { "name": "무기화학2", "code": "718.312" },
+    { "name": "유기화학실험", "code": "718.305" },
+    { "name": "물리화학실험", "code": "718.319" },
+    { "name": "무기화학실험", "code": "718.456" },
+    { "name": "분석화학실험", "code": "718.308" },
+    { "name": "화학교육론", "code": "718.316" },
+    { "name": "화학교재연구 및 지도법", "code": "718.419" },
+    { "name": "화학교육연구", "code": "718.442" }
   ],
   "tracks": [
-    {
-      "key": "single",
-      "name": "주전공(단일전공)",
-      "major_min_credits": 60,
-      "general": true,
-      "select_min": 0,
-      "required_credits": 41,
-      "required": {
-        "all": [
-          {
-            "name": "유기화학1",
-            "code": "718.201",
-            "credits": 3
-          },
-          {
-            "name": "유기화학2",
-            "code": "718.202",
-            "credits": 3
-          },
-          {
-            "name": "물리화학1",
-            "code": "718.208",
-            "credits": 3
-          },
-          {
-            "name": "물리화학2",
-            "code": "718.214",
-            "credits": 3
-          },
-          {
-            "name": "분석화학1",
-            "code": "718.215",
-            "credits": 3
-          },
-          {
-            "name": "분석화학2",
-            "code": "718.305",
-            "credits": 3
-          },
-          {
-            "name": "무기화학1",
-            "code": "718.319",
-            "credits": 3
-          },
-          {
-            "name": "무기화학2",
-            "code": "718.309",
-            "credits": 3
-          },
-          {
-            "name": "유기화학실험",
-            "code": "718.311",
-            "credits": 2
-          },
-          {
-            "name": "물리화학실험",
-            "code": "718.312",
-            "credits": 2
-          },
-          {
-            "name": "무기화학실험",
-            "code": "718.456",
-            "credits": 2
-          },
-          {
-            "name": "분석화학실험",
-            "code": "718.308",
-            "credits": 2
-          },
-          {
-            "name": "화학교육론",
-            "code": "718.316",
-            "credits": 3
-          },
-          {
-            "name": "화학교재연구 및 지도법",
-            "code": "718.419",
-            "credits": 3
-          },
-          {
-            "name": "화학교육연구",
-            "code": "718.442",
-            "credits": 3
-          }
-        ]
-      }
-    },
-    {
-      "key": "multi",
-      "name": "주전공(다전공 병행)",
-      "major_min_credits": 52,
-      "general": true,
-      "select_min": 0,
-      "required_credits": 41,
-      "required": {
-        "all": [
-          {
-            "name": "유기화학1",
-            "code": "718.201",
-            "credits": 3
-          },
-          {
-            "name": "유기화학2",
-            "code": "718.202",
-            "credits": 3
-          },
-          {
-            "name": "물리화학1",
-            "code": "718.208",
-            "credits": 3
-          },
-          {
-            "name": "물리화학2",
-            "code": "718.214",
-            "credits": 3
-          },
-          {
-            "name": "분석화학1",
-            "code": "718.215",
-            "credits": 3
-          },
-          {
-            "name": "분석화학2",
-            "code": "718.305",
-            "credits": 3
-          },
-          {
-            "name": "무기화학1",
-            "code": "718.319",
-            "credits": 3
-          },
-          {
-            "name": "무기화학2",
-            "code": "718.309",
-            "credits": 3
-          },
-          {
-            "name": "유기화학실험",
-            "code": "718.311",
-            "credits": 2
-          },
-          {
-            "name": "물리화학실험",
-            "code": "718.312",
-            "credits": 2
-          },
-          {
-            "name": "무기화학실험",
-            "code": "718.456",
-            "credits": 2
-          },
-          {
-            "name": "분석화학실험",
-            "code": "718.308",
-            "credits": 2
-          },
-          {
-            "name": "화학교육론",
-            "code": "718.316",
-            "credits": 3
-          },
-          {
-            "name": "화학교재연구 및 지도법",
-            "code": "718.419",
-            "credits": 3
-          },
-          {
-            "name": "화학교육연구",
-            "code": "718.442",
-            "credits": 3
-          }
-        ]
-      }
-    },
-    {
-      "key": "double",
-      "name": "복수전공",
-      "major_min_credits": 52,
-      "general": false,
-      "select_min": 0,
-      "required_credits": 41,
-      "required": {
-        "all": [
-          {
-            "name": "유기화학1",
-            "code": "718.201",
-            "credits": 3
-          },
-          {
-            "name": "유기화학2",
-            "code": "718.202",
-            "credits": 3
-          },
-          {
-            "name": "물리화학1",
-            "code": "718.208",
-            "credits": 3
-          },
-          {
-            "name": "물리화학2",
-            "code": "718.214",
-            "credits": 3
-          },
-          {
-            "name": "분석화학1",
-            "code": "718.215",
-            "credits": 3
-          },
-          {
-            "name": "분석화학2",
-            "code": "718.305",
-            "credits": 3
-          },
-          {
-            "name": "무기화학1",
-            "code": "718.319",
-            "credits": 3
-          },
-          {
-            "name": "무기화학2",
-            "code": "718.309",
-            "credits": 3
-          },
-          {
-            "name": "유기화학실험",
-            "code": "718.311",
-            "credits": 2
-          },
-          {
-            "name": "물리화학실험",
-            "code": "718.312",
-            "credits": 2
-          },
-          {
-            "name": "무기화학실험",
-            "code": "718.456",
-            "credits": 2
-          },
-          {
-            "name": "분석화학실험",
-            "code": "718.308",
-            "credits": 2
-          },
-          {
-            "name": "화학교육론",
-            "code": "718.316",
-            "credits": 3
-          },
-          {
-            "name": "화학교재연구 및 지도법",
-            "code": "718.419",
-            "credits": 3
-          },
-          {
-            "name": "화학교육연구",
-            "code": "718.442",
-            "credits": 3
-          }
-        ]
-      }
-    },
-    {
-      "key": "minor",
-      "name": "부전공",
-      "major_min_credits": 21,
-      "general": false,
-      "select_min": 0,
-      "required": {
-        "all": []
-      }
-    }
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 41,
+      "required": { "all": [
+        { "name": "유기화학1", "code": "718.201", "credits": 3 },
+        { "name": "유기화학2", "code": "718.202", "credits": 3 },
+        { "name": "물리화학1", "code": "718.208", "credits": 3 },
+        { "name": "물리화학2", "code": "718.309", "credits": 3 },
+        { "name": "분석화학1", "code": "718.214", "credits": 3 },
+        { "name": "분석화학2", "code": "718.215", "credits": 3 },
+        { "name": "무기화학1", "code": "718.311", "credits": 3 },
+        { "name": "무기화학2", "code": "718.312", "credits": 3 },
+        { "name": "유기화학실험", "code": "718.305", "credits": 2 },
+        { "name": "물리화학실험", "code": "718.319", "credits": 2 },
+        { "name": "무기화학실험", "code": "718.456", "credits": 2 },
+        { "name": "분석화학실험", "code": "718.308", "credits": 2 },
+        { "name": "화학교육론", "code": "718.316", "credits": 3 },
+        { "name": "화학교재연구 및 지도법", "code": "718.419", "credits": 3 },
+        { "name": "화학교육연구", "code": "718.442", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 41,
+      "required": { "all": [
+        { "name": "유기화학1", "code": "718.201", "credits": 3 },
+        { "name": "유기화학2", "code": "718.202", "credits": 3 },
+        { "name": "물리화학1", "code": "718.208", "credits": 3 },
+        { "name": "물리화학2", "code": "718.309", "credits": 3 },
+        { "name": "분석화학1", "code": "718.214", "credits": 3 },
+        { "name": "분석화학2", "code": "718.215", "credits": 3 },
+        { "name": "무기화학1", "code": "718.311", "credits": 3 },
+        { "name": "무기화학2", "code": "718.312", "credits": 3 },
+        { "name": "유기화학실험", "code": "718.305", "credits": 2 },
+        { "name": "물리화학실험", "code": "718.319", "credits": 2 },
+        { "name": "무기화학실험", "code": "718.456", "credits": 2 },
+        { "name": "분석화학실험", "code": "718.308", "credits": 2 },
+        { "name": "화학교육론", "code": "718.316", "credits": 3 },
+        { "name": "화학교재연구 및 지도법", "code": "718.419", "credits": 3 },
+        { "name": "화학교육연구", "code": "718.442", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 41,
+      "required": { "all": [
+        { "name": "유기화학1", "code": "718.201", "credits": 3 },
+        { "name": "유기화학2", "code": "718.202", "credits": 3 },
+        { "name": "물리화학1", "code": "718.208", "credits": 3 },
+        { "name": "물리화학2", "code": "718.309", "credits": 3 },
+        { "name": "분석화학1", "code": "718.214", "credits": 3 },
+        { "name": "분석화학2", "code": "718.215", "credits": 3 },
+        { "name": "무기화학1", "code": "718.311", "credits": 3 },
+        { "name": "무기화학2", "code": "718.312", "credits": 3 },
+        { "name": "유기화학실험", "code": "718.305", "credits": 2 },
+        { "name": "물리화학실험", "code": "718.319", "credits": 2 },
+        { "name": "무기화학실험", "code": "718.456", "credits": 2 },
+        { "name": "분석화학실험", "code": "718.308", "credits": 2 },
+        { "name": "화학교육론", "code": "718.316", "credits": 3 },
+        { "name": "화학교재연구 및 지도법", "code": "718.419", "credits": 3 },
+        { "name": "화학교육연구", "code": "718.442", "credits": 3 }
+      ] } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": { "all": [] } }
   ],
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상, 교직 평점 2.4 이상.",
@@ -364,6 +104,7 @@
     "외국어진행강좌: 전공 3학점 포함 9학점 이상 (english_min_courses=3은 전공 포함 과목수 근사).",
     "부전공 전공필수·이수규정은 페이지 미명시 → required 비움(근사); 부전공으로 교원자격 취득 불가.",
     "교직과정 ~22학점(교직이론 12 + 교직소양 7/4과목[교직실무·특수교육학개론·학교폭력예방 및 학생의 이해·디지털 교육] + 교육실습 4)은 전공과 별개. 2024학번 이후 디지털 교육(1학점) 신설. 교원자격 표시과목 = 화학. schema에 교직 필드 없어 NOTE로만 기록.",
+    "전필 코드 정정(2026-06-24): 물리화학2·분석화학1·2·무기화학1·2·유기화학실험·물리화학실험 7과목 코드가 name↔code 스크램블 상태였음 → 카탈로그 실코드로 교정(718.309/214/215/311/312/305/319).",
     "비학점: 졸업논문 · 교직적인성검사 2회 · 응급처치/심폐소생술 2회 · 성인지교육 4회."
   ]
 }

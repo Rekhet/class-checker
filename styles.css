@@ -527,6 +527,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .gm-type.gm-main { background: var(--cp-accent); color: var(--cp-accentInk); }
 .gm-type.gm-double { background: #3FA66A; color: #fff; }
 .gm-type.gm-minor { background: var(--cp-soft); color: var(--cp-ink); }
+.gm-type.gm-union { background: #7C5CE0; color: #fff; }
 .gm-major, .gm-year { border: 1px solid var(--cp-line); border-radius: 7px; padding: 5px 9px; font-size: 12.5px; color: var(--cp-ink); }
 .gm-del { background: none; border: none; color: var(--cp-faint); cursor: pointer; font-size: 15px; line-height: 1; padding: 2px 6px; }
 .gm-del:hover { color: var(--cp-conflict); }
@@ -541,3 +542,4 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .grad-block-h { font-size: 15px; margin: 0 0 12px; color: var(--cp-ink); }
 .grad-flag.eng { cursor: pointer; }
 .grad-note { font-size: 11.5px; color: var(--cp-muted); line-height: 1.5; margin-top: 4px; }
+.grad-note.grp { grid-column: 1 / -1; font-weight: 700; color: var(--cp-ink); margin-top: 8px; }

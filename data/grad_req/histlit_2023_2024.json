@@ -7,7 +7,7 @@
     "2024"
   ],
   "track": "단일전공",
-  "source": "https://history.snu.ac.kr/major_tracks/ (세부전공 이수학점표, 정적 HTML). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
+  "source": "https://history.snu.ac.kr/major_tracks/ + koreanhistory.snu.ac.kr/졸업/ (역사학부 통합규정 2023~). 상세: _scrape/hum.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공 통합규정 동일.",
   "total_credits": 130,
   "general": "hum_2022",
   "major_min_credits": 60,
@@ -23,39 +23,79 @@
     ]
   },
   "tracks": [
-    {
-      "key": "single",
-      "name": "심화전공(단일전공)",
-      "major_min_credits": 60,
-      "general": true,
-      "select_min": 0
-    },
-    {
-      "key": "multi",
-      "name": "주전공(다전공)",
-      "major_min_credits": 39,
-      "general": true,
-      "select_min": 0
-    },
-    {
-      "key": "double",
-      "name": "복수전공",
-      "major_min_credits": 39,
-      "general": false,
-      "select_min": 0
-    },
-    {
-      "key": "minor",
-      "name": "부전공",
-      "major_min_credits": 21,
-      "general": false,
-      "select_min": 0
-    }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0,
+      "required": {
+        "all": [ { "name": "한국사를 보는 관점과 자료", "code": "M3544.002100", "credits": 3 } ],
+        "choose": [
+          { "label": "① 역사공부 입문 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사 공부의 기초", "code": "M3533.000400", "credits": 3 },
+            { "name": "역사학 세미나", "code": "M3533.000700", "credits": 3 } ] },
+          { "label": "② 역사학논문쓰기 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사학 논문쓰기 1", "code": "M3533.001500", "credits": 3 },
+            { "name": "역사학 논문쓰기 2", "code": "M3533.000600", "credits": 3 },
+            { "name": "역사학 논문쓰기 3", "code": "M3533.000800", "credits": 3 } ] },
+          { "label": "③ 한문사료강독 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "한문사료강독 1", "code": "M3533.001400", "credits": 3 },
+            { "name": "한문사료강독 2", "code": "M3533.000500", "credits": 3 } ] },
+          { "label": "⑤ 한국사 시대사 택2", "min_courses": 2, "min_credits": 6, "pool": [
+            { "name": "한국고대사", "code": "M3544.000200", "credits": 3 },
+            { "name": "한국중세사", "code": "M3544.000400", "credits": 3 },
+            { "name": "한국근세사", "code": "M3544.002400", "credits": 3 },
+            { "name": "한국근대사", "code": "M3544.000300", "credits": 3 },
+            { "name": "한국현대사", "code": "M3544.001200", "credits": 3 } ] }
+        ]
+      } },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0,
+      "required": {
+        "all": [ { "name": "한국사를 보는 관점과 자료", "code": "M3544.002100", "credits": 3 } ],
+        "choose": [
+          { "label": "① 역사공부 입문 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사 공부의 기초", "code": "M3533.000400", "credits": 3 },
+            { "name": "역사학 세미나", "code": "M3533.000700", "credits": 3 } ] },
+          { "label": "② 역사학논문쓰기 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사학 논문쓰기 1", "code": "M3533.001500", "credits": 3 },
+            { "name": "역사학 논문쓰기 2", "code": "M3533.000600", "credits": 3 },
+            { "name": "역사학 논문쓰기 3", "code": "M3533.000800", "credits": 3 } ] },
+          { "label": "③ 한문사료강독 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "한문사료강독 1", "code": "M3533.001400", "credits": 3 },
+            { "name": "한문사료강독 2", "code": "M3533.000500", "credits": 3 } ] }
+        ]
+      } },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0,
+      "required": {
+        "all": [ { "name": "한국사를 보는 관점과 자료", "code": "M3544.002100", "credits": 3 } ],
+        "choose": [
+          { "label": "① 역사공부 입문 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사 공부의 기초", "code": "M3533.000400", "credits": 3 },
+            { "name": "역사학 세미나", "code": "M3533.000700", "credits": 3 } ] },
+          { "label": "② 역사학논문쓰기 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사학 논문쓰기 1", "code": "M3533.001500", "credits": 3 },
+            { "name": "역사학 논문쓰기 2", "code": "M3533.000600", "credits": 3 },
+            { "name": "역사학 논문쓰기 3", "code": "M3533.000800", "credits": 3 } ] },
+          { "label": "③ 한문사료강독 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "한문사료강독 1", "code": "M3533.001400", "credits": 3 },
+            { "name": "한문사료강독 2", "code": "M3533.000500", "credits": 3 } ] }
+        ]
+      } },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
+      "required": {
+        "all": [ { "name": "한국사를 보는 관점과 자료", "code": "M3544.002100", "credits": 3 } ],
+        "choose": [
+          { "label": "① 역사공부 입문 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "역사 공부의 기초", "code": "M3533.000400", "credits": 3 },
+            { "name": "역사학 세미나", "code": "M3533.000700", "credits": 3 } ] },
+          { "label": "③ 한문사료강독 택1", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "한문사료강독 1", "code": "M3533.001400", "credits": 3 },
+            { "name": "한문사료강독 2", "code": "M3533.000500", "credits": 3 } ] }
+        ]
+      } }
   ],
   "notes": [
-    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점). 2023학번~ 역사학부 통합(한국사학·동양사학·서양사학 세부전공) — 본 spec은 학부 단위(dept '역사학부').",
-    "track 학점: 주전공·복수 39 / 심화 60 / 부전공 21 (공통12+세부전공 분배+선택3 구조). 세부전공별 분배표는 본인 전공이 27/9/9 자리 차지(한국사학 view 기준).",
-    "전공필수 = 과목군 + track별 조건(코드 미표기, track-conditional substitution): 공통①역사공부의기초/역사학세미나 중1 ②역사학논문쓰기1·2·3 중1 ③한문사료강독1·2 중1, 전공④한국사를보는관점과자료 ⑤시대사 중2. 주전공/복수=①~④, 심화=①~⑤, 부전공=①③④. 동양사·서양사는 ④⑤가 해당 전공 입문·시대사로 치환 → required 자동검증 밖, 미생성.",
-    "외국어진행강좌 ≥3과목(공통 '영어로역사읽기' M3533.000100 활용 가능). 제2외국어 9학점은 교양(hum_2025) 측. 세부 학번별 표는 koreanhistory/asianhistory/whistory.snu.ac.kr 참조."
+    "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2022 어댑터(구 공통교육과정). 2023학번~ 역사학부 통합(한국사학·동양사학·서양사학 세부전공) — 본 spec은 학부 단위(dept '역사학부').",
+    "track 학점: 주전공·복수 39 / 심화 60 / 부전공 21.",
+    "전필 = 과목군 track별 조건(koreanhistory.snu.ac.kr/졸업 규정): 공통 ①역사공부의기초/역사학세미나 택1 ②역사학논문쓰기1·2·3 택1 ③한문사료강독1·2 택1 + ④한국사를 보는 관점과 자료(M3544.002100) + ⑤한국사 시대사 택2. 심화=①~⑤, 주전공/복수=①~④, 부전공=①③④ — required.groups로 track별 인코딩.",
+    "⚠ ④⑤는 한국사학전공 기준. 동양사·서양사 전공자는 ④·⑤가 해당 전공 과목으로 치환 → 직접 확인.",
+    "⑤ 시대사 = 역사학부 현행 코드 M3544.000200/000400/002400/000300/001200(2023~). (구 국사학과 109.* retired; 역사교육과 712.*는 別 학과.) ①②③ M3533.*는 현행 카탈로그 전선(전필은 학부 규정).",
+    "외국어진행강좌 ≥3과목(공통 '영어로역사읽기' M3533.000100 활용 가능). 제2외국어 9학점은 교양(hum_2022) 측."
   ]
 }

@@ -37,27 +37,21 @@
       "major_min_credits": 66,
       "general": true,
       "select_min": 0,
-      "recog_max": 0,
-      "required_credits": 30
-    },
+      "recog_max": 0    },
     {
       "key": "multi",
       "name": "주전공(다전공 병행)",
       "major_min_credits": 45,
       "general": true,
       "select_min": 0,
-      "recog_max": 0,
-      "required_credits": 30
-    },
+      "recog_max": 0    },
     {
       "key": "double",
       "name": "복수전공",
       "major_min_credits": 45,
       "general": false,
       "select_min": 0,
-      "recog_max": 0,
-      "required_credits": 30
-    },
+      "recog_max": 0    },
     {
       "key": "minor",
       "name": "부전공",
@@ -65,8 +59,7 @@
       "general": false,
       "select_min": 0,
       "recog_max": 0,
-      "required_credits": 0
-    }
+      "required_credits": 0    }
   ],
   "notes": [
     "졸업 130학점, 교양 53학점 이상(2023~2024, eng_naoe_2022), 전체·전공 평점 각 2.0 이상.",

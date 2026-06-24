@@ -14,6 +14,7 @@
   "major_double_credits": 39,
   "minor_credits": 21,
   "english_min_courses": 3,
+  "major_required_match": { "departments": ["재료공학부"], "classifications": ["전필"] },
   "major_select_match": {
     "departments": [
       "재료공학부"
@@ -63,7 +64,8 @@
       "major_min_credits": 21,
       "general": false,
       "select_min": 0,
-      "recog_max": 0
+      "recog_max": 0,
+      "required_credits": 0
     }
   ],
   "notes": [

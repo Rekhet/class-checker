@@ -1,0 +1,51 @@
+{
+  "id": "ppe",
+  "major": "정치·경제·철학(PPE)",
+  "college": "연계전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "https://ppe.snu.ac.kr/이수규정/ (연계전공 정치경제철학) + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 21,
+  "english_min_courses": 0,
+  "major_select_match": {
+    "departments": [],
+    "classifications": ["전선"]
+  },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연계전공(제2전공)",
+      "major_min_credits": 21,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "groups": [
+          { "label": "핵심 택3 (각 참여학과 ≥1)", "min_courses": 3, "min_credits": 9, "pool": [
+            { "name": "국제정치경제론 [정외]", "code": "216B.223", "credits": 3 },
+            { "name": "정치철학 [정외]", "code": "216A.405", "credits": 3 },
+            { "name": "공공선택이론 [정외]", "code": "216A.325", "credits": 3 },
+            { "name": "경제원론 1 [경제]", "code": "200.105", "credits": 3 },
+            { "name": "경제원론 2 [경제]", "code": "200.106", "credits": 3 },
+            { "name": "윤리학 [철학]", "code": "113.343", "credits": 3 },
+            { "name": "사회철학 [철학]", "code": "113.345", "credits": 3 }
+          ] },
+          { "label": "신설 택1 (PPE 개설)", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "정치경제철학 개론", "code": "M3659.000100", "credits": 3 },
+            { "name": "시장과 윤리", "code": "M3659.000200", "credits": 3 },
+            { "name": "정치·경제·철학을 위한 경제적 분석", "code": "M3659.000300", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "연계전공 21학점: 전공교과목 7과목 이상 = 핵심 3과목(9학점↑) + 기타선택 3과목(9학점↑) + 신설 1과목(3학점↑).",
+    "핵심(7과목 중 3↑, 각 참여학과 1과목↑): [정외] 국제정치경제론 216B.223·정치철학 216A.405·공공선택이론 216A.325 [경제] 경제원론1 200.105·경제원론2 200.106 [철학] 윤리학 113.343·사회철학 113.345.",
+    "신설(1과목↑, PPE 개설): 정치경제철학 개론 M3659.000100(구 '입문' M2908.000100)·시장과 윤리 M3659.000200·정치·경제·철학을 위한 경제적 분석 M3659.000300. 코드개편 M2908→M3659(2020→2025).",
+    "전필 = 핵심 택3(9학점, 각 참여학과 ≥1 — flat count로 표현, 학과별 1과목 제약은 직접 확인) + 신설 택1(3학점) → required.groups. 기타선택 3과목(9학점)은 전공선택 학점으로 반영(21−12=9).",
+    "분류 확정: ppe.snu.ac.kr 이수규정 = 연계전공 21학점(operative). colleges-root '연합전공' 표기는 legacy alias(사이트 자체가 연합/연계 혼용, footer='연계전공 사무실'). 39학점 연합 아님.",
+    "교양 = 주전공 소관(general:null). 진입 전 수강분 9학점까지 인정·중복합산 불가·최소 3개 학기 등록."
+  ]
+}

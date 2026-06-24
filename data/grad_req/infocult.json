@@ -1,0 +1,42 @@
+{
+  "id": "infocult",
+  "major": "정보문화학연합전공",
+  "college": "연합전공",
+  "batch": ["2023", "2024", "2025", "2026"],
+  "track": "제2전공",
+  "source": "http://isc.snu.ac.kr/졸업요건이수규정/ + 상세: _scrape/interdept.md",
+  "total_credits": 130,
+  "general": null,
+  "major_min_credits": 39,
+  "english_min_courses": 0,
+  "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "tracks": [
+    {
+      "key": "double",
+      "name": "연합전공(제2전공)",
+      "major_min_credits": 39,
+      "general": false,
+      "select_min": 0,
+      "required": {
+        "all": [
+          { "name": "정보문화기술입문", "code": "2114.304", "credits": 3 },
+          { "name": "HCI이론 및 실습", "code": "2114.408A", "credits": 3 },
+          { "name": "디지털 미디어의 이해", "code": "211.320B", "credits": 3 }
+        ],
+        "groups": [
+          { "label": "전공필수 택1 (디지털영상실습)", "min_courses": 1, "min_credits": 3, "pool": [
+            { "name": "디지털영상실습1", "code": "2114.303B", "credits": 3 },
+            { "name": "디지털영상실습2", "code": "2114.413A", "credits": 3 }
+          ] }
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "제2전공 전용(단독 졸업 불가). 연합전공 39학점(전필 12=4과목 + 전선 27=9과목), 평점평균 2.0 이상. (2025 졸업생~ 기준.)",
+    "data grade: isc.snu.ac.kr HTML표+코드. 단, 코드 일부는 카탈로그 name-derivation(자체 페이지 미표기) — 검증 완료. 출처검증 20/20.",
+    "전필 12학점(4과목) = 무조건 3(정보문화기술입문·HCI이론및실습·디지털미디어의이해) + 디지털영상실습 택1(2114.303B/2114.413A) → required.all + groups로 인코딩.",
+    "2025 변동: 영상문화입문(M1312.001000)·언론정보문화특강(211.320) 전필 해제 → 전선 전환, 디지털영상실습 택1 신규 전필. 현 spec은 2026(현행) 기준.",
+    "졸업논문 대체: 산학연구실습/창의연구실습 중 1."
+  ]
+}
