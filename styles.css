@@ -494,6 +494,15 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .gsheet.add { padding: 6px 11px; color: var(--cp-accent); font-weight: 600; }
 .gsheet-add { border: 1px dashed var(--cp-line); border-radius: 8px; padding: 6px 10px; font-size: 12px;
   color: var(--cp-accent); background: none; cursor: pointer; }
+.gsheet-row { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cp-line);
+  border-radius: 8px; padding: 4px 6px 4px 11px; font-size: 12px; color: var(--cp-ink);
+  font-variant-numeric: tabular-nums; }
+.gsheet-row .gs-sem { font-weight: 600; }
+.gsheet-row .gs-pick { border: none; background: none; color: inherit; font: inherit; cursor: pointer;
+  font-variant-numeric: tabular-nums; }
+.gsheet-row .gs-del { background: none; border: none; color: inherit; cursor: pointer; font-size: 14px;
+  line-height: 1; padding: 0 2px; opacity: .55; }
+.gsheet-row .gs-del:hover { opacity: 1; }
 .grad-pick { margin-bottom: 16px; }
 .gp-label { font-size: 12px; font-weight: 600; color: var(--cp-ink); margin-bottom: 7px; }
 .gp-hint { font-weight: 400; color: var(--cp-faint); }
