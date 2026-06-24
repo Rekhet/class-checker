@@ -2176,11 +2176,13 @@ function renderTrendLegend(s, visible) {
 
 // ---------- 졸업요건 (graduation audit) ----------
 const GRAD_AREA_KEY = "snu_grad_gyarea";    // {sbjt_cd: areaKey} manual 교양-area overrides
-const GRAD_STATE_KEY = "snu_grad_state";    // {sheets:[ids], list:[{type,major,year}], eng:{idx:bool}}
+const GRAD_STATE_KEY = "snu_grad_state";    // {picks:{semKey:sheetId}, list:[{type,major,year}], eng:{idx:bool}}
 let _gradIndex = null;
 const _gradSpecCache = {}, _gradReqCache = {};   // spec by file; 전필 set by batch-year
 let _gradAreaOv = _gradLoad(GRAD_AREA_KEY, {});
-let _gradState = _gradLoad(GRAD_STATE_KEY, { sheets: null, list: null, eng: {} });
+let _gradState = _gradLoad(GRAD_STATE_KEY, { picks: {}, list: null, eng: {} });
+if (!_gradState.picks || typeof _gradState.picks !== "object") _gradState.picks = {};
+delete _gradState.sheets;   // drop legacy flat selection → blank start (spec §4)
 function _gradLoad(k, dflt) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? dflt; } catch { return dflt; } }
 function _gradSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); _quotaWarned = false; } catch (e) { _onQuota(e); } }
 async function _loadGradIndex() {
@@ -2219,8 +2221,9 @@ async function _loadGyo(id) {
 // the chosen subset of timetables the audit runs against (NOT all sheets; managed on this
 // page only — adding/removing here never touches the real sheet list).
 function _gradSelectedIds() {
-  const ids = (_gradState.sheets || []).filter((id) => meta.ids.includes(id));
-  return ids.length ? ids : [activeId()];
+  // ids the audit runs against: one picked sheet per selected semester (spec §5).
+  // Dangling picks (sheet deleted) are filtered out; no active-sheet fallback.
+  return Object.values(_gradState.picks).filter((id) => meta.ids.includes(id));
 }
 function _gradTaken(ids) {                   // union of chosen sheets, deduped by classKey
   const seen = new Set(), out = [];
@@ -2326,24 +2329,49 @@ function _renderGradList(idx, majors, okByIdx) {
     addBtn("double", "+ 복수전공", dept), addBtn("minor", "+ 부전공", dept),
     inter.length ? addBtn("union", "+ 연합·연계전공", inter) : document.createTextNode("")));
 }
+// write one pick (semKey → sheetId), persist, re-audit
+function _gradSetPick(sem, id) { _gradState.picks[sem] = id; _gradSave(GRAD_STATE_KEY, _gradState); renderGrad(); }
+function _gradDropPick(sem) { delete _gradState.picks[sem]; _gradSave(GRAD_STATE_KEY, _gradState); renderGrad(); }
 function _renderGradSheets() {
   const box = $("#gradSheetPick"); if (!box) return;
-  const chosen = _gradSelectedIds();
-  const setChosen = (arr) => { _gradState.sheets = arr.length ? arr : chosen.slice(0, 1); _gradSave(GRAD_STATE_KEY, _gradState); renderGrad(); };
-  const chips = chosen.map((id) =>
-    el("span", { className: "gsheet on" },
-      el("span", { className: "gs-name" }, `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})`),
-      chosen.length > 1
-        ? el("button", { type: "button", className: "gs-del", title: "목록에서 제외",
-            onclick: () => setChosen(chosen.filter((x) => x !== id)) }, "×")
-        : document.createTextNode("")));
-  const unchosen = meta.ids.filter((id) => !chosen.includes(id));
-  if (unchosen.length)
-    chips.push(el("select", { className: "gsheet-add",
-      onchange: (e) => { if (e.target.value) setChosen([...chosen, Number(e.target.value)]); } },
-      el("option", { value: "" }, "+ 시간표 추가"),
-      ...unchosen.map((id) => el("option", { value: String(id) }, `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})`))));
-  box.replaceChildren(...chips);
+  const picks = _gradState.picks;
+  // prune dangling picks (picked sheet deleted) so its semester is re-addable (spec §6, §8)
+  for (const s of Object.keys(picks))
+    if (!meta.ids.includes(picks[s])) delete picks[s];
+
+  const byRank = (a, b) => semRankKey(b) - semRankKey(a);   // newest semester first
+  const semsWithSheets = (excludePicked) => {
+    const set = new Set();
+    for (const id of meta.ids) { const s = meta.sems[id]; if (s) set.add(s); }
+    let keys = [...set];
+    if (excludePicked) keys = keys.filter((s) => !(s in picks));
+    return keys.sort(byRank);
+  };
+  const label = (id) => `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})`;
+
+  const rows = Object.keys(picks).sort(byRank).map((sem) => {
+    const inSem = meta.ids.filter((id) => meta.sems[id] === sem);
+    const pick = el("select", { className: "gs-pick",
+      onchange: (e) => _gradSetPick(sem, Number(e.target.value)) },
+      ...inSem.map((id) => el("option", { value: String(id) }, label(id))));
+    pick.value = String(picks[sem]);
+    return el("div", { className: "gsheet-row" },
+      el("span", { className: "gs-sem" }, semLabel(sem)),
+      pick,
+      el("button", { type: "button", className: "gs-del", title: "목록에서 제외",
+        onclick: () => _gradDropPick(sem) }, "×"));
+  });
+
+  const addable = semsWithSheets(true);
+  if (addable.length)
+    rows.push(el("select", { className: "gsheet-add",
+      onchange: (e) => { const s = e.target.value; if (s) _gradSetPick(s, meta.ids.find((id) => meta.sems[id] === s)); } },
+      el("option", { value: "" }, "+ 학기 추가"),
+      ...addable.map((s) => el("option", { value: s }, semLabel(s)))));
+  else if (!semsWithSheets(false).length)
+    rows.push(el("div", { className: "grad-note" }, "시간표를 먼저 만드세요"));
+
+  box.replaceChildren(...rows);
 }
 async function renderGrad() {
   const host = $("#gradBody"); if (!host) return;
