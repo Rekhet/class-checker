@@ -15,6 +15,14 @@ window.GOOGLE_CLIENT_ID = "1357339441-37gp3tq7v7bajmldkicteajonpe6jpk0.apps.goog
 window.SEARCH_DEFAULT_YEAR = "2026";
 window.SEARCH_DEFAULT_TERM = "fall";
 
+// Default PAGE SEMESTER (timetable toggle) on first load, before the user picks one.
+// Authoritative: used even if that semester isn't in the catalog yet. Same term
+// spelling as SEARCH_DEFAULT_TERM (1학기 | 2학기 | 여름학기 | 겨울학기 / spring|fall|summer|winter
+// / raw 20-char code). Leave both empty to fall back to the newest catalog term.
+//   Note: only applies when there's no saved choice — an existing user's stored toggle wins.
+window.DEFAULT_SEMESTER_YEAR = "2026";
+window.DEFAULT_SEMESTER_TERM = "fall";
+
 // Default calendar (.ics) export range. "YYYY-MM-DD" each; empty = today / +16 weeks.
 window.ICS_DEFAULT_START = "2026-09-01";
 window.ICS_DEFAULT_END = "2026-12-21";

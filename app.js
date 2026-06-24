@@ -33,7 +33,7 @@ const SHEET_PREFIX = "snu_sheet_";
 const MAX_LIVE_SHEETS = Math.max(2, window.MAX_LIVE_SHEETS || 12);   // configurable
 const SHEET_TAB_LIMIT = Math.max(1, window.SHEET_TAB_LIMIT || 20);   // above this -> picker, not tabs
 const MAX_SHEETS = Math.max(1, window.MAX_SHEETS || 1000);           // hard cap on sheet count
-let meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {} };
+let meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {}, cur: null, sems: {} };
 const liveSheets = new Map();   // id -> classes[]; insertion order = LRU (oldest first)
 let _quotaWarned = false;       // declared before initSheets() runs (it writes to storage)
 let _metaRaf = 0;               // pending rAF id for the coalesced meta write
@@ -235,6 +235,61 @@ async function rowsToXlsx(classes) {
   }), "classes.xlsx");
 }
 function classKey(c) { return `${c.year}|${c.term}|${c.sbjt_cd}|${c.lt_no}`; }
+function semKey(c) { return `${c.year}|${c.term}`; }
+// chronological order within a year: 1학기 < 여름 < 2학기 < 겨울
+const TERM_ORDER = [
+  "U000200001U000300001", // 1학기 Spring
+  "U000200001U000300002", // 여름학기 Summer
+  "U000200002U000300001", // 2학기 Fall
+  "U000200002U000300002", // 겨울학기 Winter
+];
+function termRank(t) { const i = TERM_ORDER.indexOf(t); return i < 0 ? 0 : i; }
+function semRankKey(key) { const [y, t] = String(key).split("|"); return Number(y) * 10 + termRank(t); }
+// newest semester present in the catalog (index.json terms), as a "year|term" key
+function catalogNewest() {
+  const terms = _dataIndex?.terms || [];
+  let best = "", bestR = -Infinity;
+  for (const t of terms) {
+    const k = `${t.year}|${t.term}`, r = semRankKey(k);
+    if (r > bestR) { bestR = r; best = k; }
+  }
+  return best;
+}
+// config.js: the page semester to open on first load (before any saved choice).
+// Authoritative — honored even if absent from the catalog. "" when not configured.
+function configuredSemester() {
+  const y = (window.DEFAULT_SEMESTER_YEAR || "").toString().trim();
+  const t = resolveTermDefault(window.DEFAULT_SEMESTER_TERM);
+  return (y && t) ? `${y}|${t}` : "";
+}
+// the default semester for fresh state: configured value wins, else newest catalog term
+function defaultSemester() { return configuredSemester() || catalogNewest(); }
+// every selectable semester: catalog terms ∪ semesters any sheet belongs to, newest first
+function availableSemesters() {
+  const set = new Set();
+  for (const t of (_dataIndex?.terms || [])) set.add(`${t.year}|${t.term}`);
+  for (const k of Object.values(meta.sems)) if (k) set.add(k);
+  if (meta.cur) set.add(meta.cur);
+  return [...set].sort((a, b) => semRankKey(b) - semRankKey(a));
+}
+function semLabel(key) {
+  const [y, t] = String(key).split("|");
+  const hit = (_dataIndex?.terms || []).find((x) => x.year === y && x.term === t);
+  if (hit && hit.label) return hit.label;                 // "2026 2학기"
+  const s = (SEMESTER_LABEL[t] || t).split(" ")[0];       // "2학기"
+  return `${y} ${s}`;
+}
+// backfill sems for pre-feature sheets + pick a default cur (runs after catalog loads)
+function migrateSemesters() {
+  if (!_dataIndex) return;
+  const def = defaultSemester();
+  for (const id of meta.ids) if (!meta.sems[id]) meta.sems[id] = def;
+  if (!meta.cur) {
+    const a = activeId();
+    meta.cur = (a != null && meta.sems[a]) || def;
+  }
+  _saveMeta();
+}
 function colorFor(c) {
   let h = 0; const k = classKey(c);
   for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
@@ -374,7 +429,12 @@ async function loadTerms() {
     termSel.append(el("option", { value: t.term }, SEMESTER_LABEL[t.term] || t.term));
   });
   applySearchDefaults();
+  migrateSemesters();                       // backfill sems + default cur now that catalog is loaded
+  const [cy, ct] = String(meta.cur || "").split("|");
+  if (cy && $("#year")) $("#year").value = cy;     // toggle is the source of truth for scope
+  if (ct && $("#term")) $("#term").value = ct;
   updateScope();
+  renderSheets();                           // re-render now that sems/cur are known
 }
 
 // config.js: map a friendly term default (1학기 / spring / code) to a term code
@@ -632,7 +692,7 @@ function slotSummary(slots) {
 // ---------- timetable sheets ----------
 // ---------- timetable sheets (id-keyed; per-sheet storage + LRU memory) ----------
 // function declarations (hoisted) so the early `let timetable = initSheets()` can call them
-function activeId() { return meta.ids[meta.active]; }
+function activeId() { return meta.active >= 0 ? meta.ids[meta.active] : null; }
 function _sheetKey(id) { return SHEET_PREFIX + id; }
 function _readSheet(id) {
   try { const a = JSON.parse(localStorage.getItem(_sheetKey(id))); return Array.isArray(a) ? a : []; }
@@ -683,12 +743,13 @@ function initSheets() {
     if (m && Array.isArray(m.ids) && m.ids.length) {
       meta = { active: Math.min(Math.max(0, m.active | 0), m.ids.length - 1),
                ids: m.ids, names: m.names || {}, counts: m.counts || {}, seen: m.seen || {},
-               nextId: m.nextId || (m.ids.reduce((mx, x) => (x > mx ? x : mx), 0) + 1) };
+               nextId: m.nextId || (m.ids.reduce((mx, x) => (x > mx ? x : mx), 0) + 1),
+               cur: m.cur || null, sems: m.sems || {} };
       return _loadSheet(activeId());
     }
   } catch { /* fall through to migrate */ }
   // migrate v1 (all sheets in one key) or the legacy single timetable -> per-sheet
-  meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {} };
+  meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {}, cur: null, sems: {} };
   let v1 = null;
   try { v1 = JSON.parse(localStorage.getItem(SHEETS_KEY)); } catch { /* none */ }
   if (v1 && Array.isArray(v1.sheets) && v1.sheets.length) {
@@ -709,6 +770,7 @@ function initSheets() {
 }
 function saveTT() {
   const id = activeId();
+  if (id == null) return;               // no active sheet (empty group) — nothing to persist
   liveSheets.set(id, timetable);        // keep the active array in the cache
   meta.counts[id] = timetable.length;
   _writeSheet(id, timetable);           // O(active sheet) — not every sheet
@@ -726,8 +788,12 @@ function addSheet() {
     return;
   }
   saveTT();
+  if (meta.cur == null) meta.cur = defaultSemester();      // defensive: should be set at init
   const id = meta.nextId++;
-  meta.ids.push(id); meta.names[id] = `시간표 ${meta.ids.length}`; meta.counts[id] = 0;
+  const n = meta.ids.filter((x) => meta.sems[x] === meta.cur).length + 1;  // Nth sheet *in this group*
+  meta.ids.push(id);
+  meta.sems[id] = meta.cur;
+  meta.names[id] = `시간표 ${n}`; meta.counts[id] = 0;
   meta.active = meta.ids.length - 1;
   timetable = []; liveSheets.set(id, timetable); _evict();
   _writeSheet(id, timetable); _saveMeta();
@@ -736,22 +802,27 @@ function addSheet() {
 // remove a set of sheet ids in ONE O(n) pass (not repeated O(n) splices -> O(n²)).
 // Callers must keep the active sheet out of idSet, so at least one sheet always remains.
 function _removeSheets(idSet) {
-  const keptActive = activeId();            // survives unless this is a single-delete of the active sheet
-  const oldActive = meta.active;
+  const keptActive = activeId();            // survives unless this delete includes the active sheet
   meta.ids = meta.ids.filter((id) => !idSet.has(id));
   for (const id of idSet) {
-    delete meta.names[id]; delete meta.counts[id]; liveSheets.delete(id);
+    delete meta.names[id]; delete meta.counts[id]; delete meta.sems[id];
+    liveSheets.delete(id);
     if (meta.seen) delete meta.seen[id];
     delete _sheetChanges[id];
     try { localStorage.removeItem(_sheetKey(id)); } catch { /* ignore */ }
   }
-  const ai = meta.ids.indexOf(keptActive);  // <0 only when the active sheet itself was deleted
-  meta.active = ai >= 0 ? ai : Math.min(oldActive, meta.ids.length - 1);
-  timetable = _loadSheet(activeId());
+  const ai = meta.ids.indexOf(keptActive);  // >=0 when the active sheet survived
+  if (ai >= 0) {
+    meta.active = ai;
+  } else {
+    // active was deleted: prefer a surviving sheet in the current semester group, else none
+    const next = meta.ids.find((id) => meta.sems[id] === meta.cur);
+    meta.active = next != null ? meta.ids.indexOf(next) : -1;
+  }
+  timetable = meta.active >= 0 ? _loadSheet(activeId()) : [];
   _saveMeta(); renderSheets(); renderTT(); refreshCardStates();
 }
 function deleteSheet(i) {
-  if (meta.ids.length <= 1) { alert("마지막 시간표는 삭제할 수 없습니다."); return; }
   const id = meta.ids[i];
   if (id == null) return;
   if (!confirm(`'${meta.names[id]}' 시간표를 삭제할까요?`)) return;
@@ -791,17 +862,17 @@ function _buildTab(id, i) {               // one tab node (metadata-only)
   const chg = _sheetChanges[id];
   if (chg) tab.append(el("span", { className: "sheet-chg", title: `변경 ${chg.chg.length + chg.rm.length}건` }, "●"));
   if (i === meta.active) tab.append(el("span", { className: "sheet-pen", title: "이름 변경" }, "✎"));
-  if (meta.ids.length > 1) tab.append(el("span", {
+  tab.append(el("span", {
     className: "sheet-x", title: "삭제",
     onclick: (e) => { e.stopPropagation(); deleteSheet(i); },
   }, "×"));
   return tab;
 }
 // past SHEET_TAB_LIMIT a tab strip is unusable + huge — switch to a compact picker
-function _buildSheetPicker() {
+function _buildSheetPicker(group) {
   const sel = el("select", { className: "sheet-select",
     onchange: (e) => switchSheet(Number(e.target.value)) });
-  meta.ids.forEach((id, i) => {
+  group.forEach(({ id, i }) => {
     const o = el("option", { value: String(i) },
       `${meta.names[id] || "시간표"} (${meta.counts[id] ?? 0})${_sheetChanges[id] ? " ⚠" : ""}`);
     if (i === meta.active) o.selected = true;
@@ -813,31 +884,70 @@ function _buildSheetPicker() {
       onclick: () => renameSheet(meta.active) }, "✎"),
     el("button", { type: "button", className: "sheet-mini", title: "삭제",
       onclick: () => deleteSheet(meta.active) }, "×"),
-    el("span", { className: "sheet-total" }, `${meta.ids.length}개`));
+    el("span", { className: "sheet-total" }, `${group.length}개`));
+}
+function _buildSemToggle() {
+  const sel = el("select", {
+    className: "sem-toggle", title: "학기 전환",
+    onchange: (e) => switchSemester(e.target.value),
+  });
+  for (const key of availableSemesters()) {
+    const o = el("option", { value: key }, semLabel(key));
+    if (key === meta.cur) o.selected = true;
+    sel.append(o);
+  }
+  return sel;
+}
+function switchSemester(key) {
+  if (!key || key === meta.cur) return;
+  saveTT();
+  meta.cur = key;
+  const [y, t] = key.split("|");
+  if ($("#year")) $("#year").value = y;          // sync search scope to the toggle…
+  if ($("#term")) $("#term").value = t;          // …user may change it again afterward
+  const idx = meta.ids.findIndex((id) => meta.sems[id] === key);   // first sheet of this group
+  meta.active = idx;                              // -1 when the group is empty
+  timetable = idx >= 0 ? _loadSheet(activeId()) : [];
+  _saveMeta();
+  renderSheets(); renderTT(); refreshCardStates(); updateUndoButtons();
+  doSearch();                                     // re-run search for the new year/term
 }
 function renderSheetsNow() {
   const box = $("#ttSheets"); if (!box) return;
   box.replaceChildren();
-  if (meta.ids.length > SHEET_TAB_LIMIT) box.append(_buildSheetPicker());
-  else meta.ids.forEach((id, i) => box.append(_buildTab(id, i)));
+  const group = meta.ids
+    .map((id, i) => ({ id, i }))
+    .filter((x) => meta.sems[x.id] === meta.cur);    // only sheets of the current semester
+  if (group.length > SHEET_TAB_LIMIT) box.append(_buildSheetPicker(group));
+  else group.forEach(({ id, i }) => box.append(_buildTab(id, i)));
   box.append(el("div", { className: "tt-sheet add", title: "시간표 추가", onclick: addSheet }, "＋ 시간표 추가"));
+  box.append(_buildSemToggle());
   updateHero();
 }
 
 // hero header: active sheet name + class count (credit total is set in renderTT)
 function updateHero() {
   const id = activeId();
+  if (id == null) {
+    if ($("#activeName")) $("#activeName").textContent = "시간표 없음";
+    if ($("#activeSub")) $("#activeSub").textContent = "＋ 시간표 추가로 시작하세요";
+    return;
+  }
   const n = meta.counts[id] ?? (timetable ? timetable.length : 0);
   if ($("#activeName")) $("#activeName").textContent = (meta.names[id] || "시간표");
   if ($("#activeSub")) $("#activeSub").textContent = n ? `${n}개 강좌` : "비어 있음";
 }
 
 function addToTT(c) {
+  if (meta.active < 0) addSheet();          // empty group: create "시간표 1" under the current semester
   if (timetable.some((x) => classKey(x) === classKey(c))) return;
   if ($("#blockOverlap")?.checked && overlapsBusy(c, timetableBusy())) {
     alert("이미 추가된 강좌와 시간이 겹쳐 추가하지 않았습니다.");
     return;
   }
+  const sheetSem = meta.sems[activeId()];   // semester this timetable belongs to
+  if (sheetSem && semKey(c) !== sheetSem &&
+      !confirm(`이 강좌는 ${semLabel(sheetSem)} 강좌가 아닙니다. 추가할까요?`)) return;
   pushUndo();
   timetable.push({
     year: c.year, term: c.term, name: c.name, sbjt_cd: c.sbjt_cd, lt_no: c.lt_no,

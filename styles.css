@@ -102,6 +102,23 @@ h2 { font-size: 14px; margin: 0; font-weight: 700; }
 .sheet-mini:hover { background: var(--cp-soft); filter: none; }
 .sheet-total { font-size: 11.5px; color: var(--cp-faint); font-variant-numeric: tabular-nums; }
 
+/* semester toggle: pinned to the right end of the timetable tab row */
+.tt-sheets .sem-toggle {
+  margin-left: auto;            /* push to the right end of the flex row */
+  align-self: center;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--cp-ink);
+  background: var(--cp-paper);
+  border: 1px solid var(--cp-line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.tt-sheets .sem-toggle:hover { border-color: var(--cp-accent); }
+.tt-sheets .sem-toggle:focus-visible { outline: 2px solid var(--cp-accent); outline-offset: 1px; }
+
 /* two-column layout */
 .tt-cols { display: flex; gap: 24px; align-items: flex-start; }
 
