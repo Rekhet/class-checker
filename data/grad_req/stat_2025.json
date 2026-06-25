@@ -28,10 +28,10 @@
     "combined": { "name": "수리통계", "code": "M1399.000900", "credits": 3 }
   },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 5, "suri_sub": false },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 5, "suri_sub": false },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 5, "suri_sub": false },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "suri_sub": true }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 5, "recog_max": 9, "suri_sub": false },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 5, "recog_max": 9, "suri_sub": false },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 5, "recog_max": 9, "suri_sub": false },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "recog_max": 0, "suri_sub": true }
   ],
   "notes": [
     "통계학과: 통계학 및 통계학실험 필수, 미적분학 1·2 원칙.",

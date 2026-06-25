@@ -16,20 +16,21 @@
   "major_required_known": [
     { "name": "인간행동과 사회환경", "code": "209.219" }
   ],
+  "external_recognition": { "colleges": ["사회과학대학"], "approval_max_credits": 9 },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 3,
+    { "key": "single", "name": "심화전공(단일전공)", "recog_max": 9, "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 3,
       "required": { "all": [
         { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 3,
+    { "key": "multi", "name": "주전공(다전공)", "recog_max": 9, "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 3,
       "required": { "all": [
         { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 3,
+    { "key": "double", "name": "복수전공", "recog_max": 9, "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 3,
       "required": { "all": [
         { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
       ] } },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 3,
+    { "key": "minor", "name": "부전공", "recog_max": 0, "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 3,
       "required": { "all": [
         { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 }
       ] } }

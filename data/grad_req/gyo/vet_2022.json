@@ -3,6 +3,9 @@
   "college": "수의과대학 (수의예과)",
   "applies": "2021~2024",
   "total_min": 43,
+  "required_one_of": [
+    { "list": "gwonjang", "min_courses": 1, "label": "학문의 세계 권장과목(*) 중 1과목", "note": "언어와문학·문화와예술·역사와철학 권장과목(*) 목록 중 1과목 필수 — 2024 기준 44과목, 2021~2023 입학생 일부 차이 가능, 직접 확인." }
+  ],
   "buckets": [
     { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },

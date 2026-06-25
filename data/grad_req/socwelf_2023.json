@@ -21,11 +21,12 @@
     { "name": "사회복지 정책" },
     { "name": "사회복지 현장실습", "code": "209.319" }
   ],
+  "external_recognition": { "colleges": ["사회과학대학"], "approval_max_credits": 9 },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0 },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+    { "key": "single", "name": "심화전공(단일전공)", "recog_max": 9, "major_min_credits": 60, "general": true, "select_min": 0 },
+    { "key": "multi", "name": "주전공(다전공)", "recog_max": 9, "major_min_credits": 39, "general": true, "select_min": 0 },
+    { "key": "double", "name": "복수전공", "recog_max": 9, "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "minor", "name": "부전공", "recog_max": 0, "major_min_credits": 21, "general": false, "select_min": 0 }
   ],
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상.",

@@ -88,6 +88,7 @@
       "major_min_credits": 60,
       "general": true,
       "select_min": 5,
+      "recog_max": 9,
       "suri_sub": false
     },
     {
@@ -96,6 +97,7 @@
       "major_min_credits": 39,
       "general": true,
       "select_min": 5,
+      "recog_max": 9,
       "suri_sub": false
     },
     {
@@ -104,6 +106,7 @@
       "major_min_credits": 39,
       "general": false,
       "select_min": 5,
+      "recog_max": 9,
       "suri_sub": false
     },
     {
@@ -112,6 +115,7 @@
       "major_min_credits": 21,
       "general": false,
       "select_min": 0,
+      "recog_max": 0,
       "suri_sub": true
     }
   ],

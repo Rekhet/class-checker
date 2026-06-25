@@ -6,7 +6,7 @@
   "buckets": [
     { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 2, "area_min": [ { "areas": ["scisense"], "min": 3, "label": "자연과 기술·생명과 환경 (필수 3학점)" } ] }
   ],
-  "notes": ["학문의 세계: 자연과 기술 또는 생명과 환경에서 최소 3학점 포함, 7개 영역 중 4개 영역 이상에서 최소 12학점.", "전체 교양 14학점은 자유 선택(total에 포함)."]
+  "notes": ["학문의 세계: 자연과 기술 또는 생명과 환경에서 최소 3학점 포함, 7개 영역 중 4개 영역 이상에서 최소 12학점. ※ 2025 교과코드 통합으로 세부영역 수 자동 판정 한계 — 최소 2개 영역만 강제(과학 3학점·총 12학점은 자동 강제), 4개 영역 충족은 직접 확인.", "전체 교양 14학점은 자유 선택(total에 포함)."]
 }

@@ -8,6 +8,6 @@
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
     { "key": "math", "name": "수량적 분석과 추론", "min": 3, "areas": ["math", "stat"] },
     { "key": "science", "name": "과학적 사고와 실험", "min": 8, "areas": ["physics", "chem", "bio", "earth", "science"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
   ]
 }

@@ -21,8 +21,9 @@
     { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100" },
     { "name": "정보문화기술입문", "code": "2114.304" }
   ],
+  "external_recognition": { "any_dept": true, "approval_max_credits": 18 },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 16,
+    { "key": "single", "name": "심화전공(단일전공)", "recog_max": 12, "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 16,
       "required": { "all": [
         { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
         { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
@@ -31,7 +32,7 @@
         { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 },
         { "name": "정보문화기술입문", "code": "2114.304", "credits": 3 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 16,
+    { "key": "multi", "name": "주전공(다전공)", "recog_max": 9, "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 16,
       "required": { "all": [
         { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
         { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
@@ -40,7 +41,7 @@
         { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 },
         { "name": "정보문화기술입문", "code": "2114.304", "credits": 3 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 16,
+    { "key": "double", "name": "복수전공", "recog_max": 9, "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 16,
       "required": { "all": [
         { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
         { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
@@ -49,7 +50,7 @@
         { "name": "커뮤니케이션 데이터 분석", "code": "M1312.003100", "credits": 3 },
         { "name": "정보문화기술입문", "code": "2114.304", "credits": 3 }
       ] } },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 9,
+    { "key": "minor", "name": "부전공", "recog_max": 0, "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 9,
       "required": { "all": [
         { "name": "커뮤니케이션학 입문", "code": "M1312.002900", "credits": 3 },
         { "name": "커뮤니케이션이론 1", "code": "M1312.003000", "credits": 3 },
