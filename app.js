@@ -2198,7 +2198,7 @@ let _gradAreaCodes = null;
 async function _loadAreaCodes() {
   if (!_gradAreaCodes) {
     const d = await fetch("data/grad_req/gyo/area_codes.json").then((r) => r.json());
-    _gradAreaCodes = { codes: d.codes || {}, exceptions: d.exceptions || {} };
+    _gradAreaCodes = { codes: d.codes || {}, exceptions: d.exceptions || {}, gwonjang: d.gwonjang_codes || [], junggeup: d.junggeup_codes || [] };
   }
   return _gradAreaCodes;
 }
@@ -2388,7 +2388,8 @@ async function renderGrad() {
   const rows = taken.map((c) => {
     const m = cat.get(classKey(c)) || {};
     return { name: c.name, sbjt_cd: c.sbjt_cd, credits: Number(m.credits ?? c.credits ?? 0) || 0,
-      cls: m.classification || c.classification || [], dept: m.department || c.dept || c.department || "" };
+      cls: m.classification || c.classification || [], dept: m.department || c.dept || c.department || "",
+      college: m.college || c.college || "" };
   });
   const areaCodes = await _loadAreaCodes();
   const codeEquiv = await _loadCodeEquiv();
@@ -2413,8 +2414,24 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   const suriCodes = new Set([...(suri.seq || []).map((x) => x.code), ...(suri.combined ? [suri.combined.code] : [])]);
 
   const isStat = (d) => (spec.major_required_match?.departments || []).some((x) => (d || "").includes(x));
-  const isRecog = (d) => (spec.external_recognition?.depts || []).some((x) => (d || "").includes(x.replace(/부$/, "")));
   const hasCls = (r, t) => (r.cls || []).includes(t);
+  const er = spec.external_recognition || {};
+  const recogCodes = new Set((er.courses || []).map((c) => canon(c.code)));
+  const recogPrefix = er.code_prefixes || [];
+  const recogColl = er.colleges || [];
+  const recogDepts = er.depts || [];
+  const recogAnyDept = er.any_dept === true;                          // 타과 전선/전필 전부 인정(상한은 track.recog_max)
+  const isRecog = (r) => {
+    if (isStat(r.dept)) return false;                                  // own major handled by isStat path (no double-count)
+    const code = canon(r.sbjt_cd);
+    if (recogCodes.has(code)) return true;                            // designated course — any classification
+    if (recogPrefix.some((p) => code.startsWith(p))) return true;     // 공대공통 prefix — any classification
+    const isMajorCourse = hasCls(r, "전선") || hasCls(r, "전필");
+    if (recogAnyDept && isMajorCourse) return true;                   // any other dept's 전공 course
+    if (recogColl.includes(r.college) && isMajorCourse) return true;  // college 전공 course
+    if (recogDepts.some((x) => (r.dept || "").includes(x.replace(/부$/, ""))) && isMajorCourse) return true;
+    return false;
+  };
   const _takenCanon = new Set(rows.map((r) => canon(r.sbjt_cd)));   // 수강 코드 정규화
   const takenCodes = { has: (code) => _takenCanon.has(canon(code)) };   // 전필 매칭 시 required 코드도 canon → 개편 전/후 코드 호환
 
@@ -2434,8 +2451,12 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
 
   const majorSelRows = rows.filter((r) => isStat(r.dept) && hasCls(r, "전선"));
   const majorReqCr = rows.filter((r) => isStat(r.dept) && hasCls(r, "전필")).reduce((s, r) => s + r.credits, 0);
-  let recogCr = rows.filter((r) => isRecog(r.dept) && (hasCls(r, "전선") || hasCls(r, "전필"))).reduce((s, r) => s + r.credits, 0);
-  if (track.recog_max != null) recogCr = Math.min(recogCr, track.recog_max);   // CSE caps 인정 (주전공 12 / 복수 6)
+  const recogRows = rows.filter((r) => isRecog(r));
+  let recogCounted = recogRows;
+  if (track.recog_max_courses != null)   // 과목 수 상한: 학점 높은 순 N과목만 인정(학생 유리)
+    recogCounted = [...recogRows].sort((a, b) => b.credits - a.credits).slice(0, track.recog_max_courses);
+  let recogCr = recogCounted.reduce((s, r) => s + r.credits, 0);
+  if (track.recog_max != null) recogCr = Math.min(recogCr, track.recog_max);   // recog_max 학점 상한 (econ 12 / me 15 / stat 9; 부전공 0)
   const illegalCr = suriIllegal ? rows.filter((r) => r.sbjt_cd === suri.combined.code).reduce((s, r) => s + r.credits, 0) : 0;
   const majorCr = majorReqCr + majorSelRows.reduce((s, r) => s + r.credits, 0) + recogCr - illegalCr;
 
@@ -2504,8 +2525,8 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   };
   const bucketOf = (fine) => (gyBuckets.find((b) => (b.areas || []).includes(fine)) || {}).key || "";
   const areaOf = (r) => _gradAreaOv[r.sbjt_cd] || bucketOf(fineOf(r.sbjt_cd));        // → bucket key
-  const bucketCr = {}, bucketAreas = {};
-  gyBuckets.forEach((b) => { bucketCr[b.key] = 0; bucketAreas[b.key] = new Set(); });
+  const bucketCr = {}, bucketAreas = {}, bucketFineCr = {};
+  gyBuckets.forEach((b) => { bucketCr[b.key] = 0; bucketAreas[b.key] = new Set(); bucketFineCr[b.key] = {}; });
   let gyTotal = 0;
   for (const r of gyRows) {
     gyTotal += r.credits;
@@ -2513,9 +2534,14 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     if (bk && bk in bucketCr) {
       bucketCr[bk] += r.credits;
       const f = fineOf(r.sbjt_cd), bdef = gyBuckets.find((b) => b.key === bk);
-      if (f && bdef && (bdef.areas || []).includes(f)) bucketAreas[bk].add(f);   // 영역 카운트는 해당 버킷 소속 세부영역만 (수동 override 오염 방지)
+      if (f && bdef && (bdef.areas || []).includes(f)) {   // 영역 카운트·하위영역 학점은 해당 버킷 소속 세부영역만 (수동 override 오염 방지)
+        bucketAreas[bk].add(f);
+        bucketFineCr[bk][f] = (bucketFineCr[bk][f] || 0) + r.credits;
+      }
     }
   }
+  // 학문의 세계 교차배분(pre-25): 하위영역 학점 하한 — 인문·사회계는 자연계 영역 ≥N, 자연·공계는 인문계 영역 ≥N
+  const areaMinCr = (b, am) => (am.areas || []).reduce((s, a) => s + ((bucketFineCr[b.key] || {})[a] || 0), 0);
 
   const sections = [];
   // 1) summary — 졸업/교양 only for tracks that earn the degree (심화전공·다전공 주전공)
@@ -2555,7 +2581,29 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
       el("span", {}, `⚠ ${track.name}은 수리통계(${suri.combined.code}) 이수 불가 — 수리통계 1·2로 이수해야 하며 전공학점에서 제외됨`)));
   if (track.select_min > 0) major.append(_gradBar("전공선택 (과목 수)", majorSelRows.length, track.select_min, "과목"));
   if (selectMinCredits > 0) major.append(_gradBar("전공선택 (학점)", selectCredits, selectMinCredits, "학점"));
-  if (recogCr) major.append(el("div", { className: "grad-note" }, `전공선택인정(수리·컴공 등): ${recogCr}학점 반영`));
+  if (recogCr) major.append(el("div", { className: "grad-note" }, `전공선택인정: ${recogCr}학점 반영`));
+  if (majorSelRows.length || recogRows.length) {
+    const fold = el("details", { className: "grad-fold" });
+    fold.append(el("summary", {}, `전공선택 인정 과목 ${majorSelRows.length + recogRows.length}개 · ${selectCredits}학점`));
+    const courseLine = (r) => el("div", { className: "gfold-row" },
+      el("span", { className: "gfr-name" }, r.name),
+      el("span", { className: "gfr-code" }, r.sbjt_cd),
+      el("span", { className: "gfr-cr" }, `${r.credits}학점`),
+      el("span", { className: "gfr-dept" }, r.dept || "—"));
+    if (majorSelRows.length) {
+      fold.append(el("div", { className: "gfold-grp" }, "전공 (전선)"));
+      majorSelRows.forEach((r) => fold.append(courseLine(r)));
+    }
+    if (recogRows.length) {
+      const capParts = [];
+      if (track.recog_max_courses != null) capParts.push(`최대 ${track.recog_max_courses}과목`);
+      if (track.recog_max != null) capParts.push(`최대 ${track.recog_max}학점`);
+      const cap = capParts.length ? ` (${capParts.join(", ")}, 반영 ${recogCr})` : "";
+      fold.append(el("div", { className: "gfold-grp" }, "타과 인정" + cap));
+      recogRows.forEach((r) => fold.append(courseLine(r)));
+    }
+    major.append(fold);
+  }
   sections.push(major);
 
   // 3) 교양 (degree tracks only)
@@ -2564,6 +2612,30 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     gyBuckets.forEach((b) => {
       const nm = b.pick_min_areas ? `${b.name} · ${bucketAreas[b.key].size}/${b.pick_min_areas}영역` : b.name;
       gen.append(_gradBar(nm, bucketCr[b.key], b.min, "학점"));
+      (b.area_min || []).forEach((am) => {
+        if (am.ref) gen.append(el("div", { className: "grad-note" }, `└ ${am.label || "참고 하위영역"}: ${areaMinCr(b, am)}/${am.min}학점 (참고·비강제)`));
+        else gen.append(_gradBar(`└ ${am.label || "필수 하위영역"}`, areaMinCr(b, am), am.min, "학점"));
+      });
+    });
+    (ruleset.notes || []).forEach((n) => gen.append(el("div", { className: "grad-note" }, "· " + n)));
+    // 권장과목(*)·중급이상 같은 '코드 목록 중 N과목' 요건 — 자문(advisory), 졸업 판정(ok)에는 미반영(오탈락 방지)
+    (ruleset.required_one_of || []).forEach((req) => {
+      const poolSet = new Set((areaCodes && areaCodes[req.list]) || []);
+      const matched = gyRows.filter((r) => poolSet.has(r.sbjt_cd) || poolSet.has(canon(r.sbjt_cd)));
+      const need = req.min_courses || 1;
+      const met = matched.length >= need;
+      gen.append(el("div", { className: "grad-flag adv" + (met ? " ok" : "") },
+        el("span", {}, `${met ? "✓" : "○"} ${req.label} (${matched.length}/${need}과목) · 참고·비강제`)));
+      if (req.note) gen.append(el("div", { className: "grad-note" }, "· " + req.note));
+      if (matched.length) {
+        const fold = el("details", { className: "grad-fold" });
+        fold.append(el("summary", {}, `인정 과목 ${matched.length}개`));
+        matched.forEach((r) => fold.append(el("div", { className: "gfold-row" },
+          el("span", { className: "gfr-name" }, r.name),
+          el("span", { className: "gfr-code" }, r.sbjt_cd),
+          el("span", { className: "gfr-cr" }, `${r.credits}학점`))));
+        gen.append(fold);
+      }
     });
     gen.append(el("div", { className: "grad-subh" }, "교양 강좌 영역 (코드 자동분류 · 필요 시 수정)"));
     if (!gyRows.length) gen.append(el("div", { className: "grad-note" }, "선택한 시간표에 교양 강좌가 없습니다."));
@@ -2601,7 +2673,9 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   if (selectMinCredits > 0) ok = ok && selectCredits >= selectMinCredits;
   if (track.general) {
     ok = ok && totalCr >= spec.total_credits && gyTotal >= ((ruleset && ruleset.total_min) || 0)
-      && gyBuckets.every((b) => bucketCr[b.key] >= b.min && (!b.pick_min_areas || bucketAreas[b.key].size >= b.pick_min_areas))
+      && gyBuckets.every((b) => bucketCr[b.key] >= b.min
+          && (!b.pick_min_areas || bucketAreas[b.key].size >= b.pick_min_areas)
+          && (b.area_min || []).every((am) => am.ref || areaMinCr(b, am) >= am.min))
       && (spec.dept_required_general || []).every((g) => rows.some((r) => r.name === g.name) || gyRows.some((r) => r.name.includes(g.name)))
       && !!(_gradState.eng || {})[blkIdx];
   }
