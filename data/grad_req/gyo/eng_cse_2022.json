@@ -9,6 +9,7 @@
     { "key": "math", "name": "수학", "min": 16, "areas": ["math", "stat"] },
     { "key": "science", "name": "과학", "min": 12, "areas": ["physics", "chem", "bio", "earth", "science"] },
     { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 }
-  ]
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] }
+  ],
+  "notes": ["학문의 세계: 6개 영역(언어와문학·문화와예술·역사와철학·정치와경제·인간과사회·생명과환경) 중 4개 영역 이상에서 12학점. 컴퓨터공학부는 생명과환경 인정·자연과기술 제외이나, 2025 교양개편으로 교과코드(C40)가 두 영역을 통합하여 자동 구분이 불가 → 과학 교양을 모두 인정 처리(자연과기술 사용 여부 직접 확인). 영역 4개 요건은 4개 세부영역이 coarse 영역키로 최소 2개까지 합쳐져 자동 강제 시 오탈락 위험이 있어 학점(12)만 강제."]
 }

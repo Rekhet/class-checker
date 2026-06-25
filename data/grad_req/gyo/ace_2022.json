@@ -7,8 +7,8 @@
     { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
     { "key": "msc", "name": "수량적 분석·과학적 사고", "min": 20, "areas": ["math", "stat", "physics", "chem", "bio", "earth", "computing", "science"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 4 },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 2 },
     { "key": "veritas", "name": "선택교양(베리타스)", "min": 9, "areas": ["veritas"] }
   ],
-  "notes": ["사고와 표현 4 = 대학 글쓰기 1(2) + 대학 글쓰기 2: 과학기술 글쓰기(2).", "수과컴 20 = 필수(수량적 분석과 추론·과학적 사고와 실험·컴퓨터와 정보 활용 각 1과목, 10) + 선택(같은 3개 영역 중 택 3과목, 10).", "학문의 세계: 7개 영역 중 4개 영역에서 12학점 이상.", "선택교양 베리타스 9 = 베리타스 강좌1(3) + 베리타스 실천(3) + 베리타스 강좌2(3) 필수."]
+  "notes": ["사고와 표현 4 = 대학 글쓰기 1(2) + 대학 글쓰기 2: 과학기술 글쓰기(2).", "수과컴 20 = 필수(수량적 분석과 추론·과학적 사고와 실험·컴퓨터와 정보 활용 각 1과목, 10) + 선택(같은 3개 영역 중 택 3과목, 10).", "학문의 세계: 7개 영역 중 4개 영역에서 12학점 이상. ※ 2025 교과코드 통합으로 세부영역 수 자동 판정 한계 — 최소 2개 영역만 강제, 4개 영역 충족은 직접 확인.", "선택교양 베리타스 9 = 베리타스 강좌1(3) + 베리타스 실천(3) + 베리타스 강좌2(3) 필수."]
 }
