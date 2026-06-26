@@ -1245,6 +1245,7 @@ function renderDetail() {
     ? el("div", { className: "d-chips" }, ...cls.map((x) => el("span", { className: "d-chip" }, x)))
     : "-");
   kv("코드", `${c.sbjt_cd || ""}(${c.lt_no || ""})`);
+  if (c.room) kv("강의실", c.room);
   body.append(grid);
 
   const seats = [];
