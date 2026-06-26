@@ -120,7 +120,7 @@ function matchRow(c, f) {
   if (f.name && nameScore(c.name, f.name) === 0) return false;
   if (f.professor && !has(c.professor, f.professor)) return false;
   if (f.department && !has(c.department, f.department)) return false;
-  if (f.grades?.length && !f.grades.includes(c.grade)) return false;
+  if (f.grades?.length && !f.grades.includes(gradeBucket(c.grade))) return false;
   const cls = c.classification || [];
   if (f.classifications?.length && !f.classifications.some((x) => cls.includes(x))) return false;
   if (f.levels?.length && !f.levels.some((x) => cls.includes(x))) return false;
@@ -480,11 +480,26 @@ async function loadClassifications() {
 }
 
 // 학년: raw '0' means 전학년 (no grade restriction); show it readably.
-const gradeLabel = (g) => (g === "0" ? "전학년 All-yr" : g);
+// 5·6년제(건축·약학) 5/6학년은 검색 칩에서 "5+학년" 하나로 묶는다(소수 과목).
+const gradeBucket = (g) => {
+  const s = String(g ?? "");
+  return s === "5학년" || s === "6" || s === "6학년" ? "5+학년" : s;
+};
+const gradeLabel = (g) => {
+  if (g === "0") return "전학년 All-yr";
+  if (g === "6") return "6학년";   // 약학 6년제: 원본은 접미사 없는 '6'
+  return g;
+};
 async function loadGrades() {
   try {
     const { grades } = await dataIndex();
-    fillChips("gradeChips", grades, gradeLabel);
+    const seen = new Set();
+    const bucketed = grades.reduce((acc, g) => {
+      const b = gradeBucket(g);
+      if (!seen.has(b)) { seen.add(b); acc.push(b); }
+      return acc;
+    }, []);
+    fillChips("gradeChips", bucketed, gradeLabel);
   } catch { /* grade filter optional */ }
 }
 
