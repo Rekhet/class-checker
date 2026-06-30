@@ -12,7 +12,7 @@
     { "key": "math", "name": "수량적 분석과 추론", "min": 6, "areas": ["math", "stat"] },
     { "key": "science", "name": "과학적 사고와 실험", "min": 8, "areas": ["physics", "chem", "bio", "earth", "science"] },
     { "key": "computing", "name": "컴퓨터와 정보 활용", "min": 3, "areas": ["computing"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_seminar"] },
     { "key": "arts", "name": "예술과 체육", "min": 2, "areas": ["x_arts"] }
   ],
   "notes": ["통계학·통계학실험은 수량적 분석과 추론 소속이나 과학적 사고와 실험 영역 이수로 인정.", "대학 글쓰기 2는 '수학 논리 및 논술' 이수로 대체 가능(대체 시에도 총 41학점 충족 필요).", "선택 교양: 체육계열과목 2학점 필수 이수."]

@@ -9,7 +9,7 @@
   "buckets": [
     { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_seminar"] },
     { "key": "arts", "name": "예술과 체육", "min": 2, "areas": ["x_arts"] }
   ],
   "notes": ["대학 글쓰기 2는 '교과 논리 및 논술' 이수로 대체 가능(대체 시에도 총 36학점 충족 필요).", "선택 교양: 체육계열과목 2학점 필수 이수.", "전체 교양 교과목 중 12학점 자유 선택."]
