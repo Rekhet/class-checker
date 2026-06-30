@@ -263,7 +263,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .ttx-hd .en { color: var(--cp-faint); font-weight: 500; margin-left: 5px; font-size: 10px; letter-spacing: 0.06em; }
 .ttx-gutter, .ttx-col { background: var(--cp-paper); position: relative; }
 .ttx-hour { position: absolute; right: 7px; color: var(--cp-faint); font-size: 10px;
-  transform: translateY(-5px); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  transform: translateY(2px); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ttx-line { position: absolute; left: 0; right: 0; border-top: 1px solid var(--cp-gridLine); }
 .ttx-block {
   position: absolute; border-radius: 4px; padding: 5px 7px; color: #fff;
