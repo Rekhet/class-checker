@@ -12,6 +12,7 @@
   "minor_credits": 21,
   "english_min_courses": 3,
   "major_select_match": { "departments": ["언어학과"], "classifications": ["전선"] },
+  "external_recognition": { "any_dept": true, "approval_max_credits": 6 },
   "major_required_known": [
     { "name": "말소리의세계", "code": "100.131" },
     { "name": "심화통사론", "code": "M1246.001500" },
@@ -23,15 +24,15 @@
     { "name": "세계의언어", "code": "100.132" }
   ],
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0 },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "recog_max": 6 },
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "recog_max": 6 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "recog_max": 6 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "recog_max": 3 }
   ],
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
     "전공필수 12학점(단일·복수·부전공 모두 전필 전부 이수). 표준이수형태 과목 후보를 major_required_known에 수록하나 정확 전필 집합은 페이지 표 재확인 필요 → required.all 미생성, 전선 학점으로 산입(근사).",
-    "전공선택: 타과 교과목 전공인정 최대 6학점(복수 6, 부전공 3). select min 명시 없음.",
+    "전공선택: 타과 교과목 전공인정 = 지정목록 없음, 타과에서 이수한 교과목을 교과과정위원회 승인 절차로 최대 6학점까지 언어학과 전공과목 인정(단일/주전공/복수 6, 부전공 3). → external_recognition any_dept=true + recog_max [6,6,6,3] (이수규정 페이지 verbatim 확인 2026-06-30, comm과 동일 위원회재량 패턴). select min 명시 없음.",
     "외국어진행강좌 ≥3과목. 제2외국어 9학점은 교양(hum_2025) 측; 복수전공(타단대) 1과목. 졸업논문: 언어학연습1,2 권장, 누적평점 2.7↑."
   ]
 }

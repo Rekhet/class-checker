@@ -12,27 +12,72 @@
   "minor_credits": 21,
   "english_min_courses": 3,
   "major_select_match": { "departments": ["아시아언어문명학부"], "classifications": ["전선"] },
+  "external_recognition": {
+    "approval_max_credits": 9,
+    "courses": [
+      { "code": "M3545.001800", "name": "근세무슬림제국과 그 유산", "dept": "역사학부" },
+      { "code": "M1249.000800", "name": "서아시아사 특강", "dept": "역사학부" },
+      { "code": "111.223B", "name": "중동사회의 전통과 근대(구 서아시아사특강)", "dept": "동양사학과" },
+      { "code": "114.214", "name": "이슬람교개론", "dept": "종교학과" },
+      { "code": "114.412", "name": "고대종교", "dept": "종교학과" },
+      { "code": "216B.345", "name": "중동/아프리카 지역연구", "dept": "정치외교학부" },
+      { "code": "116.217B", "name": "인도의 미술", "dept": "고고미술사학과" },
+      { "code": "100.146A", "name": "인도불교철학", "dept": "철학과" },
+      { "code": "114.204", "name": "인도종교", "dept": "종교학과" },
+      { "code": "6522.3425", "name": "인도음악", "dept": "작곡과" },
+      { "code": "M2752.001200", "name": "이슬람세계 예술의 이해", "dept": "아시아언어문명학부 서아시아언어문명전공" },
+      { "code": "M3545.001500", "name": "동남아시아의 역사와 해상무역", "dept": "역사학부" },
+      { "code": "M3545.001600", "name": "개관베트남사", "dept": "역사학부" },
+      { "code": "M3545.001700", "name": "동남아시아 및 주변의 역사와 기억", "dept": "역사학부" },
+      { "code": "206.229A", "name": "동남아문화의 이해", "dept": "인류학과" },
+      { "code": "216B.427", "name": "동남아의 정치와 외교", "dept": "정치외교학부" },
+      { "code": "111.329", "name": "동남아시아 근대와 제국주의(폐지)", "dept": "동양사학과" },
+      { "code": "M1263.000100", "name": "일본의 회화", "dept": "고고미술사학과" },
+      { "code": "M1265.000100", "name": "일본의 미술", "dept": "고고미술사학과" },
+      { "code": "116.216B", "name": "일본미술사(구 일본의미술)", "dept": "고고미술사학과" },
+      { "code": "M3545.002400", "name": "개관일본사", "dept": "역사학부" },
+      { "code": "M3545.000500", "name": "일본근현대사 1", "dept": "역사학부" },
+      { "code": "M3545.000600", "name": "일본근현대사 2", "dept": "역사학부" },
+      { "code": "M3545.000800", "name": "일본고중세사", "dept": "역사학부" },
+      { "code": "M3545.000700", "name": "일본사 특강", "dept": "역사학부" },
+      { "code": "M3563.000100", "name": "동아시아비교문학론", "dept": "연합전공 동아시아비교인문학" },
+      { "code": "M3563.000500", "name": "동아시아비교인문학특강", "dept": "연합전공 동아시아비교인문학" },
+      { "code": "114.325", "name": "일본종교", "dept": "종교학과" },
+      { "code": "205.345A", "name": "일본과 동아시아", "dept": "사회학과" },
+      { "code": "216B.341", "name": "일본과 국제관계", "dept": "정치외교학부" },
+      { "code": "216A.207", "name": "일본정치론", "dept": "정치외교학부" },
+      { "code": "206.219B", "name": "일본문화의 이해", "dept": "인류학과" },
+      { "code": "M3236.000100", "name": "일본학입문", "dept": "연계전공 일본학" },
+      { "code": "M3716.000100", "name": "현대 일본의 쟁점", "dept": "연계전공 일본학" },
+      { "code": "M1249.000200", "name": "일본의 국가와 문화(폐지)", "dept": "동양사학과" },
+      { "code": "111.225", "name": "일본국가와 문화의 형성(구)", "dept": "동양사학과" },
+      { "code": "111.227A", "name": "일본의 무사사회(폐지)", "dept": "동양사학과" },
+      { "code": "111.326", "name": "일본근대국가의 성립과 전개(폐지)", "dept": "동양사학과" },
+      { "code": "111.415", "name": "20세기일본의 역사(폐지)", "dept": "동양사학과" },
+      { "code": "108.416", "name": "일본어의 구조", "dept": "언어학과" }
+    ]
+  },
   "major_required_known": [
     { "name": "아시아문명론입문", "code": "1003.221" },
     { "name": "아시아연구지도", "code": "M2641.000300" }
   ],
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 6,
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 6, "recog_max_courses": 3,
       "required": { "all": [
         { "name": "아시아문명론입문", "code": "1003.221", "credits": 3 },
         { "name": "아시아연구지도", "code": "M2641.000300", "credits": 3 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 6,
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 6, "recog_max_courses": 3,
       "required": { "all": [
         { "name": "아시아문명론입문", "code": "1003.221", "credits": 3 },
         { "name": "아시아연구지도", "code": "M2641.000300", "credits": 3 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6,
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6, "recog_max_courses": 3,
       "required": { "all": [
         { "name": "아시아문명론입문", "code": "1003.221", "credits": 3 },
         { "name": "아시아연구지도", "code": "M2641.000300", "credits": 3 }
       ] } },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 6,
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "required_credits": 6, "recog_max_courses": 3,
       "required": { "all": [
         { "name": "아시아문명론입문", "code": "1003.221", "credits": 3 },
         { "name": "아시아연구지도", "code": "M2641.000300", "credits": 3 }
@@ -41,7 +86,8 @@
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = hum_2025 어댑터(36학점).",
     "학부 내 4개 전공(서아시아·인도·동남아시아·일본 언어문명) 통합 spec. 학부 전공필수(전 전공 공통) 2과목: 아시아문명론입문[1003.221]·아시아연구지도[M2641.000300] = 6학점(학점 3/3 가정, 근사).",
-    "⚠ 총학점·track 표는 학부규정 페이지 SPA-blocked → 인문대 standard(60/39/39/21) 가정. 전공별 공통교과목·전공탐색·인정과목(타과목 3과목 이내만 전공인정)은 전공별 상이 — 단일 spec으로 미반영.",
+    "⚠ 총학점·track 표는 학부규정 페이지 SPA-blocked → 인문대 standard(60/39/39/21) 가정.",
+    "전공선택 인정과목(교과목 페이지 verbatim 2026-06-30): 지정목록 방식(any_dept 아님). 서아시아5·인도5·동남아6·일본16과목 + 폐지/구코드. 규정 = 각 전공 '이 중 3과목 이내로만 전공인정'(과목 수 상한) → 4개 전공 목록을 단일 spec external_recognition.courses로 합본 + recog_max_courses 3(전 트랙). 학부 통합 spec이라 전공 교차인정(예: 서아시아생이 일본목록 과목 인정)은 over-accept = cardinal-safe. M2752.001200(이슬람세계예술이해)은 학부 자체과목이라 isStat로 직접 전선 산입(중복 안전).",
     "외국어진행강좌 ≥3과목. 제2외국어 9학점은 교양(hum_2025) 측. 권장교양: 아랍어/산스크리트어/힌디어/말레이-인도네시아어/베트남어/고급일본어."
   ]
 }

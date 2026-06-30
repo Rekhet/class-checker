@@ -13,8 +13,8 @@
   "major_min_credits": 60,
   "english_min_courses": 1,
   "external_recognition": {
-    "depts": [],
-    "approval_max_credits": 0
+    "colleges": ["자연과학대학", "공과대학"],
+    "approval_max_credits": 12
   },
   "major_required_match": {
     "departments": [
@@ -53,35 +53,39 @@
       "name": "심화전공(단일전공)",
       "major_min_credits": 60,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "recog_max": 12
     },
     {
       "key": "multi",
       "name": "주전공(다전공 병행)",
       "major_min_credits": 39,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "recog_max": 12
     },
     {
       "key": "double",
       "name": "복수전공",
       "major_min_credits": 39,
       "general": false,
-      "select_min": 0
+      "select_min": 0,
+      "recog_max": 12
     },
     {
       "key": "minor",
       "name": "부전공/연계전공",
       "major_min_credits": 21,
       "general": false,
-      "select_min": 0
+      "select_min": 0,
+      "recog_max": 0
     }
   ],
   "notes": [
     "졸업이수학점표 통계학과와 동일: 졸업130·교양46·주전공(단일)60·다전공 병행39·복수39·부전공21.",
     "교양 = 자연과학대학 공통교육과정 46 (수학 6-8 + 과학·컴퓨팅 16 세분; 본 spec은 수과컴 24로 통합).",
     "외국어진행강좌(영어강의) 최소 1과목 (자연대).",
-    "전공필수(*): 해석개론 및 연습 1·2, 현대대수학 1 등 — 전체 전필/전선·복수/부전공 세부는 졸업이수규정 이미지(미추출) 참조. 전필 집합은 카탈로그(수리과학부·전필)에서 산출.",
-    "전공선택 인정과목(타 학과 전선 인정)·세부 트랙 전필은 미확정 — 필요 시 졸업이수규정 이미지 확인."
+    "전공필수(*): 해석개론 및 연습 1·2, 현대대수학 1 등 — 전체 전필/전선·복수/부전공 세부는 졸업이수규정 이미지 참조. 전필 집합은 카탈로그(수리과학부·전필)에서 산출.",
+    "전공선택 타학부 인정: 자연과학대학·공과대학 개설 전공교과목 최대 12학점 인정(부전공 제외). 출처 math.snu.ac.kr criteria wr_id=46/40/39/38 — 2021~2026 전 학번 동일 규정. colleges 모드 + recog_max 12."
   ]
 }

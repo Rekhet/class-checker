@@ -10,6 +10,9 @@
   "major_min_credits": 21,
   "english_min_courses": 0,
   "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "external_recognition": {
+    "colleges": ["인문대학"]
+  },
   "major_required_known": [
     { "name": "동아시아문헌과 규장각", "code": null },
     { "name": "서양고전문헌학입문", "code": null },
@@ -29,6 +32,7 @@
     "제2전공 전용(단독 졸업 불가). 연계전공 21학점 이상(7과목 이상), 평점평균 2.0 이상.",
     "data grade: cnp.snu.ac.kr og:description meta(본문은 Elementor SPA 스텁). 공통필수 3과목 코드는 자체 페이지 미표기 — 코드 미검증(카탈로그 부재)으로 required.all에서 제외, major_required_known에 과목명만 수록.",
     "트랙 택1(한문 / 그리스어 / 라틴어). 공통필수 3과목(트랙 무관 필수): 동아시아문헌과 규장각, 서양고전문헌학입문, 고전문헌번역연습.",
-    "타 트랙 과목 수강 시 3학점까지 전공학점 인정. 졸업 전 선택 언어로 문헌비평·번역·주해 수행."
+    "타 트랙 과목 수강 시 3학점까지 전공학점 인정. 졸업 전 선택 언어로 문헌비평·번역·주해 수행.",
+    "deptless 연계전공: 카탈로그에 본 전공 태그 과목 없음 + 공통필수 코드 카탈로그 부재 → 전공학점은 external_recognition으로만 집계. 한문/그리스-라틴 트랙 모두 인문대학 개설 → colleges 인문대학 인정(상한 없음, cardinal-safe). any_dept 미사용."
   ]
 }

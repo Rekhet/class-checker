@@ -10,6 +10,12 @@
   "major_min_credits": 39,
   "english_min_courses": 0,
   "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "external_recognition": {
+    "courses": [
+      { "code": "613.302", "name": "현대매체예술사" }
+    ],
+    "code_prefixes": ["613."]
+  },
   "major_required_known": [
     { "name": "현대매체예술사", "code": "613.302" }
   ],
@@ -31,6 +37,7 @@
     "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상, 평점평균 2.0 이상.",
     "data grade: art.snu.ac.kr 이수표준형태 HTML표. 출처검증 20/20.",
     "전필 1과목(현대매체예술사) — 이수표준형태에서 전필 표기(*) 유일. 학점 미표기, 카탈로그 기준 3학점.",
-    "전선은 613.### 영상매체 개설과목. 졸업작품 전시(심사) 필수. 중복인정: 공통 9학점 + 타학과공통 3학점."
+    "전선은 613.### 영상매체 개설과목. 졸업작품 전시(심사) 필수. 중복인정: 공통 9학점 + 타학과공통 3학점.",
+    "deptless 연합전공: 카탈로그에 본 전공 태그 과목 없음 → 전공학점은 external_recognition으로만 집계. 전필 613.302 + 613. prefix(영상매체 개설과목 전체)로 인정. 상한 없음(cardinal-safe). any_dept 미사용."
   ]
 }

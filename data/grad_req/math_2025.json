@@ -9,7 +9,7 @@
   "general": "natsci_2025",
   "major_min_credits": 60,
   "english_min_courses": 1,
-  "external_recognition": { "depts": [], "approval_max_credits": 0 },
+  "external_recognition": { "colleges": ["자연과학대학", "공과대학"], "approval_max_credits": 12 },
   "major_required_match": { "departments": ["수리과학"], "classifications": ["전필"] },
   "major_select_match": { "departments": ["수리과학"], "classifications": ["전선"] },
   "major_required_known": [
@@ -19,15 +19,15 @@
   ],
   "dept_required_general": [],
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },
-    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 39, "general": true, "select_min": 0 },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
-    { "key": "minor", "name": "부전공/연계전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "recog_max": 12 },
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 39, "general": true, "select_min": 0, "recog_max": 12 },
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "recog_max": 12 },
+    { "key": "minor", "name": "부전공/연계전공", "major_min_credits": 21, "general": false, "select_min": 0, "recog_max": 0 }
   ],
   "notes": [
     "졸업이수학점표: 졸업130·교양46·주전공(단일)60·다전공39·복수39·부전공21 (통계학과·math 전 학번 동일).",
     "교양 = 자연과학대학 공통교육과정 46 (struct A, 2025학번~).",
     "외국어진행강좌 ≥1 (자연대). 수리통계 대체 규칙 없음.",
-    "전공선택 인정과목 미게시 → recog 없음. 전필은 카탈로그(수리과학부·전필) 파생."
+    "전공선택 타학부 인정: 자연과학대학·공과대학 개설 전공교과목 최대 12학점(부전공 제외). 출처 wr_id=38/39/40/46 — 전 학번 동일 규정. colleges 모드 + recog_max 12. 전필은 카탈로그(수리과학부·전필) 파생."
   ]
 }

@@ -10,6 +10,19 @@
   "major_min_credits": 39,
   "english_min_courses": 0,
   "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "external_recognition": {
+    "courses": [
+      { "code": "2114.304", "name": "정보문화기술입문" },
+      { "code": "2114.408A", "name": "HCI이론 및 실습" },
+      { "code": "211.320B", "name": "디지털 미디어의 이해" },
+      { "code": "2114.303B", "name": "디지털영상실습1" },
+      { "code": "2114.413A", "name": "디지털영상실습2" },
+      { "code": "M1312.001000", "name": "영상문화입문" },
+      { "code": "211.320", "name": "언론정보문화특강" }
+    ],
+    "code_prefixes": ["2114."],
+    "depts": ["언론정보학과"]
+  },
   "tracks": [
     {
       "key": "double",
@@ -37,6 +50,7 @@
     "data grade: isc.snu.ac.kr HTML표+코드. 단, 코드 일부는 카탈로그 name-derivation(자체 페이지 미표기) — 검증 완료. 출처검증 20/20.",
     "전필 12학점(4과목) = 무조건 3(정보문화기술입문·HCI이론및실습·디지털미디어의이해) + 디지털영상실습 택1(2114.303B/2114.413A) → required.all + groups로 인코딩.",
     "2025 변동: 영상문화입문(M1312.001000)·언론정보문화특강(211.320) 전필 해제 → 전선 전환, 디지털영상실습 택1 신규 전필. 현 spec은 2026(현행) 기준.",
-    "졸업논문 대체: 산학연구실습/창의연구실습 중 1."
+    "졸업논문 대체: 산학연구실습/창의연구실습 중 1.",
+    "deptless 연합전공: 카탈로그에 본 전공 태그 과목 없음 → 전공학점은 external_recognition으로만 집계. 전필4+전선전환과목(courses) + 2114. prefix + 언론정보학과 인정. 상한 없음(cardinal-safe). any_dept 미사용."
   ]
 }
