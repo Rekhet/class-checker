@@ -76,7 +76,7 @@ async function termRows(year, term) {
 }
 // does the query narrow results by anything other than year/term?
 function hasOtherFilters(f) {
-  return !!(f.name || f.professor || f.department || f.day != null || f.period != null
+  return !!(f.name || f.department || f.day != null || f.period != null
     || f.classifications?.length || f.levels?.length || f.grades?.length);
 }
 // which term files to load. Year/term scope them; otherwise every matching term
@@ -117,8 +117,7 @@ function nameScore(name, q) {
 }
 function matchRow(c, f) {
   const has = (hay, needle) => (hay || "").toLowerCase().includes(needle.toLowerCase());
-  if (f.name && nameScore(c.name, f.name) === 0) return false;
-  if (f.professor && !has(c.professor, f.professor)) return false;
+  if (f.name && nameScore(c.name, f.name) === 0 && !has(c.professor, f.name)) return false;
   if (f.department && !has(c.department, f.department)) return false;
   if (f.grades?.length && !f.grades.includes(gradeBucket(c.grade))) return false;
   const cls = c.classification || [];
@@ -172,6 +171,7 @@ async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
   }
   if (f.name) {   // rank by name relevance so a shorthand surfaces the best match first
     rows.sort((a, b) => nameScore(b.name, f.name) - nameScore(a.name, f.name)
+      || (a.professor || "").localeCompare(b.professor || "")
       || (a.name || "").localeCompare(b.name || "")
       || (a.lt_no || "").localeCompare(b.lt_no || ""));
   } else {
@@ -308,9 +308,9 @@ function buildFilters() {
   const sel = (name) => el("select", { name, id: name });
   const labeled = (text, control) => el("label", {}, text, control);
 
-  // always-visible course-name search
+  // always-visible search: matches course name OR professor
   form.append(el("input", {
-    type: "text", name: "name", id: "name", className: "name-input", placeholder: "강좌명 검색",
+    type: "text", name: "name", id: "name", className: "name-input", placeholder: "강좌명·교수 검색",
   }));
 
   // advanced filters, smoothly expanded/collapsed by #filterToggle
@@ -318,12 +318,12 @@ function buildFilters() {
   const grid = el("div", { className: "adv-grid" });
   grid.append(labeled("연도", sel("year")));
   grid.append(labeled("학기", sel("term")));
-  grid.append(labeled("교수", el("input", { type: "text", name: "professor", id: "professor", placeholder: "이름" })));
   const dept = el("input", { type: "text", name: "department", id: "department", placeholder: "학과명" });
   dept.setAttribute("list", "deptList");
   const deptLabel = labeled("학과", dept);
   deptLabel.append(el("datalist", { id: "deptList" }));
   grid.append(deptLabel);
+  grid.append(labeled("강의실", el("input", { type: "text", name: "roomFilter", id: "roomFilter", placeholder: "예: 38 또는 38-422" })));
   grid.append(labeled("요일", sel("day")));
   grid.append(labeled("교시", sel("period")));
   grid.append(labeled("학점", el("select", { name: "credits", id: "credits" },
@@ -332,7 +332,6 @@ function buildFilters() {
     el("option", { value: "2" }, "2학점"),
     el("option", { value: "3" }, "3학점"),
     el("option", { value: "4+" }, "4학점 이상"))));
-  grid.append(labeled("강의실", el("input", { type: "text", name: "roomFilter", id: "roomFilter", placeholder: "예: 38 또는 38-422" })));
   adv.append(grid);
 
   adv.append(el("div", { className: "adv-label" }, "과정"));
@@ -483,7 +482,8 @@ async function loadClassifications() {
 // 5·6년제(건축·약학) 5/6학년은 검색 칩에서 "5+학년" 하나로 묶는다(소수 과목).
 const gradeBucket = (g) => {
   const s = String(g ?? "");
-  return s === "5학년" || s === "6" || s === "6학년" ? "5+학년" : s;
+  const n = parseInt(s, 10);
+  return n >= 5 ? "5+학년" : s;
 };
 const gradeLabel = (g) => {
   if (g === "0") return "전학년 All-yr";
@@ -579,7 +579,7 @@ function currentFilters() {
   const num = (n) => { const v = val(n); return v === "" ? null : Number(v); };
   return {
     year: val("year") || null, term: val("term") || null,
-    name: val("name"), professor: val("professor"), department: val("department"),
+    name: val("name"), department: val("department"),
     classifications: chipVals("typeChips"),   // 이수구분 (전선/전필/교양…)
     levels: chipVals("levelChips"),            // 과정 (학사/석사/박사…)
     grades: chipVals("gradeChips"),
