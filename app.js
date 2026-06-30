@@ -1371,6 +1371,11 @@ function renderTTNow() {
       line.style.top = (i * HOUR_PX) + "px";
       col.append(line);
     }
+    for (let i = 0; i < hourCount; i++) {   // half-hour gridlines (dashed, fainter)
+      const half = el("div", { className: "ttx-line half" });
+      half.style.top = (i * HOUR_PX + HOUR_PX / 2) + "px";
+      col.append(half);
+    }
     for (const m of packedByDay[d]) {
       const c = m.c, conflict = conflictKeys.has(classKey(c));
       const h = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2);
@@ -1722,12 +1727,19 @@ function exportTTPng() {
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height };
   };
   ctx.fillStyle = "#FBFBFA"; ctx.fillRect(0, 0, base.width, base.height);
-  // grid lines under the blocks (mirror on-screen .ttx): solid hour rules + day separators
+  // grid lines under the blocks (mirror on-screen .ttx): solid hour rules,
+  // dashed/fainter half-hour rules, solid day separators
   ctx.strokeStyle = "#ECEBE7"; ctx.lineWidth = 1;
-  root.querySelectorAll(".ttx-line").forEach((e) => {
+  root.querySelectorAll(".ttx-line:not(.half)").forEach((e) => {
     const b = box(e), y = Math.round(b.y);
     ctx.beginPath(); ctx.moveTo(b.x, y); ctx.lineTo(b.x + b.w, y); ctx.stroke();
   });
+  ctx.save(); ctx.strokeStyle = "#F2F1EF"; ctx.setLineDash([3, 3]);
+  root.querySelectorAll(".ttx-line.half").forEach((e) => {
+    const b = box(e), y = Math.round(b.y);
+    ctx.beginPath(); ctx.moveTo(b.x, y); ctx.lineTo(b.x + b.w, y); ctx.stroke();
+  });
+  ctx.restore();
   root.querySelectorAll(".ttx-col").forEach((e) => {
     const b = box(e), x = Math.round(b.x);
     ctx.beginPath(); ctx.moveTo(x, b.y); ctx.lineTo(x, b.y + b.h); ctx.stroke();
