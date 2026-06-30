@@ -1722,6 +1722,16 @@ function exportTTPng() {
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height };
   };
   ctx.fillStyle = "#FBFBFA"; ctx.fillRect(0, 0, base.width, base.height);
+  // grid lines under the blocks (mirror on-screen .ttx): solid hour rules + day separators
+  ctx.strokeStyle = "#ECEBE7"; ctx.lineWidth = 1;
+  root.querySelectorAll(".ttx-line").forEach((e) => {
+    const b = box(e), y = Math.round(b.y);
+    ctx.beginPath(); ctx.moveTo(b.x, y); ctx.lineTo(b.x + b.w, y); ctx.stroke();
+  });
+  root.querySelectorAll(".ttx-col").forEach((e) => {
+    const b = box(e), x = Math.round(b.x);
+    ctx.beginPath(); ctx.moveTo(x, b.y); ctx.lineTo(x, b.y + b.h); ctx.stroke();
+  });
   ctx.font = "700 11px 'Noto Sans KR', sans-serif"; ctx.textAlign = "center"; ctx.fillStyle = "#1A1A19";
   root.querySelectorAll(".ttx-hd").forEach((e) => {
     const b = box(e); ctx.fillText(e.textContent, b.x + b.w / 2, b.y + b.h / 2);
