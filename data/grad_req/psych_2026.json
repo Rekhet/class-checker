@@ -13,27 +13,56 @@
   "english_min_courses": 1,
   "major_select_match": { "departments": ["심리학과"], "classifications": ["전선"] },
   "major_required_match": { "departments": ["심리학과"], "classifications": ["전필"] },
+  "external_recognition": {
+    "approval_max_credits": 9,
+    "courses": [
+      { "code": "108.320", "name": "심리언어학", "dept": "언어학과" },
+      { "code": "108.419", "name": "언어장애 및 치료", "dept": "언어학과" },
+      { "code": "113.463", "name": "과학철학", "dept": "철학과" },
+      { "code": "113.365", "name": "언어철학", "dept": "철학과" },
+      { "code": "113.464", "name": "심리철학", "dept": "철학과" },
+      { "code": "114.310", "name": "종교심리학", "dept": "종교학과" },
+      { "code": "115.303", "name": "예술심리학", "dept": "미학과" },
+      { "code": "205.322c", "name": "가족, 생애, 현대사회", "dept": "사회학과" },
+      { "code": "206.211A", "name": "문화와 심리", "dept": "인류학과" },
+      { "code": "206.424A", "name": "마음의 진화와 문화", "dept": "인류학과" },
+      { "code": "211.417", "name": "광고론", "dept": "언론정보학과" },
+      { "code": "211.225", "name": "설득커뮤니케이션", "dept": "언론정보학과" },
+      { "code": "211.313", "name": "대인커뮤니케이션", "dept": "언론정보학과" },
+      { "code": "209.219", "name": "인간행동과 사회환경", "dept": "사회복지학과" },
+      { "code": "209.325", "name": "아동복지론", "dept": "사회복지학과" },
+      { "code": "251.327", "name": "소비자행동", "dept": "경영학과" },
+      { "code": "251.303", "name": "인사관리", "dept": "경영학과" },
+      { "code": "251.209", "name": "조직행위론", "dept": "경영학과" },
+      { "code": "M2171.001400", "name": "마케팅 애널리틱스", "dept": "경영학과" },
+      { "code": "4190.408", "name": "인공지능", "dept": "컴퓨터공학부" },
+      { "code": "2071.301", "name": "뇌-마음-행동", "dept": "연계전공 뇌-마음-행동" },
+      { "code": "2071.402", "name": "뇌와 계산", "dept": "연계전공 뇌-마음-행동" },
+      { "code": "326.214", "name": "표본설계 및 조사실습", "dept": "통계학과" },
+      { "code": "357.225", "name": "소비자 심리의 이해", "dept": "소비자아동학부" }
+    ]
+  },
   "major_required_known": [
     { "name": "심리통계학", "code": "207.202" },
     { "name": "실험심리입문 및 실험", "code": "207.214" }
   ],
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 6,
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 6, "recog_max": 9,
       "required": { "all": [
         { "name": "심리통계학", "code": "207.202", "credits": 3 },
         { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 6,
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 6, "recog_max": 9,
       "required": { "all": [
         { "name": "심리통계학", "code": "207.202", "credits": 3 },
         { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6,
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6, "recog_max": 9,
       "required": { "all": [
         { "name": "심리통계학", "code": "207.202", "credits": 3 },
         { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }
       ] } },
-    { "key": "minor", "name": "부전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6,
+    { "key": "minor", "name": "부전공", "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 6, "recog_max": 0,
       "required": { "all": [
         { "name": "심리통계학", "code": "207.202", "credits": 3 },
         { "name": "실험심리입문 및 실험", "code": "207.214", "credits": 3 }

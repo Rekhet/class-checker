@@ -13,26 +13,27 @@
   "english_min_courses": 3,
   "major_select_match": { "departments": ["식품영양학과"], "classifications": ["전선"] },
   "major_required_match": { "departments": ["식품영양학과"], "classifications": ["전필"] },
+  "external_recognition": { "courses": [ { "code": "886.031", "name": "기초유기화학", "dept": "화학부" } ], "any_dept": true, "approval_max_credits": 9 },
   "major_required_known": [
     { "name": "생활과학신입생세미나", "code": "M2174.001600" }
   ],
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 1,
+    { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 1, "recog_max": 12,
       "required": { "all": [
         { "name": "생활과학신입생세미나", "code": "M2174.001600", "credits": 1 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 48, "general": true, "select_min": 0, "required_credits": 1,
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 48, "general": true, "select_min": 0, "required_credits": 1, "recog_max": 12,
       "required": { "all": [
         { "name": "생활과학신입생세미나", "code": "M2174.001600", "credits": 1 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0 },
-    { "key": "minor", "name": "부전공", "major_min_credits": 24, "general": false, "select_min": 0 }
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "recog_max": 12 },
+    { "key": "minor", "name": "부전공", "major_min_credits": 24, "general": false, "select_min": 0, "recog_max": 12 }
   ],
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상. 교양 = human_food_2025 어댑터(40학점, 15학번~).",
     "전공 학점 by track(15학번~ 표): 단일전공 60 · 다른전공 병행이수 48 · 복수전공 39 · 부전공 24.",
     "전공필수: 생활과학신입생세미나(구 생활과학의이해) 주전공생 필수(코드 = 생활대 공통 M2174.001600 적용; 페이지 코드 미표기). 복수·부전공자는 제외하고 각 39/24.",
-    "전공선택 인정: 기초유기화학 886.031 = 전선 3학점(유기화학 325.209와 중복불가). 타과 과목 학과장 인정 시 9학점 이내 전선 인정.",
+    "전공선택 인정(이수규정 verbatim 2026-06-30): 기초유기화학 886.031 = 전공선택 3학점 인정(325.209 유기화학과 중복인정 불가). '그 외에' 유전학·물리화학·미생물학 등 타학과(부) 교과목을 학과장 인정 시 9학점 이내 전공선택 인정. → external_recognition courses=[886.031] + any_dept(학과장재량) + recog_max 12 (886.031의 3 + 그외 9 별도 합산 최대치; recog_max 9면 3+9=12 보유 학생 false-fail이라 cardinal-safe로 12). 중복인정불가(886.031↔325.209)는 over-count 축소용이라 미인코딩(student-favorable).",
     "외국어진행강좌: 전공 1과목 포함 3과목 이상(2009학번~). 졸업논문 제출 필수(논문제출자격시험 별도).",
     "재이수 자동대체: 식품화학 352.322=352.217(A/B), 영양학 352.214=352.327(A/B 기초영양학) 등 알파벳 suffix."
   ]

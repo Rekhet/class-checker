@@ -12,6 +12,7 @@
   "minor_credits": 21,
   "english_min_courses": 1,
   "major_select_match": { "departments": ["물리·천문학부"], "classifications": ["전선"] },
+  "external_recognition": { "colleges": ["자연과학대학", "공과대학"], "approval_max_credits": 15 },
   "major_required_known": [
     { "name": "항성과 항성계", "code": "300.215" },
     { "name": "은하와 우주", "code": "300.218" },
@@ -21,7 +22,7 @@
     { "name": "천체물리학개론 2", "code": "3345.420" }
   ],
   "tracks": [
-    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0,
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "recog_max": 15,
       "required": { "all": [
         { "name": "항성과 항성계", "code": "300.215", "credits": 3 },
         { "name": "은하와 우주", "code": "300.218", "credits": 3 },
@@ -30,7 +31,7 @@
         { "name": "천체물리학개론 1", "code": "3345.322", "credits": 3 },
         { "name": "천체물리학개론 2", "code": "3345.420", "credits": 3 }
       ] } },
-    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0,
+    { "key": "multi", "name": "주전공(다전공)", "major_min_credits": 39, "general": true, "select_min": 0, "recog_max": 15,
       "required": { "all": [
         { "name": "항성과 항성계", "code": "300.215", "credits": 3 },
         { "name": "은하와 우주", "code": "300.218", "credits": 3 },
@@ -39,7 +40,7 @@
         { "name": "천체물리학개론 1", "code": "3345.322", "credits": 3 },
         { "name": "천체물리학개론 2", "code": "3345.420", "credits": 3 }
       ] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0,
+    { "key": "double", "name": "복수전공", "major_min_credits": 39, "general": false, "select_min": 0, "recog_max": 15,
       "required": { "all": [
         { "name": "항성과 항성계", "code": "300.215", "credits": 3 },
         { "name": "은하와 우주", "code": "300.218", "credits": 3 },
@@ -48,12 +49,13 @@
         { "name": "천체물리학개론 1", "code": "3345.322", "credits": 3 },
         { "name": "천체물리학개론 2", "code": "3345.420", "credits": 3 }
       ] } },
-    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0 }
+    { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0, "recog_max": 0 }
   ],
   "notes": [
     "졸업 130학점. 물리천문학부 = 물리학전공/천문학전공 분리, 졸업표 동일(130/60/39/21).",
     "전공필수 = 표준이수형태 ＊마크 6과목(항성과항성계·은하와우주·천문관측실험1·2·천체물리학개론1·2). 학점 split 페이지 미명시 — 과목당 3학점 근사(졸업논문 M1420.000400 별도).",
     "외국어진행강좌 최소 과목수 미명시 — 자연대 baseline 1과목.",
-    "부전공 전필 = 표준형태 파일 확인 필요(미인코딩)."
+    "부전공 전필 = 표준형태 파일 확인 필요(미인코딩).",
+    "전공선택 인정: 자연대·공대 타학과 개설과목 최대 15학점 (물리학전공과 동일 물리천문학부 이수규정 — astron 페이지 미명시, 학부-parity 가정·cardinal-safe widening). 앱: external_recognition colleges=[자연과학대학,공과대학] + recog_max [단일15/주전공15/복수15/부전공0]. 물리·천문학부 자체 과목은 major_select_match로 isStat 제외 — 중복인정 없음."
   ]
 }

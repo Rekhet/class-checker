@@ -2429,7 +2429,7 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   const suri = spec.suri || { seq: [], combined: null };
   const suriCodes = new Set([...(suri.seq || []).map((x) => x.code), ...(suri.combined ? [suri.combined.code] : [])]);
 
-  const isStat = (d) => (spec.major_required_match?.departments || []).some((x) => (d || "").includes(x));
+  const isStat = (d) => [...(spec.major_required_match?.departments || []), ...(spec.major_select_match?.departments || [])].some((x) => (d || "").includes(x));
   const hasCls = (r, t) => (r.cls || []).includes(t);
   const er = spec.external_recognition || {};
   const recogCodes = new Set((er.courses || []).map((c) => canon(c.code)));

@@ -10,6 +10,17 @@
   "major_min_credits": 39,
   "english_min_courses": 0,
   "major_select_match": { "departments": [], "classifications": ["전선"] },
+  "external_recognition": {
+    "courses": [
+      { "code": "3349.201A", "name": "계산과학의 이해" },
+      { "code": "3349.203", "name": "계산과학이론 및 실습1" },
+      { "code": "3349.204", "name": "계산과학 이론 및 실습2" },
+      { "code": "M1421.000100", "name": "계산과학의 원리와 응용" },
+      { "code": "3349.309", "name": "데이터과학" },
+      { "code": "3349.404", "name": "계산과학 종합설계" }
+    ],
+    "code_prefixes": ["3349.", "M1421."]
+  },
   "major_required_known": [
     { "name": "계산과학의 이해", "code": "3349.201A" },
     { "name": "계산과학이론 및 실습1", "code": "3349.203" },
@@ -40,6 +51,7 @@
   "notes": [
     "제2전공 전용(단독 졸업 불가). 연합전공 39학점 이상, 평점평균 2.0 이상.",
     "data grade: 학부대학 snuc.snu.ac.kr course-map JSON에서 전필 코드 추출(자체 도메인 uipcs.snu.ac.kr 폐기). 출처검증 20/20.",
-    "전필 6과목. course-map에 학점 미표기 — 카탈로그 기준 각 3학점(종합설계 포함)으로 표기."
+    "전필 6과목. course-map에 학점 미표기 — 카탈로그 기준 각 3학점(종합설계 포함)으로 표기.",
+    "deptless 연합전공: 카탈로그에 본 전공 태그 과목 없음 → 전공학점은 external_recognition으로만 집계. 전필6(3349.*/M1421.*) + 3349./M1421. prefix 인정. 상한 없음(cardinal-safe). any_dept 미사용."
   ]
 }
