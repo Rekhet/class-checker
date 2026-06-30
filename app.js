@@ -2214,7 +2214,7 @@ let _gradAreaCodes = null;
 async function _loadAreaCodes() {
   if (!_gradAreaCodes) {
     const d = await fetch("data/grad_req/gyo/area_codes.json").then((r) => r.json());
-    _gradAreaCodes = { codes: d.codes || {}, exceptions: d.exceptions || {}, gwonjang: d.gwonjang_codes || [], junggeup: d.junggeup_codes || [] };
+    _gradAreaCodes = { codes: d.codes || {}, exceptions: d.exceptions || {}, flex_recognition: d.flex_recognition || {}, gwonjang: d.gwonjang_codes || [], junggeup: d.junggeup_codes || [] };
   }
   return _gradAreaCodes;
 }
@@ -2535,26 +2535,47 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
 
   const gyRows = rows.filter((r) => hasCls(r, "교양"));
   const gyBuckets = (ruleset && ruleset.buckets) || [];
+  const byKey = {}; gyBuckets.forEach((b) => { byKey[b.key] = b; });
+  const flexRecog = (areaCodes && areaCodes.flex_recognition) || {};
   const fineOf = (sb) => {            // 예외목록 우선, 없으면 코드 접두사 → 세부영역
     const s = String(sb || "");
     return ((areaCodes && areaCodes.exceptions) || {})[s] || ((areaCodes && areaCodes.codes) || {})[s.split(".")[0]] || "";
   };
-  const bucketOf = (fine) => (gyBuckets.find((b) => (b.areas || []).includes(fine)) || {}).key || "";
-  const areaOf = (r) => _gradAreaOv[r.sbjt_cd] || bucketOf(fineOf(r.sbjt_cd));        // → bucket key
+  // 과목이 들어갈 수 있는 버킷 키 목록(버킷 순서 유지). 통계처럼 교차인정(flex_recognition) 규칙이 있으면 여러 버킷에 적격.
+  const eligOf = (r) => {
+    const ov = _gradAreaOv[r.sbjt_cd];
+    if (ov) return ov in byKey ? [ov] : [];          // 수동 override → 해당 버킷 단일 배정
+    const f = fineOf(r.sbjt_cd);
+    if (!f) return [];
+    const markers = flexRecog[f] || [];
+    return gyBuckets.filter((b) => (b.areas || []).includes(f) || markers.some((m) => (b.areas || []).includes(m))).map((b) => b.key);
+  };
   const bucketCr = {}, bucketAreas = {}, bucketFineCr = {};
   gyBuckets.forEach((b) => { bucketCr[b.key] = 0; bucketAreas[b.key] = new Set(); bucketFineCr[b.key] = {}; });
+  const addTo = (bk, r) => {
+    bucketCr[bk] += r.credits;
+    const f = fineOf(r.sbjt_cd), bdef = byKey[bk];
+    if (f && bdef && (bdef.areas || []).includes(f)) {   // 영역 카운트·하위영역 학점은 해당 버킷 소속 세부영역만 (override·flex 오염 방지)
+      bucketAreas[bk].add(f);
+      bucketFineCr[bk][f] = (bucketFineCr[bk][f] || 0) + r.credits;
+    }
+  };
+  // 1패스: 적격 버킷 1개인 과목 즉시 배정. 2패스: 다중적격(flex) 과목은 부족분 큰 버킷부터 그리디 배정 → 최소충족 최대화(오탈락 방지).
+  const assign = new Map(), flexRows = [];
   let gyTotal = 0;
   for (const r of gyRows) {
     gyTotal += r.credits;
-    const bk = areaOf(r);
-    if (bk && bk in bucketCr) {
-      bucketCr[bk] += r.credits;
-      const f = fineOf(r.sbjt_cd), bdef = gyBuckets.find((b) => b.key === bk);
-      if (f && bdef && (bdef.areas || []).includes(f)) {   // 영역 카운트·하위영역 학점은 해당 버킷 소속 세부영역만 (수동 override 오염 방지)
-        bucketAreas[bk].add(f);
-        bucketFineCr[bk][f] = (bucketFineCr[bk][f] || 0) + r.credits;
-      }
+    const elig = eligOf(r);
+    if (elig.length === 1) { assign.set(r, elig[0]); addTo(elig[0], r); }
+    else if (elig.length > 1) flexRows.push([r, elig]);
+  }
+  for (const [r, elig] of flexRows) {
+    let best = elig[0], bestDef = byKey[best].min - bucketCr[best];
+    for (const k of elig) {
+      const def = byKey[k].min - bucketCr[k];
+      if (def > bestDef) { best = k; bestDef = def; }
     }
+    assign.set(r, best); addTo(best, r);
   }
   // 학문의 세계 교차배분(pre-25): 하위영역 학점 하한 — 인문·사회계는 자연계 영역 ≥N, 자연·공계는 인문계 영역 ≥N
   const areaMinCr = (b, am) => (am.areas || []).reduce((s, a) => s + ((bucketFineCr[b.key] || {})[a] || 0), 0);
@@ -2656,7 +2677,7 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     gen.append(el("div", { className: "grad-subh" }, "교양 강좌 영역 (코드 자동분류 · 필요 시 수정)"));
     if (!gyRows.length) gen.append(el("div", { className: "grad-note" }, "선택한 시간표에 교양 강좌가 없습니다."));
     gyRows.forEach((r) => {
-      const cur = areaOf(r);
+      const cur = assign.has(r) ? assign.get(r) : "";
       const sel = el("select", { className: "gy-area" + (cur ? "" : " unset"),
         onchange: (e) => { _gradAreaOv[r.sbjt_cd] = e.target.value; _gradSave(GRAD_AREA_KEY, _gradAreaOv); renderGrad(); } },
         el("option", { value: "" }, "미분류"),

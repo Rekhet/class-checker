@@ -6,11 +6,11 @@
   "buckets": [
     { "key": "writing", "name": "글쓰기와 말하기", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 6, "areas": ["foreign"] },
-    { "key": "math", "name": "수학", "min": 3, "areas": ["math"] },
+    { "key": "math", "name": "수학", "min": 3, "areas": ["math", "stat"] },
     { "key": "science", "name": "과학", "min": 4, "areas": ["physics", "chem", "bio", "earth", "science"] },
     { "key": "claves", "name": "지성의 열쇠", "min": 9, "areas": ["culture", "history", "human", "scisense"], "pick_min_areas": 3 },
     { "key": "veritas", "name": "베리타스", "min": 3, "areas": ["veritas"] },
     { "key": "extension", "name": "지성의 확장", "min": 7, "areas": ["x_engage", "x_creative", "x_arts", "x_seminar", "x_classics"] }
   ],
-  "notes": ["베리타스 강좌 2는 고학년 대상이라 이수 대상에서 제외.", "지성의 확장 = 공감과 공존·자율과 창의·예술과 체육·학부생 세미나."]
+  "notes": ["베리타스 강좌 2는 고학년 대상이라 이수 대상에서 제외.", "지성의 확장 = 공감과 공존·자율과 창의·예술과 체육·학부생 세미나. (지식의 세계는 수의예과 미인정 — 2026-1 수강편람 p87~88 확인.)"]
 }

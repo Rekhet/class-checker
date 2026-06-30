@@ -9,7 +9,7 @@
     { "key": "math", "name": "수학", "min": 12, "areas": ["math", "stat"] },
     { "key": "science", "name": "과학", "min": 12, "areas": ["physics", "chem", "bio", "earth", "science"] },
     { "key": "computing", "name": "컴퓨팅", "min": 3, "areas": ["computing"] },
-    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"] },
+    { "key": "world", "name": "학문의 세계", "min": 12, "areas": ["culture", "history", "human", "x_knowledge", "x_creative", "x_arts", "x_seminar"] },
     { "key": "engage", "name": "사회봉사", "min": 1, "areas": ["x_engage"] }
   ]
 }
