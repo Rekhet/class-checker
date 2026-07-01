@@ -2749,6 +2749,16 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
 
 // ---------- wire up ----------
 // ---------- pages (top-nav router) ----------
+// Hash routing: a bare "#trend" is route "trend"/no-param; "#code/M3502.019800"
+// is route "code"/param "M3502.019800". Param-routes render a sub-view inside a
+// host page (code -> explore). Spec 2 adds { prof: "explore" }.
+const PAGE_FOR_ROUTE = { code: "explore", prof: "explore" };
+function parseHash() {
+  const raw = (location.hash || "").slice(1);
+  const i = raw.indexOf("/");
+  if (i === -1) return { route: raw, param: "" };
+  return { route: raw.slice(0, i), param: decodeURIComponent(raw.slice(i + 1)) };
+}
 function showPage(name) {
   const pages = [...$$(".page")];
   if (!pages.length) return;
@@ -2758,6 +2768,12 @@ function showPage(name) {
   if (name === "trend") ensureTrend();   // lazy-init the trend page on first view
   if (name === "grad") renderGrad();     // recompute the audit each view
   window.scrollTo(0, 0);
+}
+function route() {
+  const { route: r, param } = parseHash();
+  const page = PAGE_FOR_ROUTE[r] || r || (($$(".page")[0] || {}).dataset?.page);
+  showPage(page);
+  if (page === "explore") renderExplore(r, param);
 }
 function setupNav() {
   const nav = $("#topnav"); if (!nav) return;
@@ -2770,8 +2786,8 @@ function setupNav() {
     link.onclick = (e) => { e.preventDefault(); location.hash = p.dataset.page; };
     nav.append(link);
   });
-  window.addEventListener("hashchange", () => showPage((location.hash || "").slice(1)));
-  showPage((location.hash || "").slice(1) || ($$(".page")[0] || {}).dataset?.page);
+  window.addEventListener("hashchange", route);
+  route();
 }
 
 function init() {
@@ -2829,6 +2845,10 @@ function init() {
     cntBtn.addEventListener("click", () => runCounts(false));
     $("#cntForceBtn").addEventListener("click", () => runCounts(true));
   }
+  const prBtn = $("#profReviewLoad");    // dev panel — absent in production
+  if (prBtn) prBtn.addEventListener("click", loadProfReview);
+  const clBtn = $("#codeLinkReviewLoad");   // dev panel — absent in production
+  if (clBtn) clBtn.addEventListener("click", loadCodeLinkReview);
   $("#loadMore").addEventListener("click", loadMore);
   $("#expXlsx").addEventListener("click", () => exportSearch("xlsx"));
   $("#expCsv").addEventListener("click", () => exportSearch("csv"));
@@ -2862,6 +2882,408 @@ function flushUI() {
   if (_cardsRaf) { cancelAnimationFrame(_cardsRaf); _cardsRaf = 0; refreshCardStatesNow(); }
   flushMeta();
 }
+// ==================== 강의탐색 (Explore) ====================
+// Cross-semester class/code search + per-sbjt_cd code page, built from the prebuilt
+// data/explore-index.json (interned string tables + integer-coded offering rows).
+let _EX = null;             // decoded index (load-once cache)
+let _exLoading = null;      // in-flight fetch promise (dedupes concurrent callers)
+
+// Row position 2 is an int OR an array of ints (Spec 2 co-professors). Always read
+// as an array so the schema never reshapes.
+function exProfs(row) {
+  const p = row[2];
+  return Array.isArray(p) ? p : [p];
+}
+
+// Known SNU term codes -> Korean short label (reuses the app's SEMESTER_LABEL map).
+function exSemLabel(termIdx) {
+  const t = _EX && _EX.terms[termIdx];
+  if (!t) return "";
+  const [year, code] = t;
+  const lbl = (SEMESTER_LABEL[code] || "").split(" ")[0] || code;
+  return `${year} ${lbl}`;
+}
+
+// Reverse index: profId -> [{ code, o }] over every offering row. Built once (O(N)
+// over all rows) and cached. A co-taught row (position 2 = array) is listed under
+// EACH member's profId, so no professor's class is ever hidden.
+let _exProfIndex = null;
+function exProfIndex() {
+  if (_exProfIndex) return _exProfIndex;
+  const m = new Map();
+  for (const code of _EX.codes) {
+    for (const o of code.o) {
+      for (const pid of exProfs(o)) {
+        let arr = m.get(pid);
+        if (!arr) m.set(pid, arr = []);
+        arr.push({ code, o });
+      }
+    }
+  }
+  _exProfIndex = m;
+  return m;
+}
+
+async function ensureExploreData() {
+  if (_EX) return _EX;
+  if (_exLoading) return _exLoading;
+  _exLoading = (async () => {
+    const raw = await fetch("data/explore-index.json").then((r) => {
+      if (!r.ok) throw new Error(`explore-index ${r.status}`);
+      return r.json();
+    });
+    const byCode = new Map();
+    for (const c of raw.codes) {
+      // searchable string built once: all distinct names for this code + the code itself
+      c.q = (c.names.map((i) => raw.strings.names[i]).join(" ") + " " + c.c).toLowerCase();
+      byCode.set(c.c, c);
+    }
+    const profById = new Map();
+    raw.strings.profs.forEach((p, i) => profById.set(p.id, i));
+    _EX = {
+      version: raw.version, generated: raw.generated,
+      names: raw.strings.names, profs: raw.strings.profs, depts: raw.strings.depts,
+      terms: raw.terms, codes: raw.codes, byCode, profById,
+    };
+    return _EX;
+  })();
+  return _exLoading;
+}
+
+const EX_MAX_RESULTS = 50;
+let _exSearchBound = false;
+
+// Rank codes for a query: fuzzy over the prebuilt per-code searchable string, with a
+// strong boost when the query is a case-insensitive prefix/exact of the sbjt_cd.
+function exSearch(q) {
+  if (!_EX) return [];
+  const query = (q || "").trim();
+  const ql = query.toLowerCase();
+  const scored = [];
+  for (const c of _EX.codes) {
+    let s = nameScore(c.q, query);
+    if (ql && c.c.toLowerCase().startsWith(ql)) s += 6;   // exact/prefix code match wins
+    if (s > 0) scored.push([s, c]);
+  }
+  scored.sort((a, b) => b[0] - a[0]);
+  return scored.slice(0, EX_MAX_RESULTS).map((x) => x[1]);
+}
+
+function exSearchProfs(q) {
+  if (!_EX) return [];
+  const query = (q || "").trim();
+  if (!query) return [];
+  const scored = [];
+  _EX.profs.forEach((p, i) => {
+    const s = nameScore(p.name, query);
+    if (s > 0) scored.push([s, i]);
+  });
+  scored.sort((a, b) => b[0] - a[0]);
+  return scored.slice(0, EX_MAX_RESULTS).map((x) => x[1]);   // profIds
+}
+
+function exProfResultRow(profId) {
+  const p = _EX.profs[profId];
+  const depts = (p.depts || []).map((d) => _EX.depts[d]).filter(Boolean).join(", ") || "정보 없음";
+  const n = (exProfIndex().get(profId) || []).length;
+  const row = el("a", { className: "ex-row ex-row-prof", href: "#prof/" + encodeURIComponent(p.id) },
+    el("span", { className: "ex-name" }, p.name || "정보 없음"),
+    el("span", { className: "ex-tag ex-tag-prof" }, "교수"),
+    el("span", { className: "ex-dept" }, depts),
+    el("span", { className: "ex-meta" }, `강의 ${n}개`));
+  row.onclick = (e) => { e.preventDefault(); location.hash = "#prof/" + encodeURIComponent(p.id); };
+  return row;
+}
+
+function exResultRow(c) {
+  const name = _EX.names[c.names[0]] || "(이름 없음)";
+  const top = c.o[0];                                   // newest offering
+  const dept = _EX.depts[top[3]] || "정보 없음";
+  const sem = exSemLabel(top[0]);
+  const row = el("a", { className: "ex-row", href: "#code/" + encodeURIComponent(c.c) },
+    el("span", { className: "ex-name" }, name),
+    el("span", { className: "ex-code" }, c.c),
+    el("span", { className: "ex-dept" }, dept),
+    el("span", { className: "ex-meta" }, sem));
+  row.onclick = (e) => { e.preventDefault(); location.hash = "#code/" + encodeURIComponent(c.c); };
+  return row;
+}
+
+function renderExploreResults() {
+  const q = $("#exploreQ")?.value || "";
+  const box = $("#exploreResults"); if (!box) return;
+  const profHits = exSearchProfs(q).map(exProfResultRow);
+  const codeHits = exSearch(q).map(exResultRow);
+  box.replaceChildren(...profHits, ...codeHits);
+  const count = $("#exploreCount");
+  if (count) count.textContent = q.trim()
+    ? `교수 ${profHits.length} · 과목 ${codeHits.length}` : "";
+}
+
+function renderExploreSearch() {
+  $("#exploreSearch")?.classList.remove("hidden");
+  $("#exploreDetail")?.classList.add("hidden");
+  if (!_exSearchBound) {
+    const input = $("#exploreQ");
+    if (input) {
+      let t = 0;
+      input.addEventListener("input", () => { clearTimeout(t); t = setTimeout(renderExploreResults, 120); });
+      _exSearchBound = true;
+    }
+  }
+  renderExploreResults();
+}
+
+async function renderExplore(route, param) {
+  await ensureExploreData();
+  if (route === "code" && param) return renderCodeDetail(param);
+  if (route === "prof" && param) return renderProfDetail(param);
+  return renderExploreSearch();
+}
+
+function exProfLinks(row) {
+  const wrap = el("span", { className: "ex-prof-links" });
+  const named = exProfs(row).map((i) => _EX.profs[i]).filter((p) => p && p.name);
+  if (!named.length) { wrap.append(document.createTextNode("정보 없음")); return wrap; }
+  named.forEach((p, k) => {
+    if (k) wrap.append(document.createTextNode(", "));
+    const a = el("a", { className: "ex-plink", href: "#prof/" + encodeURIComponent(p.id) }, p.name);
+    a.onclick = (e) => { e.preventDefault(); location.hash = "#prof/" + encodeURIComponent(p.id); };
+    wrap.append(a);
+  });
+  return wrap;
+}
+
+// chronological sort key for an offering's term: year*10 + season rank.
+// Descending = newest-first (year desc, then 겨울>2학기>여름>1학기 within a year).
+function exTermChrono(termIdx) { const t = _EX.terms[termIdx]; return Number(t[0]) * 10 + termRank(t[1]); }
+
+function renderCodeDetail(sbjt_cd) {
+  $("#exploreSearch")?.classList.add("hidden");
+  const box = $("#exploreDetail"); if (!box) return;
+  box.classList.remove("hidden");
+
+  const c = _EX.byCode.get(sbjt_cd);
+  if (!c) {
+    box.replaceChildren(
+      el("div", { className: "ex-empty" },
+        el("p", {}, "해당 과목코드를 찾을 수 없습니다."),
+        el("a", { className: "ex-back", href: "#explore" }, "← 강의탐색으로")));
+    return;
+  }
+
+  const curName = _EX.names[c.names[0]] || "(이름 없음)";
+  const depts = [...new Set(c.o.map((o) => _EX.depts[o[3]]).filter(Boolean))].join(", ") || "정보 없음";
+
+  const header = el("div", { className: "ex-detail-head" },
+    el("a", { className: "ex-back", href: "#explore" }, "← 강의탐색"),
+    el("h2", { className: "ex-title" }, curName),
+    el("div", { className: "ex-sub" }, `${sbjt_cd} · ${depts}`));
+
+  // rename notice: older distinct names (newest-first, skipping current)
+  const older = c.names.slice(1).map((i) => _EX.names[i]).filter(Boolean);
+  const rename = older.length
+    ? el("div", { className: "ex-rename" }, "이전 명칭: " + older.join(", "))
+    : el("div", { className: "ex-rename hidden" });
+
+  // prev/next code links (Spec 3) filled into the reserved slot; empty -> hidden by CSS.
+  const links = el("div", { id: "exCodeLinks", className: "ex-code-links" });
+  renderCodeLinks(links, c);
+
+  const table = el("div", { className: "ex-hist" });
+  const rows = c.o.slice().sort((a, b) => exTermChrono(b[0]) - exTermChrono(a[0]));  // newest-first
+  let prevTerm = null;
+  for (const o of rows) {
+    const cls = "ex-hrow" + (prevTerm !== null && o[0] !== prevTerm ? " ex-sem-start" : "");
+    prevTerm = o[0];
+    table.append(el("div", { className: cls },
+      el("span", { className: "ex-h-sem" }, exSemLabel(o[0])),
+      el("span", { className: "ex-h-prof" }, exProfLinks(o)),
+      el("span", { className: "ex-h-dept" }, _EX.depts[o[3]] || "정보 없음"),
+      el("span", { className: "ex-h-sec" }, o[5] || "-"),
+      el("span", { className: "ex-h-cr" }, (o[4] || 0) + "학점")));
+  }
+
+  box.replaceChildren(header, rename, links, table);
+  window.scrollTo(0, 0);
+}
+
+function renderProfDetail(profIdStr) {
+  $("#exploreSearch")?.classList.add("hidden");
+  const box = $("#exploreDetail"); if (!box) return;
+  box.classList.remove("hidden");
+
+  const pid = _EX.profById.get(profIdStr);
+  const p = pid == null ? null : _EX.profs[pid];
+  if (!p) {
+    box.replaceChildren(el("div", { className: "ex-empty" },
+      el("p", {}, "해당 교수를 찾을 수 없습니다."),
+      el("a", { className: "ex-back", href: "#explore" }, "← 강의탐색으로")));
+    return;
+  }
+
+  const depts = (p.depts || []).map((d) => _EX.depts[d]).filter(Boolean).join(", ") || "정보 없음";
+  const refs = (exProfIndex().get(pid) || []).slice();   // {code, o}
+  refs.sort((a, b) => exTermChrono(b.o[0]) - exTermChrono(a.o[0]));   // newest-first (year desc, season desc)
+
+  const header = el("div", { className: "ex-detail-head" },
+    el("a", { className: "ex-back", href: "#explore" }, "← 강의탐색"),
+    el("h2", { className: "ex-title" }, p.name || "정보 없음"),
+    el("div", { className: "ex-sub" }, `교수 · ${depts} · 강의 ${refs.length}개`));
+
+  const list = el("div", { className: "ex-hist" });
+  let prevTerm = null;
+  for (const { code, o } of refs) {
+    const others = exProfs(o).filter((i) => i !== pid).map((i) => _EX.profs[i]?.name).filter(Boolean);
+    const nameLink = el("a", { className: "ex-h-name", href: "#code/" + encodeURIComponent(code.c) },
+      _EX.names[o[1]] || "(이름 없음)");
+    nameLink.onclick = (e) => { e.preventDefault(); location.hash = "#code/" + encodeURIComponent(code.c); };
+    const semStart = prevTerm !== null && o[0] !== prevTerm; prevTerm = o[0];
+    const row = el("div", { className: "ex-hrow ex-hrow-prof" + (semStart ? " ex-sem-start" : "") },
+      el("span", { className: "ex-h-sem" }, exSemLabel(o[0])),
+      nameLink,
+      el("span", { className: "ex-h-code" }, code.c),
+      el("span", { className: "ex-h-dept" }, _EX.depts[o[3]] || "정보 없음"));
+    if (others.length) row.append(el("span", { className: "ex-h-co" }, "공동담당: " + others.join(", ")));
+    list.append(row);
+  }
+
+  box.replaceChildren(header, list);
+  window.scrollTo(0, 0);
+}
+
+async function loadProfReview() {
+  const box = $("#profReview"); if (!box) return;
+  await ensureExploreData();
+  const byName = new Map();
+  _EX.profs.forEach((p, i) => {
+    if (!p.name) return;
+    let a = byName.get(p.name); if (!a) byName.set(p.name, a = []);
+    a.push(i);
+  });
+  const groups = [...byName.entries()].filter(([, ids]) => ids.length >= 2);
+  box.replaceChildren(el("div", { className: "pr-count" },
+    `${groups.length}개 그룹 · 같은 사람인 항목만 선택해 병합 (대표 = 강의 최다)`));
+  for (const [name, ids] of groups.slice(0, 200)) {   // cap render
+    const g = el("div", { className: "pr-group" }, el("div", { className: "pr-name" }, name));
+    // One checkbox per identity record; the user ticks only the records that are
+    // genuinely the same person. Canonical = the ticked record with the most
+    // lectures (most-established identity), shown live before commit so nothing
+    // is merged on a hidden assumption.
+    const rows = ids.map((i) => {
+      const p = _EX.profs[i];
+      const depts = (p.depts || []).map((d) => _EX.depts[d]).filter(Boolean).join(", ");
+      const n = (exProfIndex().get(i) || []).length;
+      const cb = el("input", { type: "checkbox" });
+      const node = el("label", { className: "pr-id" }, cb, ` ${depts || "?"} · 강의 ${n}개 · ${p.id.slice(0, 8)}`);
+      return { cb, id: p.id, n, depts: depts || "?", node };
+    });
+    const preview = el("div", { className: "pr-preview" }, "선택 없음");
+    const chosenSet = () => rows.filter((r) => r.cb.checked);
+    const canonOf = (chosen) => chosen.reduce((a, b) => (b.n > a.n ? b : a));
+    const update = () => {
+      const chosen = chosenSet();
+      if (chosen.length < 2) {
+        preview.textContent = chosen.length ? "1개 선택 — 병합하려면 2개 이상" : "선택 없음";
+        return;
+      }
+      const canon = canonOf(chosen);
+      preview.textContent = `대표: ${canon.depts} (강의 ${canon.n}개) ← ` +
+        chosen.filter((r) => r !== canon).map((r) => r.depts).join(", ");
+    };
+    rows.forEach((r) => { r.cb.onchange = update; g.append(r.node); });
+    g.append(preview);
+    const btn = el("button", { className: "pr-merge" }, "선택 병합 Merge selected");
+    btn.onclick = async () => {
+      const chosen = chosenSet();
+      if (chosen.length < 2) { preview.textContent = "2개 이상 선택하세요"; return; }
+      btn.disabled = true;
+      const canon = canonOf(chosen);
+      const members = chosen.filter((r) => r !== canon).map((r) => r.id);
+      try {
+        await api("/api/prof-merge", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ canonical: canon.id, members, note: `${name} selective merge ${new Date().toISOString().slice(0, 10)}` }) });
+        btn.textContent = "저장됨 (다음 export 반영) Saved";
+      } catch { btn.textContent = "실패 Failed"; btn.disabled = false; }
+    };
+    g.append(btn);
+    box.append(g);
+  }
+}
+
+// ---- 과목코드 변경 링크 (Spec 3): fill the reserved #exCodeLinks slot ----
+// Renders 이전/이후 과목코드 as links to #code/<c>. conf 'confirmed' (curated
+// fact) -> plain link; any inference ('high'/'low') -> link + 추정 badge. Display-only.
+function exCodeLinkAnchor(entry) {
+  const target = _EX.byCode.get(entry.c);
+  const nm = target ? (_EX.names[target.names[0]] || "(이름 없음)") : "(알 수 없음)";
+  const a = el("a", { className: "ex-clink", href: "#code/" + encodeURIComponent(entry.c) },
+    el("span", { className: "ex-clink-name" }, nm),
+    el("span", { className: "ex-clink-code" }, entry.c));
+  if (entry.conf !== "confirmed") a.append(el("span", { className: "ex-badge-guess" }, "추정"));
+  a.onclick = (e) => { e.preventDefault(); location.hash = "#code/" + encodeURIComponent(entry.c); };
+  return a;
+}
+
+function renderCodeLinks(container, codeObj) {
+  container.replaceChildren();
+  const prev = codeObj.prev || [];
+  const next = codeObj.next || [];
+  if (!prev.length && !next.length) return;       // stays empty -> hidden by .ex-code-links:empty
+  if (prev.length) {
+    container.append(el("div", { className: "ex-clink-group" },
+      el("span", { className: "ex-clink-label" }, "이전 과목코드"),
+      ...prev.map(exCodeLinkAnchor)));
+  }
+  if (next.length) {
+    container.append(el("div", { className: "ex-clink-group" },
+      el("span", { className: "ex-clink-label" }, "이후 과목코드"),
+      ...next.map(exCodeLinkAnchor)));
+  }
+}
+
+// ---- Dev-only: inferred code-link review (guarded; nodes absent in production) ----
+// Lists EVERY non-confirmed (추정) directed pair — both 'high' and 'low' — so any
+// inference can be promoted to 확정(confirmed, a curated fact) or 거부(suppressed).
+async function loadCodeLinkReview() {
+  const box = $("#codeLinkReview"); if (!box) return;
+  await ensureExploreData();
+  const inferred = [];
+  for (const c of _EX.codes) {
+    for (const e of (c.next || [])) if (e.conf !== "confirmed") inferred.push({ prev: c.c, next: e.c, conf: e.conf });
+  }
+  box.replaceChildren(el("div", { className: "cl-count" }, `${inferred.length}개 추정 링크`));
+  for (const { prev, next, conf } of inferred.slice(0, 200)) {
+    const pc = _EX.byCode.get(prev), nc = _EX.byCode.get(next);
+    const pn = pc ? (_EX.names[pc.names[0]] || "?") : "?";
+    const nn = nc ? (_EX.names[nc.names[0]] || "?") : "?";
+    const g = el("div", { className: "cl-group" },
+      el("div", { className: "cl-pair" },
+        el("span", { className: "cl-conf cl-conf-" + conf }, conf),
+        ` ${pn} (${prev}) → ${nn} (${next})`));
+    const ok = el("button", { className: "cl-confirm" }, "확정 Confirm");
+    const no = el("button", { className: "cl-reject" }, "거부 Reject");
+    ok.onclick = async () => {
+      ok.disabled = no.disabled = true;
+      try {
+        await api("/api/code-link", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prev, next, note: `confirmed ${new Date().toISOString().slice(0, 10)}` }) });
+        ok.textContent = "저장됨 Saved";
+      } catch { ok.textContent = "실패 Failed"; ok.disabled = no.disabled = false; }
+    };
+    no.onclick = async () => {
+      ok.disabled = no.disabled = true;
+      try {
+        await api("/api/code-suppress", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ a: prev, b: next, note: `rejected ${new Date().toISOString().slice(0, 10)}` }) });
+        no.textContent = "저장됨 Saved";
+      } catch { no.textContent = "실패 Failed"; ok.disabled = no.disabled = false; }
+    };
+    g.append(ok, no);
+    box.append(g);
+  }
+}
+
 addEventListener("pagehide", flushMeta);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushMeta(); });
 
