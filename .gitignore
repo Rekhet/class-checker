@@ -11,6 +11,9 @@ data/*.db-wal
 data/*.db-shm
 data/turso.db
 
+# Node / tooling
+node_modules/
+
 # Python / tooling
 .venv/
 __pycache__/
