@@ -1,0 +1,20 @@
+<!-- 강의탐색 (cross-semester Explore): fuzzy class/code search over the prebuilt
+     data/explore-index.json, plus a per-sbjt_cd code detail page. One .page with two
+     sub-views (#exploreSearch / #exploreDetail) toggled by the router. All content is
+     built in app.js (renderExplore / renderExploreSearch / renderCodeDetail). -->
+<div class="page" data-page="explore" data-title="강의탐색">
+<div class="tt-wrap explore-wrap">
+
+  <div id="exploreSearch" class="explore-view">
+    <div class="explore-head">
+      <input id="exploreQ" class="explore-q" type="search" autocomplete="off"
+             placeholder="과목명 또는 과목코드로 전체 학기 검색" aria-label="강의탐색">
+      <span id="exploreCount" class="explore-count"></span>
+    </div>
+    <div id="exploreResults" class="explore-results"></div>
+  </div>
+
+  <div id="exploreDetail" class="explore-view hidden"></div>
+
+</div>
+</div>
