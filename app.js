@@ -2635,6 +2635,26 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
     gi.forEach((it) => chk.append(chkItem(it.label, it.done, it.code)));
   });
   major.append(chk);
+  // 전공선택필수: 전공선택 내 부분집합 게이트. 학점은 전공선택에 이미 산입되므로 reqCreditsFixed(전공필수 학점)에는 넣지 않는다.
+  // slots[] 각각이 한 '과목'(유사교과 codes[] 중 1과목만 인정); min_slots개 이상의 slot을 채워야 함.
+  const selReq = track.select_required;
+  let selReqSlots = 0, selReqDone = 0;
+  if (selReq && Array.isArray(selReq.slots) && selReq.slots.length) {
+    selReqSlots = selReq.min_slots != null ? selReq.min_slots : selReq.slots.length;
+    const selReqItems = selReq.slots.map((s) => {
+      const done = (s.codes || []).some((cd) => takenCodes.has(cd));
+      if (done) selReqDone++;
+      return { label: s.name, code: (s.codes || [])[0], done };
+    });
+    major.append(_gradBar(`전공선택필수 (${Math.min(selReqDone, selReqSlots)}/${selReqSlots}과목)`,
+      Math.min(selReqDone, selReqSlots), selReqSlots, "과목"));
+    const sc = el("div", { className: "grad-chklist" });
+    sc.append(el("div", { className: "grad-note grp" },
+      `${selReq.label || "전공선택필수"} — 아래 ${selReq.slots.length}과목 중 ${selReqSlots}과목 이상`
+      + (selReq.min_credits ? ` (${selReq.min_credits}학점↑, 전공선택 학점에 포함)` : " (전공선택 학점에 포함)")));
+    selReqItems.forEach((it) => sc.append(chkItem(it.label, it.done, it.code)));
+    major.append(sc);
+  }
   if (suriIllegal)
     major.append(el("div", { className: "grad-flag warn" },
       el("span", {}, `⚠ ${track.name}은 수리통계(${suri.combined.code}) 이수 불가 — 수리통계 1·2로 이수해야 하며 전공학점에서 제외됨`)));
@@ -2730,6 +2750,7 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   let ok = majorCr >= track.major_min_credits && reqDoneN >= reqTotalN && !suriIllegal;
   if (track.select_min > 0) ok = ok && majorSelRows.length >= track.select_min;
   if (selectMinCredits > 0) ok = ok && selectCredits >= selectMinCredits;
+  if (selReqSlots > 0) ok = ok && selReqDone >= selReqSlots;
   if (track.general) {
     ok = ok && totalCr >= spec.total_credits && gyTotal >= ((ruleset && ruleset.total_min) || 0)
       && gyBuckets.every((b) => bucketCr[b.key] >= b.min

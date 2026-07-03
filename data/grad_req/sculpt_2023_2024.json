@@ -33,11 +33,11 @@
   },
   "major_required_known": [
     {
-      "name": "미술이론",
+      "name": "한국미술과 문화",
       "code": "600.228A"
     },
     {
-      "name": "미술이론(공통)",
+      "name": "서양미술사",
       "code": "M2182.000100"
     }
   ],
@@ -47,21 +47,168 @@
       "name": "심화전공(단일전공)",
       "major_min_credits": 60,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국미술과 문화",
+            "code": "600.228A",
+            "credits": 3
+          },
+          {
+            "name": "서양미술사",
+            "code": "M2182.000100",
+            "credits": 3
+          },
+          {
+            "name": "조소 기초1",
+            "code": "M1767.000200",
+            "credits": 2
+          },
+          {
+            "name": "조소 기초2",
+            "code": "M1767.000300",
+            "credits": 2
+          },
+          {
+            "name": "조소 1",
+            "code": "603.201",
+            "credits": 2
+          },
+          {
+            "name": "조소 2",
+            "code": "603.202",
+            "credits": 2
+          },
+          {
+            "name": "현대조각론 1",
+            "code": "603.413",
+            "credits": 3
+          },
+          {
+            "name": "조각입문세미나1",
+            "code": "603.418",
+            "credits": 2
+          },
+          {
+            "name": "조각입문세미나2",
+            "code": "603.419",
+            "credits": 2
+          }
+        ]
+      }
     },
     {
       "key": "multi",
       "name": "주전공(다전공)",
       "major_min_credits": 39,
       "general": true,
-      "select_min": 0
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국미술과 문화",
+            "code": "600.228A",
+            "credits": 3
+          },
+          {
+            "name": "서양미술사",
+            "code": "M2182.000100",
+            "credits": 3
+          },
+          {
+            "name": "조소 기초1",
+            "code": "M1767.000200",
+            "credits": 2
+          },
+          {
+            "name": "조소 기초2",
+            "code": "M1767.000300",
+            "credits": 2
+          },
+          {
+            "name": "조소 1",
+            "code": "603.201",
+            "credits": 2
+          },
+          {
+            "name": "조소 2",
+            "code": "603.202",
+            "credits": 2
+          },
+          {
+            "name": "현대조각론 1",
+            "code": "603.413",
+            "credits": 3
+          },
+          {
+            "name": "조각입문세미나1",
+            "code": "603.418",
+            "credits": 2
+          },
+          {
+            "name": "조각입문세미나2",
+            "code": "603.419",
+            "credits": 2
+          }
+        ]
+      }
     },
     {
       "key": "double",
       "name": "복수전공",
       "major_min_credits": 39,
       "general": false,
-      "select_min": 0
+      "select_min": 0,
+      "required": {
+        "all": [
+          {
+            "name": "한국미술과 문화",
+            "code": "600.228A",
+            "credits": 3
+          },
+          {
+            "name": "서양미술사",
+            "code": "M2182.000100",
+            "credits": 3
+          },
+          {
+            "name": "조소 기초1",
+            "code": "M1767.000200",
+            "credits": 2
+          },
+          {
+            "name": "조소 기초2",
+            "code": "M1767.000300",
+            "credits": 2
+          },
+          {
+            "name": "조소 1",
+            "code": "603.201",
+            "credits": 2
+          },
+          {
+            "name": "조소 2",
+            "code": "603.202",
+            "credits": 2
+          },
+          {
+            "name": "현대조각론 1",
+            "code": "603.413",
+            "credits": 3
+          },
+          {
+            "name": "조각입문세미나1",
+            "code": "603.418",
+            "credits": 2
+          },
+          {
+            "name": "조각입문세미나2",
+            "code": "603.419",
+            "credits": 2
+          }
+        ]
+      }
     },
     {
       "key": "minor",
@@ -75,6 +222,7 @@
     "⚠ BASELINE-ASSUMED: 미술대학은 졸업총학점·전공 by track 학점이 학과 사이트에 미게시. 졸업 130 / 단일전공 60 / 복수 39 / 부전공 21은 SNU 학칙 baseline 가정값 — 미대 행정실 졸업사정표로 확정 필요.",
     "교양 = art_2025 어댑터(36학점, 5과 공통).",
     "⚠ 조소과 전필 * 코드는 본 스크레이프 미수집 — 동일 패턴(?catemenu=Courses&type=major)으로 추출 필요. required.all 미생성(코드 미상). 공통 이론과목 풀 600.228A·M2182.* = 5과 공통으로 추정.",
-    "외국어진행강좌 최소 과목수: 페이지 미명시 — baseline 1과목."
+    "외국어진행강좌 최소 과목수: 페이지 미명시 — baseline 1과목.",
+    "⚠ FIX(2026-07-02): art.snu.ac.kr 조소과 이수표준형태 「* 전공필수」 범례 확인. 이전엔 전필 2과목(이름도 오기: 미술이론→한국미술과문화/서양미술사)만 있고 required 게이트 없었음. 카탈로그·라이브 양쪽 전필인 9과목을 required.all에 추가(21학점). 목조/석조/금속조 1·2·현대조각론2(603.203~208,603.414)는 라이브 *전필이나 카탈로그 전선(택일 실기 가능성) → 미게이팅, 직접확인."
   ]
 }

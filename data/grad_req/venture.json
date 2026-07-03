@@ -52,12 +52,14 @@
       "major_min_credits": 39,
       "general": false,
       "select_min": 0,
+      "required_credits": 15,
       "required": { "all": [] }
     }
   ],
   "notes": [
     "제2전공 전용(단독 졸업 불가). 연합전공 39학점(전필 15=5과목 + 전선 24, 그중 연합개설 9↑), 평점평균 2.0 이상. (2023 선발자~.)",
     "data grade: ect.snu.ac.kr HTML표 — 전필 과목명만, sbjt_cd 미표기. 코드 미검증(카탈로그 부재)으로 required.all에서 제외, major_required_known에 과목명만 수록.",
+    "⚠ FIX(2026-07-02): required.all=[]만 있어 전공필수 게이트가 아예 없던 문제 → track.required_credits=15 추가(출처: ect 전필 15학점). 코드 부재로 과목 단위 판정은 불가하므로 '전공필수 15학점 — 직접 확인' 학점 게이트로만 반영(nursing 패턴), 5과목명은 major_required_known 유지. selectMinCredits=39-15=24로 전선 하한도 출처(전선 24)와 일치. code:null을 required.all에 넣으면 영구 false-fail이라 금지.",
     "전필 5과목(각 3학점): 벤처창업론, 기술트렌드와 사업기회분석, 창조와 혁신, 사회적 기업의 창업, 창업론실습1/창업론실습2(둘 다 이수 시 1과목만 전필·나머지 전선).",
     "참여 4개 학과: 철학·경영·컴공·식품동물생명. 졸업논문 = 창업사례보고서/창업계획서(S/U).",
     "deptless 연합전공: 카탈로그에 본 전공 태그 과목 없음 → 전공학점은 external_recognition으로만 집계. 참여 4개학과(철학/경영/컴공/식품동물생명) + scrape 인정코드 인정. 상한 없음(cardinal-safe). any_dept 미사용. 전필 코드 카탈로그 부재로 과목명 매칭 불가 — depts 기반 집계."

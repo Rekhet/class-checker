@@ -37,7 +37,8 @@
       "major_min_credits": 62,
       "general": true,
       "select_min": 0,
-      "recog_max": 0
+      "recog_max": 0,
+      "required_credits": 46
     },
     {
       "key": "multi",
@@ -45,7 +46,8 @@
       "major_min_credits": 45,
       "general": true,
       "select_min": 0,
-      "recog_max": 0
+      "recog_max": 0,
+      "required_credits": 46
     },
     {
       "key": "double",
@@ -53,7 +55,8 @@
       "major_min_credits": 39,
       "general": false,
       "select_min": 0,
-      "recog_max": 0
+      "recog_max": 0,
+      "required_credits": 46
     },
     {
       "key": "minor",
@@ -70,6 +73,7 @@
     "전공선택: 전선 16학점 중 학부 전선 4과목 필수(select_min 16에 반영; 4과목 필수 풀은 카탈로그 참조).",
     "외국어진행강좌: 전공 1과목 포함 3과목 이상.",
     "공과대학 공통과목 3학점(전필 인정).",
-    "전공필수: 학부 게시 표가 전필 학점/코드를 분리 명시하지 않음(전공 62·전선 4과목 필수만) → required.all 생략, required_credits 미설정."
+    "전공필수: 학부 게시 표가 전필 학점/코드를 분리 명시하지 않음(전공 62·전선 4과목 필수만) → required.all 생략, required_credits 미설정.",
+    "⚠ FIX(2026-07-02): 라이브 화학생물공학부 게시(전필 46학점/전선 16, 2026 · 전필 43/전선 19, 2023) — 이전 spec은 전필 학점 미명시였음. required_credits 추가(2026=46, 2023=43). 표준형태 **표시 선택필수(분석화학·응용생화학·화학산업경영·화학생물공학세미나)는 필수 과목수 규정 미확인이라 미모델링(직접확인)."
   ]
 }

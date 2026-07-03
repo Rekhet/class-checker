@@ -18,14 +18,15 @@
     { "name": "선형대수학1" },
     { "name": "현대대수학1" },
     { "name": "수학교육론" },
-    { "name": "위상수학1" }
+    { "name": "위상수학1" },
+    { "name": "수학교육과졸업논문지도", "code": "M1867.000800", "credits": 3 }
   ],
   "tracks": [
-    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 15,
+    { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 18,
       "required": { "all": [] } },
-    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 15,
+    { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 18,
       "required": { "all": [] } },
-    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 15,
+    { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 18,
       "required": { "all": [] } },
     { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
       "required": { "all": [] } }

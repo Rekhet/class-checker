@@ -23,9 +23,33 @@
   ],
   "external_recognition": { "colleges": ["사회과학대학"], "approval_max_credits": 9 },
   "tracks": [
-    { "key": "single", "name": "심화전공(단일전공)", "recog_max": 9, "major_min_credits": 60, "general": true, "select_min": 0 },
-    { "key": "multi", "name": "주전공(다전공)", "recog_max": 9, "major_min_credits": 39, "general": true, "select_min": 0 },
-    { "key": "double", "name": "복수전공", "recog_max": 9, "major_min_credits": 39, "general": false, "select_min": 0 },
+    { "key": "single", "name": "심화전공(단일전공)", "recog_max": 9, "major_min_credits": 60, "general": true, "select_min": 0, "required_credits": 18,
+      "required": { "all": [
+        { "name": "사회복지개론", "code": "209.112", "credits": 3 },
+        { "name": "사회복지조사", "code": "209.213", "credits": 3 },
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 },
+        { "name": "사회복지정책", "code": "209.304", "credits": 3 },
+        { "name": "사회복지실천론", "code": "209.320", "credits": 3 },
+        { "name": "사회복지현장실습", "code": "209.319", "credits": 3 }
+      ] } },
+    { "key": "multi", "name": "주전공(다전공)", "recog_max": 9, "major_min_credits": 39, "general": true, "select_min": 0, "required_credits": 18,
+      "required": { "all": [
+        { "name": "사회복지개론", "code": "209.112", "credits": 3 },
+        { "name": "사회복지조사", "code": "209.213", "credits": 3 },
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 },
+        { "name": "사회복지정책", "code": "209.304", "credits": 3 },
+        { "name": "사회복지실천론", "code": "209.320", "credits": 3 },
+        { "name": "사회복지현장실습", "code": "209.319", "credits": 3 }
+      ] } },
+    { "key": "double", "name": "복수전공", "recog_max": 9, "major_min_credits": 39, "general": false, "select_min": 0, "required_credits": 18,
+      "required": { "all": [
+        { "name": "사회복지개론", "code": "209.112", "credits": 3 },
+        { "name": "사회복지조사", "code": "209.213", "credits": 3 },
+        { "name": "인간행동과 사회환경", "code": "209.219", "credits": 3 },
+        { "name": "사회복지정책", "code": "209.304", "credits": 3 },
+        { "name": "사회복지실천론", "code": "209.320", "credits": 3 },
+        { "name": "사회복지현장실습", "code": "209.319", "credits": 3 }
+      ] } },
     { "key": "minor", "name": "부전공", "recog_max": 0, "major_min_credits": 21, "general": false, "select_min": 0 }
   ],
   "notes": [
@@ -35,6 +59,7 @@
     "전공선택 최소: 별도 카운트 없음(총학점 − 전필).",
     "타과 전선 인정: 사회과학대학 개설 모든 전공과목(전필/전선) 최대 9학점(2025-1 수강분~). S/U 인정 불가. 복수전공 사회대 내 타과 9학점 중복인정.",
     "외국어진행강좌 최소 과목수 명시 없음 — baseline 1과목.",
-    "사회복지현장실습 209.319 포함(표준형태). 졸업논문 제출(별도 안내)."
+    "사회복지현장실습 209.319 포함(표준형태). 졸업논문 제출(별도 안내).",
+    "⚠ FIX(2026-07-02): socwelf_2023 트랙에 required 블록이 없어 전필 6과목이 게이팅되지 않던 문제 수정. socialwelfare.snu.ac.kr ug-curriculum 라이브 확인된 6과목(209.112/213/219/304/320/319, 각 3학점, 계 18학점)을 단일/다전공/복수 트랙 required.all에 추가. 부전공 전필은 미확인이라 미추가."
   ]
 }

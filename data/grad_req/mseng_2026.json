@@ -15,7 +15,7 @@
   "major_select_match": { "departments": ["재료공학부"], "classifications": ["전선"] },
   "major_required_known": [
     { "name": "재료공학원리", "code": "445.102A" },
-    { "name": "재료공학", "code": "445.206" }
+    { "name": "결정학개론", "code": "445.206" }
   ],
   "tracks": [
     { "key": "single", "name": "주전공(단일전공)", "major_min_credits": 63, "general": true, "select_min": 0, "recog_max": 0 },

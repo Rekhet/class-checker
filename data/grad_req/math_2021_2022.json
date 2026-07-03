@@ -14,7 +14,6 @@
   "major_select_match": { "departments": ["수리과학"], "classifications": ["전선"] },
   "major_required_known": [
     { "name": "해석개론 및 연습 1", "code": "M1407.000600" },
-    { "name": "해석개론 및 연습 2", "code": "M1407.000700" },
     { "name": "현대대수학 1", "code": "881.301" }
   ],
   "dept_required_general": [],

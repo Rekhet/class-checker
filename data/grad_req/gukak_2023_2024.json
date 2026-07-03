@@ -10,7 +10,7 @@
   "source": "https://music.snu.ac.kr/rule/10 → 「국악과-학사」. 상세: _scrape/music_browser.md | 2023·2024 batch: OLD 공통교육과정(학문의 기초/세계), 전공은 2026과 동일(stable) 가정. liberaledu_2024.pdf.",
   "total_credits": 130,
   "general": "music_2022",
-  "major_min_credits": 60,
+  "major_min_credits": 56,
   "major_double_credits": 38,
   "minor_credits": 31,
   "english_min_courses": 1,
@@ -34,18 +34,18 @@
     {
       "key": "single",
       "name": "심화전공(단일전공)",
-      "major_min_credits": 60,
+      "major_min_credits": 56,
       "general": true,
       "select_min": 0,
-      "required_credits": 43
+      "required_credits": 39
     },
     {
       "key": "multi",
       "name": "주전공(다전공)",
-      "major_min_credits": 60,
+      "major_min_credits": 56,
       "general": true,
       "select_min": 0,
-      "required_credits": 43
+      "required_credits": 39
     },
     {
       "key": "double",

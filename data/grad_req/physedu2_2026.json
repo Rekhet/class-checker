@@ -34,7 +34,10 @@
         { "name": "파동 및 광학교육", "code": "717.332", "credits": 3 },
         { "name": "열통계물리 및 교육", "code": "717.428A", "credits": 3 },
         { "name": "물리교육실험", "code": "717.327A", "credits": 2 },
-        { "name": "물리교육론", "code": "717.329", "credits": 3 }
+        { "name": "물리교육론", "code": "717.329", "credits": 3 },
+        { "name": "일반물리학 및 실험2", "code": "700.252", "credits": 4 },
+        { "name": "물리실험 및 시범1", "code": "717.204A", "credits": 2 },
+        { "name": "물리실험 및 시범2", "code": "717.228", "credits": 2 }
       ] } },
     { "key": "multi", "name": "주전공(다전공 병행)", "major_min_credits": 52, "general": true, "select_min": 0, "required_credits": 34,
       "required": { "all": [
@@ -46,7 +49,10 @@
         { "name": "파동 및 광학교육", "code": "717.332", "credits": 3 },
         { "name": "열통계물리 및 교육", "code": "717.428A", "credits": 3 },
         { "name": "물리교육실험", "code": "717.327A", "credits": 2 },
-        { "name": "물리교육론", "code": "717.329", "credits": 3 }
+        { "name": "물리교육론", "code": "717.329", "credits": 3 },
+        { "name": "일반물리학 및 실험2", "code": "700.252", "credits": 4 },
+        { "name": "물리실험 및 시범1", "code": "717.204A", "credits": 2 },
+        { "name": "물리실험 및 시범2", "code": "717.228", "credits": 2 }
       ] } },
     { "key": "double", "name": "복수전공", "major_min_credits": 52, "general": false, "select_min": 0, "required_credits": 34,
       "required": { "all": [
@@ -58,7 +64,10 @@
         { "name": "파동 및 광학교육", "code": "717.332", "credits": 3 },
         { "name": "열통계물리 및 교육", "code": "717.428A", "credits": 3 },
         { "name": "물리교육실험", "code": "717.327A", "credits": 2 },
-        { "name": "물리교육론", "code": "717.329", "credits": 3 }
+        { "name": "물리교육론", "code": "717.329", "credits": 3 },
+        { "name": "일반물리학 및 실험2", "code": "700.252", "credits": 4 },
+        { "name": "물리실험 및 시범1", "code": "717.204A", "credits": 2 },
+        { "name": "물리실험 및 시범2", "code": "717.228", "credits": 2 }
       ] } },
     { "key": "minor", "name": "부전공", "major_min_credits": 21, "general": false, "select_min": 0,
       "required": { "all": [] } }
@@ -66,7 +75,7 @@
   "notes": [
     "졸업 130학점, 전체·전공 평점 각 2.0 이상.",
     "단일전공 60 (전공필수 34 포함). 다전공 병행(복수·부·연합·연계·학생설계) 52 = 전필 34 + 전선 18.",
-    "⚠ 전공필수 = 졸업사정 표상 34학점이나, edu.md에 코드가 명시된 핵심 9과목 합은 26학점(역학/양자물리/전자기 등 2단계 과목 일부 미열거). required_credits=34는 학과 명시값, required.all은 확인된 코드만 — 차액 8학점은 학번별 이수표 확인 권장.",
+    "⚠ FIX(2026-07-02): physed.snu.ac.kr/2025학번 라이브 재확인 결과 전공필수 34학점 = 12과목. 이전엔 9과목(26학점)만 인코딩되어 8학점 누락. 카탈로그 전필 확인된 3과목 추가(일반물리학및실험2 700.252/4학점·물리실험및시범1 717.204A/2·물리실험및시범2 717.228/2 = +8) → 12과목 34학점, required_credits=34와 정확히 일치.",
     "교과교육: 물리교육론 포함 3과목 8학점 이상 (과학논리 및 논술 2 · 물리교재 연구 및 지도법 3 · 물리교수법 3).",
     "외국어진행강좌: 졸업사정 페이지 최소 과목수 미명시 → 사범대 baseline 전공 3학점 포함 9학점(english_min_courses=3) 적용(근사).",
     "부전공 전공필수·이수규정 페이지 미명시 → required 비움(근사, baseline 21학점).",

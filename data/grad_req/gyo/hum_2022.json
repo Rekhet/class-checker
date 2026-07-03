@@ -10,7 +10,7 @@
   "buckets": [
     { "key": "writing", "name": "사고와 표현", "min": 4, "areas": ["writing"] },
     { "key": "foreign", "name": "외국어", "min": 12, "areas": ["foreign"] },
-    { "key": "world", "name": "학문의 세계", "min": 15, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "area_min": [ { "areas": ["scisense"], "min": 3, "ref": true, "label": "자연과 기술·생명과 환경 (학문의기초 이공계 1과목으로 대체 가능)" } ] },
+    { "key": "world", "name": "학문의 세계", "min": 15, "areas": ["culture", "history", "human", "scisense", "x_knowledge", "x_engage", "x_creative", "x_arts", "x_seminar"], "pick_min_areas": 2, "area_min": [ { "areas": ["scisense"], "min": 3, "ref": true, "label": "자연과 기술·생명과 환경 (학문의기초 이공계 1과목으로 대체 가능)" } ] },
     { "key": "classics", "name": "고전 원전 읽기", "min": 2, "areas": ["x_classics"] }
   ],
   "notes": ["외국어 12 = 제2외국어 9(중급이상 1과목 포함) + 영어 3(TEPS 따라 3 또는 6).", "학문의 세계: 4개 영역 이상에서 15학점 이상 + 언어와문학/문화와예술/역사와철학 권장과목(*) 중 1과목 필수.", "선택교양 소그룹 고전원전읽기 1 또는 2 중 1과목(2학점) = classics."]

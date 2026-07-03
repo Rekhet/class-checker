@@ -15,8 +15,8 @@
   "major_select_match": { "departments": ["공예과"], "classifications": ["전선"] },
   "major_required_match": { "departments": ["공예과"], "classifications": ["전필"] },
   "major_required_known": [
-    { "name": "미술이론", "code": "600.228A" },
-    { "name": "미술이론(공통)", "code": "M2182.000100" }
+    { "name": "한국미술과 문화", "code": "600.228A" },
+    { "name": "서양미술사", "code": "M2182.000100" }
   ],
   "tracks": [
     { "key": "single", "name": "심화전공(단일전공)", "major_min_credits": 60, "general": true, "select_min": 0 },

@@ -12,12 +12,12 @@
     "E51": "x_seminar", "E52": "x_seminar",
 
     "L0440": "writing", "L0441": "foreign", "L0442": "math", "L0443": "science", "L0444": "computing",
-    "L0545": "culture", "L0546": "history", "L0547": "human", "L0549": "scisense", "L0550": "scisense", "L0551": "scisense",
+    "L0545": "culture", "L0546": "culture", "L0547": "history", "L0548": "human", "L0549": "human", "L0550": "scisense", "L0551": "scisense",
     "L0655": "veritas",
     "L0652": "x_knowledge", "L0653": "x_engage", "L0654": "x_creative", "L0656": "x_arts",
 
     "031": "writing", "032": "foreign", "033": "math", "034": "science", "035": "computing",
-    "041": "culture", "042": "history", "043": "human", "044": "human", "045": "scisense", "046": "scisense", "047": "scisense",
+    "041": "culture", "042": "culture", "043": "history", "044": "human", "045": "human", "046": "scisense", "047": "scisense",
     "051": "x_knowledge", "052": "x_engage", "053": "x_creative", "054": "x_arts", "055": "x_seminar"
   },
   "exceptions": {
