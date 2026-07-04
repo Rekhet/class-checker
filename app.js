@@ -70,7 +70,21 @@ async function termRows(year, term) {
   const key = `${year}|${term}`;
   if (!_termData.has(key)) {
     const meta = (await dataIndex()).terms.find((t) => t.year === year && t.term === term);
-    _termData.set(key, meta ? await fetch("data/classes/" + meta.file).then((r) => r.json()) : []);
+    // Load one term's rows ISOLATED: a missing / 404 / unparseable file yields [] for
+    // THIS term only, never a rejection. Otherwise a single absent term file (e.g. a
+    // year deleted from data/classes/ while still listed in index.json) would reject
+    // the whole multi-term loop in rowsForScope and blank out EVERY year's results.
+    let rows = [];
+    if (meta) {
+      try {
+        const r = await fetch("data/classes/" + meta.file);
+        if (r.ok) rows = await r.json();
+        else console.warn(`term ${meta.file}: HTTP ${r.status} — skipped`);
+      } catch (e) {
+        console.warn(`term ${meta.file}: unreadable — skipped (${e.message})`);
+      }
+    }
+    _termData.set(key, rows);
   }
   return _termData.get(key);
 }
@@ -483,7 +497,7 @@ async function loadClassifications() {
 const gradeBucket = (g) => {
   const s = String(g ?? "");
   const n = parseInt(s, 10);
-  return n >= 5 ? "5+학년" : s;
+  return n >= 5 ? "5학년 +" : s;
 };
 const gradeLabel = (g) => {
   if (g === "0") return "전학년 All-yr";
