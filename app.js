@@ -91,7 +91,8 @@ async function termRows(year, term) {
 // does the query narrow results by anything other than year/term?
 function hasOtherFilters(f) {
   return !!(f.name || f.department || f.day != null || f.period != null
-    || f.classifications?.length || f.levels?.length || f.grades?.length);
+    || f.classifications?.length || f.levels?.length || f.grades?.length
+    || f.gradings?.length || f.switchableOnly);
 }
 // which term files to load. Year/term scope them; otherwise every matching term
 // is searched so "all years" is complete. Only a TRULY empty query (no filters at
@@ -143,6 +144,9 @@ function matchRow(c, f) {
   }
   if (f.room && !has(c.room, f.room)) return false;
   if (f.englishOnly && c.language !== "영어") return false;
+  // 평가방식 미수집(옛 데이터, c.grading 없음) 강좌는 평가방식 필터에서 제외된다
+  if (f.gradings?.length && !f.gradings.includes(c.grading)) return false;
+  if (f.switchableOnly && c.grading_switch !== "Y") return false;
   if (f.day != null || f.period != null) {
     if (!(c.slots || []).some((s) =>
       (f.day == null || s.day_index === f.day) && (f.period == null || s.period === f.period)))
@@ -206,7 +210,8 @@ async function lookupLocal(keys) {
 
 // ---------- export (client-side: no backend) ----------
 const EXPORT_HEADERS = ["연도", "학기", "교과목명", "교수", "단과대학", "학과", "교과목번호",
-  "강좌번호", "학점", "학년", "이수구분", "정원", "재학생정원", "신입생정원", "신청", "수업시간"];
+  "강좌번호", "학점", "학년", "이수구분", "정원", "재학생정원", "신입생정원", "신청",
+  "평가방식", "평가방식전환가능", "수업시간"];
 function fmtSlotsExport(slots) {
   return (slots || []).filter((s) => s.day_index != null && s.start_time)
     .map((s) => `${DAYS[s.day_index]}(${s.start_time}~${s.end_time || ""})`).join("/");
@@ -217,7 +222,8 @@ function exportRow(c) {
     c.name || "", c.professor || "", c.college || "", c.department || "",
     c.sbjt_cd || "", c.lt_no || "", c.credits ?? "", c.grade || "",
     (c.classification || []).join(" "), q ?? "", ret ?? "",
-    (q != null && ret != null) ? q - ret : "", c.applied ?? "", fmtSlotsExport(c.slots)];
+    (q != null && ret != null) ? q - ret : "", c.applied ?? "",
+    c.grading || "", c.grading_switch || "", fmtSlotsExport(c.slots)];
 }
 function rowsToCsv(classes) {
   const esc = (v) => { v = String(v ?? ""); return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
@@ -354,14 +360,18 @@ function buildFilters() {
   adv.append(el("div", { className: "chips", id: "typeChips" }));
   adv.append(el("div", { className: "adv-label" }, "학년"));
   adv.append(el("div", { className: "chips", id: "gradeChips" }));
+  adv.append(el("div", { className: "adv-label" }, "평가방식"));
+  adv.append(el("div", { className: "chips", id: "gradingChips" }));
 
   const empty = el("input", { type: "checkbox", id: "emptyOnly" });   // only classes that fit the free slots
   const timed = el("input", { type: "checkbox", id: "timedOnly" });   // only classes with a scheduled time
   const eng = el("input", { type: "checkbox", id: "englishOnly" });   // only 영어강의
+  const sw = el("input", { type: "checkbox", id: "switchableOnly" }); // only 평가방식 전환가능
   adv.append(el("div", { className: "adv-checks" },
     el("label", {}, empty, " 빈 시간만"),
     el("label", {}, timed, " 시간 배정만"),
-    el("label", {}, eng, " 영어강의만")));
+    el("label", {}, eng, " 영어강의만"),
+    el("label", {}, sw, " 평가방식 전환가능만")));
   form.append(adv);
 
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
@@ -517,6 +527,18 @@ async function loadGrades() {
   } catch { /* grade filter optional */ }
 }
 
+// 평가방식 (성적부여형태): 미수집 데이터셋(index.json에 gradings 없음)이어도 칩은
+// 항상 뜨도록 고정 목록으로 폴백; 필터 결과가 빈 것은 데이터 부재의 올바른 표현.
+const GRADING_FALLBACK = ["A~F", "S/U", "S+/S/U"];
+async function loadGradings() {
+  let list = GRADING_FALLBACK;
+  try {
+    const { gradings } = await dataIndex();
+    if (gradings?.length) list = gradings;
+  } catch { /* grading filter optional */ }
+  fillChips("gradingChips", list);
+}
+
 async function loadStatus() {
   if (!$("#status")) return;   // status line is dev-only (absent on the production page)
   try {
@@ -597,10 +619,12 @@ function currentFilters() {
     classifications: chipVals("typeChips"),   // 이수구분 (전선/전필/교양…)
     levels: chipVals("levelChips"),            // 과정 (학사/석사/박사…)
     grades: chipVals("gradeChips"),
+    gradings: chipVals("gradingChips"),        // 평가방식 (A~F / S/U / S+/S/U)
     day: num("day"), period: num("period"),
     credits: (() => { const v = val("credits"); return v === "" ? null : (v === "4+" ? "4+" : Number(v)); })(),
     room: val("roomFilter"),
     englishOnly: $("#englishOnly")?.checked || false,
+    switchableOnly: $("#switchableOnly")?.checked || false,   // 평가방식 전환가능만
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
   };
@@ -693,6 +717,9 @@ function renderResults(classes, append = false) {
     const tags = [];
     if (c.language === "영어") tags.push(el("span", { className: "rtag eng" }, "영어"));
     if (c.status === "폐강대상") tags.push(el("span", { className: "rtag warn" }, "폐강대상"));
+    // A~F가 기본이므로 S/U 계열만 태그로 표시; 전환가능은 별도 태그
+    if (c.grading && c.grading !== "A~F") tags.push(el("span", { className: "rtag su" }, c.grading));
+    if (c.grading_switch === "Y") tags.push(el("span", { className: "rtag sw" }, "전환가능"));
     card.append(bar,
       el("div", { className: "rbody" },
         el("div", { className: "rname" }, c.name, ...tags),
@@ -1260,6 +1287,8 @@ function renderDetail() {
     : "-");
   kv("코드", `${c.sbjt_cd || ""}(${c.lt_no || ""})`);
   if (c.room) kv("강의실", c.room);
+  if (c.grading)
+    kv("평가방식", c.grading + (c.grading_switch === "Y" ? " · 전환가능" : ""));
   body.append(grid);
 
   const seats = [];
@@ -2833,6 +2862,7 @@ function init() {
   loadDepartments();
   loadClassifications();
   loadGrades();
+  loadGradings();
   loadTimeStats();
   loadStatus().then((s) => {
     // if a refresh is already running (e.g. page reload), resume polling

@@ -161,8 +161,13 @@ h2 { font-size: 14px; margin: 0; font-weight: 700; }
   background: transparent; color: var(--cp-chipInk); border: 1px solid var(--cp-line);
 }
 .chip-tog.on { background: var(--cp-accent); color: var(--cp-accentInk); border-color: var(--cp-accent); }
-.adv-checks { display: flex; gap: 16px; margin-top: 13px; font-size: 12.5px; color: var(--cp-ink); }
-.adv-checks label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+/* Checkbox labels NEVER wrap their text (aesthetically horrible). Fit cascade:
+   one line -> flex-wrap into 2 rows -> row per checkbox; if even a single label
+   overflows the rail, the container query shrinks the text instead of wrapping. */
+.adv-checks { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 13px;
+  font-size: 12.5px; color: var(--cp-ink); container-type: inline-size; }
+.adv-checks label { display: flex; align-items: center; gap: 6px; cursor: pointer;
+  white-space: nowrap; flex: 0 0 auto; font-size: min(12.5px, 8cqw); }
 .adv-checks input { accent-color: var(--cp-accent); }
 
 button {
@@ -204,6 +209,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   border-radius: 4px; vertical-align: middle; }
 .rtag.eng { background: var(--cp-accent); color: var(--cp-accentInk); }
 .rtag.warn { background: var(--cp-conflict); color: #fff; }
+.rtag.su { background: var(--cp-warn); color: #fff; }            /* 평가방식 S/U 계열 */
+.rtag.sw { background: var(--cp-ok); color: #fff; }              /* 평가방식 전환가능 */
 
 /* wishlist bar + panel */
 .wish-bar { display: flex; align-items: center; gap: 8px; padding: 8px 18px 0; }
