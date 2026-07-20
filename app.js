@@ -1633,6 +1633,10 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function downloadJson(obj, filename) {
+  downloadBlob(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }), filename);
+}
+
 // Export/import carry only the *connection* to a class (year|term|sbjt_cd|lt_no), never a
 // frozen copy of its data. Re-importing rebuilds each entry from the CURRENT catalog, so a
 // file exported before a class's time was set (or while it differed) reflects today's time
@@ -1675,20 +1679,25 @@ async function resolveEntries(arr) {
   return { entries, dropped };
 }
 
+// Shared import preamble: parse the uploaded JSON, accept either a bare array or
+// a {version, <key>: [...]} envelope, then resolve refs against the live catalog.
+// Returns resolveEntries' {entries, dropped} or null (already alerted) on any failure.
+async function readImportFile(file, key, label) {
+  let data;
+  try { data = JSON.parse(await file.text()); }
+  catch { alert(`불러올 수 없는 ${label} 파일입니다.`); return null; }
+  const arr = Array.isArray(data) ? data : data[key];
+  if (!Array.isArray(arr)) { alert(`불러올 수 없는 ${label} 파일입니다.`); return null; }
+  return await resolveEntries(arr);
+}
+
 // loadable timetable file: our own JSON, re-imported by importTTJson below
 function exportTTJson() {
   if (!timetable.length) { alert("시간표가 비어 있습니다."); return; }
-  const blob = new Blob([JSON.stringify({ version: 2, timetable: timetable.map(classRef) }, null, 2)],
-    { type: "application/json" });
-  downloadBlob(blob, "timetable.json");
+  downloadJson({ version: 2, timetable: timetable.map(classRef) }, "timetable.json");
 }
 async function importTTJson(file) {
-  let data;
-  try { data = JSON.parse(await file.text()); }
-  catch { alert("불러올 수 없는 시간표 파일입니다."); return; }
-  const arr = Array.isArray(data) ? data : data.timetable;
-  if (!Array.isArray(arr)) { alert("불러올 수 없는 시간표 파일입니다."); return; }
-  const res = await resolveEntries(arr);
+  const res = await readImportFile(file, "timetable", "시간표");
   if (!res) return;                         // lookup failed — keep current timetable
   pushUndo();
   timetable = res.entries;
@@ -1699,18 +1708,12 @@ async function importTTJson(file) {
 }
 function exportWishlist() {
   if (!wishlist.length) { alert("찜한 강좌가 없습니다."); return; }
-  const blob = new Blob([JSON.stringify({ version: 2, wishlist: wishlist.map(classRef) }, null, 2)], { type: "application/json" });
-  downloadBlob(blob, "wishlist.json");
+  downloadJson({ version: 2, wishlist: wishlist.map(classRef) }, "wishlist.json");
 }
 // merge (dedupe by classKey) rather than replace, so importing on another device adds
 // to — never wipes — the local list.
 async function importWishlist(file) {
-  let data;
-  try { data = JSON.parse(await file.text()); }
-  catch { alert("불러올 수 없는 찜 목록 파일입니다."); return; }
-  const arr = Array.isArray(data) ? data : data.wishlist;
-  if (!Array.isArray(arr)) { alert("불러올 수 없는 찜 목록 파일입니다."); return; }
-  const res = await resolveEntries(arr);
+  const res = await readImportFile(file, "wishlist", "찜 목록");
   if (!res) return;
   const have = new Set(wishlist.map(classKey));
   let added = 0;
