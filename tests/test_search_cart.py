@@ -29,9 +29,12 @@ class SearchCartDisplayTests(unittest.TestCase):
         cls.server.server_close()
         cls.thread.join(timeout=5)
 
-    def test_regular_search_result_shows_current_cart_count(self) -> None:
+    def test_regular_search_result_shows_cart_count_and_competition_rate(self) -> None:
         rows = json.loads(TERM_DATA.read_text(encoding="utf-8"))
-        target = next(row for row in rows if row.get("cart") is not None)
+        target = next(
+            row for row in rows
+            if row.get("cart") is not None and row.get("quota") not in (None, 0)
+        )
         page_errors: list[str] = []
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
@@ -48,15 +51,21 @@ class SearchCartDisplayTests(unittest.TestCase):
                 page.fill("#name", target["name"])
                 page.click("#searchForm button[type=submit]")
                 expected = f"장바구니 {target['cart']}"
+                expected_rate = (
+                    f"경쟁률 {target['cart'] / target['quota']:.2f}:1"
+                    f" ({target['cart']}/{target['quota']})"
+                )
                 page.wait_for_function(
                     "expected => [...document.querySelectorAll('#results .rmeta')]"
-                    ".some((node) => node.textContent.includes(expected))",
-                    arg=expected,
+                    ".some((node) => node.textContent.includes(expected.cart) && "
+                    "node.textContent.includes(expected.rate))",
+                    arg={"cart": expected, "rate": expected_rate},
                     timeout=10000,
                 )
 
                 result_text = page.locator("#results .rmeta").all_text_contents()
                 self.assertTrue(any(expected in text for text in result_text))
+                self.assertTrue(any(expected_rate in text for text in result_text))
                 self.assertFalse(page_errors, page_errors)
             finally:
                 browser.close()

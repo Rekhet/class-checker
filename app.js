@@ -699,7 +699,12 @@ function renderResults(classes, append = false) {
       if (c.quota_returning != null)   // 재학생/신입생 split, same as the detail drawer
         seats += ` (재학생 ${c.quota_returning}·신입생 ${(c.quota ?? 0) - c.quota_returning})`;
     }
-    if (c.cart != null) seats += ` · 장바구니 ${c.cart}`;
+    if (c.cart != null) {
+      seats += ` · 장바구니 ${c.cart}`;
+      const cart = Number(c.cart), quota = Number(c.quota);
+      if (Number.isFinite(cart) && Number.isFinite(quota) && quota > 0)
+        seats += ` · 경쟁률 ${(cart / quota).toFixed(2)}:1 (${c.cart}/${c.quota})`;
+    }
     const card = el("li", { className: "rcard" });
     card.addEventListener("click", () => openDetail(c));        // open the detail drawer
     card.addEventListener("mouseenter", () => startHoverPreview(c));
