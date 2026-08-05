@@ -699,6 +699,7 @@ function renderResults(classes, append = false) {
       if (c.quota_returning != null)   // 재학생/신입생 split, same as the detail drawer
         seats += ` (재학생 ${c.quota_returning}·신입생 ${(c.quota ?? 0) - c.quota_returning})`;
     }
+    if (c.cart != null) seats += ` · 장바구니 ${c.cart}`;
     const card = el("li", { className: "rcard" });
     card.addEventListener("click", () => openDetail(c));        // open the detail drawer
     card.addEventListener("mouseenter", () => startHoverPreview(c));
