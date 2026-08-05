@@ -56,6 +56,482 @@ async function api(path, opts) {
   return r.json();
 }
 
+// ---------- JSON boundary validation ----------
+// Static JSON is the application's data API. Keep validation local and dependency-free:
+// reject malformed collection-level payloads, discard malformed catalog rows, and never
+// let untrusted values reach HTML markup or SVG attributes. There are deliberately no
+// payload-size or array-length limits here; published data may grow normally.
+function _isRecord(v) { return v !== null && typeof v === "object" && !Array.isArray(v); }
+function _isString(v) { return typeof v === "string"; }
+function _isFiniteNumber(v) { return typeof v === "number" && Number.isFinite(v); }
+function _isInteger(v) { return Number.isInteger(v); }
+function _isNullable(v, predicate) { return v == null || predicate(v); }
+function _safeJsonFile(v) {
+  return _isString(v) && /^[A-Za-z0-9][A-Za-z0-9._-]*\.json$/.test(v) && !v.includes("..");
+}
+function _jsonError(source, detail) { return new Error(`${source}: ${detail}`); }
+function _assertJson(ok, source, detail) { if (!ok) throw _jsonError(source, detail); }
+function _validStringArray(v) { return Array.isArray(v) && v.every(_isString); }
+function _optionalStringArray(v) { return v == null || _validStringArray(v); }
+function _validateCourseRule(v, source = "course rule") {
+  if (!_isRecord(v)) return `${source} must be an object`;
+  if (!_isString(v.name)) return `${source}.name must be a string`;
+  if (!_isNullable(v.code, _isString)) return `${source}.code must be a string or null`;
+  if (!_isNullable(v.credits, _isFiniteNumber)) return `${source}.credits must be a number or null`;
+  if (!_isNullable(v.dept, _isString)) return `${source}.dept must be a string or null`;
+  return null;
+}
+function _validateCourseRules(v, source = "course rules") {
+  if (v == null) return null;
+  if (!Array.isArray(v)) return `${source} must be an array`;
+  for (let i = 0; i < v.length; i++) {
+    const error = _validateCourseRule(v[i], `${source}[${i}]`);
+    if (error) return error;
+  }
+  return null;
+}
+function _validateRequiredGroup(v, source = "required group") {
+  if (!_isRecord(v)) return `${source} must be an object`;
+  if (!_isNullable(v.label, _isString)) return `${source}.label must be a string`;
+  if (!_isNullable(v.min_courses, _isInteger) || (v.min_courses != null && v.min_courses < 0))
+    return `${source}.min_courses must be a non-negative integer`;
+  if (!_isNullable(v.min_credits, _isFiniteNumber) || (v.min_credits != null && v.min_credits < 0))
+    return `${source}.min_credits must be a non-negative number`;
+  return _validateCourseRules(v.pool, `${source}.pool`);
+}
+function _validateRequiredSpec(v, source = "required specification") {
+  if (v == null) return null;
+  if (!_isRecord(v)) return `${source} must be an object`;
+  for (const key of ["all", "pool"]) {
+    const error = _validateCourseRules(v[key], `${source}.${key}`);
+    if (error) return error;
+  }
+  for (const key of ["groups", "choose"]) {
+    if (v[key] == null) continue;
+    if (!Array.isArray(v[key])) return `${source}.${key} must be an array`;
+    for (let i = 0; i < v[key].length; i++) {
+      const error = _validateRequiredGroup(v[key][i], `${source}.${key}[${i}]`);
+      if (error) return error;
+    }
+  }
+  if (!_isNullable(v.label, _isString)) return `${source}.label must be a string`;
+  if (!_isNullable(v.note, _isString)) return `${source}.note must be a string`;
+  if (!_isNullable(v.min_courses, _isInteger) || (v.min_courses != null && v.min_courses < 0))
+    return `${source}.min_courses must be a non-negative integer`;
+  if (!_isNullable(v.min_credits, _isFiniteNumber) || (v.min_credits != null && v.min_credits < 0))
+    return `${source}.min_credits must be a non-negative number`;
+  return null;
+}
+function _validateSelectRequired(v, source = "select-required specification") {
+  if (v == null) return null;
+  if (!_isRecord(v)) return `${source} must be an object`;
+  if (!_isNullable(v.label, _isString)) return `${source}.label must be a string`;
+  if (!_isNullable(v.min_slots, _isInteger) || (v.min_slots != null && v.min_slots < 0))
+    return `${source}.min_slots must be a non-negative integer`;
+  if (!_isNullable(v.min_credits, _isFiniteNumber) || (v.min_credits != null && v.min_credits < 0))
+    return `${source}.min_credits must be a non-negative number`;
+  if (v.slots == null) return null;
+  if (!Array.isArray(v.slots)) return `${source}.slots must be an array`;
+  for (let i = 0; i < v.slots.length; i++) {
+    const slot = v.slots[i];
+    if (!_isRecord(slot) || !_isString(slot.name) || !_validStringArray(slot.codes))
+      return `${source}.slots[${i}] must contain a name and string code array`;
+  }
+  return null;
+}
+function _validateMatchRule(v, source = "match rule") {
+  if (v == null) return null;
+  if (!_isRecord(v) || !_validStringArray(v.departments) || !_validStringArray(v.classifications))
+    return `${source} must contain department and classification string arrays`;
+  return null;
+}
+function _validateExternalRecognition(v, source = "external recognition") {
+  if (v == null) return null;
+  if (!_isRecord(v)) return `${source} must be an object`;
+  const courses = _validateCourseRules(v.courses, `${source}.courses`);
+  if (courses) return courses;
+  for (const key of ["code_prefixes", "colleges", "depts"])
+    if (!_optionalStringArray(v[key])) return `${source}.${key} must be an array of strings`;
+  if (!_isNullable(v.any_dept, (x) => typeof x === "boolean")) return `${source}.any_dept must be boolean`;
+  if (!_isNullable(v.approval_max_credits, _isFiniteNumber))
+    return `${source}.approval_max_credits must be a number`;
+  if (!_isNullable(v.note, _isString)) return `${source}.note must be a string`;
+  return null;
+}
+function _validateSuri(v, source = "suri rule") {
+  if (v == null) return null;
+  if (!_isRecord(v) || !Array.isArray(v.seq)) return `${source}.seq must be an array`;
+  const seq = _validateCourseRules(v.seq, `${source}.seq`);
+  if (seq) return seq;
+  return v.combined == null ? null : _validateCourseRule(v.combined, `${source}.combined`);
+}
+function _validateTrack(v, source = "track") {
+  if (!_isRecord(v)) return `${source} must be an object`;
+  for (const key of ["key", "name"])
+    if (!_isString(v[key])) return `${source}.${key} must be a string`;
+  for (const key of ["major_min_credits", "select_min", "required_credits", "recog_max",
+    "recog_max_courses", "english_min_courses"])
+    if (!_isNullable(v[key], _isFiniteNumber)) return `${source}.${key} must be a number`;
+  if (!_isNullable(v.general, (x) => typeof x === "boolean")) return `${source}.general must be boolean`;
+  if (!_isNullable(v.suri_sub, (x) => typeof x === "boolean")) return `${source}.suri_sub must be boolean`;
+  const required = _validateRequiredSpec(v.required, `${source}.required`);
+  if (required) return required;
+  return _validateSelectRequired(v.select_required, `${source}.select_required`);
+}
+function _validateDeptGeneral(v, source = "department general requirement") {
+  if (v == null) return null;
+  if (!Array.isArray(v)) return `${source} list must be an array`;
+  for (let i = 0; i < v.length; i++) {
+    if (!_isRecord(v[i]) || !_isString(v[i].name) || !_isNullable(v[i].area, _isString))
+      return `${source}[${i}] must contain a name and optional area`;
+  }
+  return null;
+}
+
+function _emptyClassIndex() {
+  return { terms: [], departments: [], classifications: [], grades: [], gradings: [] };
+}
+function _validateClassIndex(raw, source = "class index") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  _assertJson(Array.isArray(raw.terms), source, "terms must be an array");
+  raw.terms.forEach((t, i) => {
+    _assertJson(_isRecord(t), source, `terms[${i}] must be an object`);
+    _assertJson(_isString(t.year) && _isString(t.term) && _isString(t.label), source,
+      `terms[${i}] has invalid identity fields`);
+    _assertJson(_isInteger(t.count) && t.count >= 0, source,
+      `terms[${i}].count must be a non-negative integer`);
+    _assertJson(_safeJsonFile(t.file), source,
+      `terms[${i}].file is not a safe JSON filename`);
+    _assertJson(t.trend == null || _safeJsonFile(t.trend), source,
+      `terms[${i}].trend is not a safe JSON filename`);
+  });
+  for (const key of ["departments", "classifications", "grades", "gradings"])
+    _assertJson(raw[key] == null || _validStringArray(raw[key]), source,
+      `${key} must be an array of strings`);
+  return {
+    terms: raw.terms,
+    departments: raw.departments || [],
+    classifications: raw.classifications || [],
+    grades: raw.grades || [],
+    gradings: raw.gradings || [],
+  };
+}
+
+function _validateSlot(slot, source = "slot") {
+  if (!_isRecord(slot)) return `${source} must be an object`;
+  if (!_isInteger(slot.class_id)) return `${source}.class_id must be an integer`;
+  if (!_isNullable(slot.day_index, _isInteger)) return `${source}.day_index must be an integer or null`;
+  if (!_isNullable(slot.period, _isInteger)) return `${source}.period must be an integer or null`;
+  if (!_isNullable(slot.start_time, _isString)) return `${source}.start_time must be a string or null`;
+  if (!_isNullable(slot.end_time, _isString)) return `${source}.end_time must be a string or null`;
+  return null;
+}
+function _validateStoredSlot(slot, source = "stored slot") {
+  if (!_isRecord(slot)) return `${source} must be an object`;
+  if (slot.class_id != null && !_isInteger(slot.class_id)) return `${source}.class_id must be an integer`;
+  if (!_isNullable(slot.day_index, _isInteger)) return `${source}.day_index must be an integer or null`;
+  if (!_isNullable(slot.period, _isInteger)) return `${source}.period must be an integer or null`;
+  if (!_isNullable(slot.start_time, _isString)) return `${source}.start_time must be a string or null`;
+  if (!_isNullable(slot.end_time, _isString)) return `${source}.end_time must be a string or null`;
+  return null;
+}
+function _validateClassRow(row, source = "class row") {
+  if (!_isRecord(row)) return `${source} must be an object`;
+  for (const key of ["term", "year", "shtm_fg", "deta_shtm_fg", "sbjt_cd", "lt_no",
+    "subh_cd", "name", "professor", "department"])
+    if (!_isString(row[key])) return `${source}.${key} must be a string`;
+  for (const key of ["id", "credits", "applied"])
+    if (!_isInteger(row[key])) return `${source}.${key} must be an integer`;
+  if (!_validStringArray(row.classification))
+    return `${source}.classification must be an array of strings`;
+  for (const key of ["enrolled", "quota", "quota_returning", "cart"])
+    if (!_isNullable(row[key], _isInteger)) return `${source}.${key} must be an integer or null`;
+  for (const key of ["grade", "college", "language", "status", "room", "grading", "grading_switch"])
+    if (!_isNullable(row[key], _isString)) return `${source}.${key} must be a string or null`;
+  if (!Array.isArray(row.slots)) return `${source}.slots must be an array`;
+  for (let i = 0; i < row.slots.length; i++) {
+    const error = _validateSlot(row.slots[i], `${source}.slots[${i}]`);
+    if (error) return error;
+  }
+  return null;
+}
+function _validateClassRows(raw, source = "class rows") {
+  _assertJson(Array.isArray(raw), source, "expected an array");
+  const rows = [];
+  raw.forEach((row, i) => {
+    const error = _validateClassRow(row, `${source}[${i}]`);
+    if (error) console.warn(`${error} — row skipped`);
+    else rows.push(row);
+  });
+  return rows;
+}
+
+function _validateTrendData(raw, source = "trend data") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  _assertJson(Array.isArray(raw.ts), source, "ts must be an array");
+  _assertJson(raw.ts.every((v) => _isString(v) && !Number.isNaN(Date.parse(v))), source,
+    "ts must contain valid date strings");
+  _assertJson(_isRecord(raw.series), source, "series must be an object");
+  for (const [key, series] of Object.entries(raw.series)) {
+    _assertJson(_isRecord(series), source, `series.${key} must be an object`);
+    for (const metric of ["a", "c", "e", "q"]) {
+      const values = series[metric];
+      _assertJson(Array.isArray(values) && values.length === raw.ts.length, source,
+        `series.${key}.${metric} must match ts length`);
+      _assertJson(values.every((v) => v == null || _isInteger(v)), source,
+        `series.${key}.${metric} must contain integers or null`);
+    }
+  }
+  _assertJson(raw.updated == null || _isString(raw.updated), source, "updated must be a string");
+  _assertJson(raw.closed == null || typeof raw.closed === "boolean", source, "closed must be boolean");
+  _assertJson(raw.closedAt == null || _isString(raw.closedAt), source, "closedAt must be a string");
+  return raw;
+}
+
+function _emptyExploreData() {
+  return { version: 0, generated: "", names: [], profs: [], depts: [], terms: [], codes: [],
+    byCode: new Map(), profById: new Map() };
+}
+function _validateExploreData(raw, source = "explore index") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  _assertJson(_isInteger(raw.version), source, "version must be an integer");
+  _assertJson(_isString(raw.generated), source, "generated must be a string");
+  _assertJson(_isRecord(raw.strings), source, "strings must be an object");
+  const strings = raw.strings;
+  _assertJson(_validStringArray(strings.names), source, "strings.names must be an array of strings");
+  _assertJson(_validStringArray(strings.depts), source, "strings.depts must be an array of strings");
+  _assertJson(Array.isArray(strings.profs), source, "strings.profs must be an array");
+  strings.profs.forEach((p, i) => {
+    _assertJson(_isRecord(p) && _isString(p.id) && _isString(p.name), source,
+      `strings.profs[${i}] has invalid identity fields`);
+    _assertJson(Array.isArray(p.depts) && p.depts.every((d) => _isInteger(d)
+      && d >= 0 && d < strings.depts.length), source,
+      `strings.profs[${i}].depts must contain valid department indexes`);
+  });
+  _assertJson(Array.isArray(raw.terms), source, "terms must be an array");
+  raw.terms.forEach((t, i) => _assertJson(Array.isArray(t) && t.length === 2
+    && _isString(t[0]) && _isString(t[1]), source, `terms[${i}] must be [year, term]`));
+  _assertJson(Array.isArray(raw.codes), source, "codes must be an array");
+  raw.codes.forEach((c, i) => {
+    _assertJson(_isRecord(c) && _isString(c.c) && Array.isArray(c.names) && c.names.length > 0,
+      source, `codes[${i}] has invalid identity fields`);
+    _assertJson(c.names.every((n) => _isInteger(n) && n >= 0 && n < strings.names.length), source,
+      `codes[${i}].names contains an invalid name index`);
+    for (const direction of ["prev", "next"]) {
+      if (c[direction] == null) continue;
+      _assertJson(Array.isArray(c[direction]), source, `codes[${i}].${direction} must be an array`);
+      c[direction].forEach((link, j) => _assertJson(_isRecord(link) && _isString(link.c)
+        && (link.conf == null || _isString(link.conf)), source,
+        `codes[${i}].${direction}[${j}] has invalid fields`));
+    }
+    _assertJson(Array.isArray(c.o) && c.o.length > 0, source, `codes[${i}].o must be a non-empty array`);
+    c.o.forEach((o, j) => {
+      _assertJson(Array.isArray(o) && o.length >= 6, source, `codes[${i}].o[${j}] has too few fields`);
+      _assertJson(_isInteger(o[0]) && o[0] >= 0 && o[0] < raw.terms.length, source,
+        `codes[${i}].o[${j}] has an invalid term index`);
+      _assertJson(_isInteger(o[1]) && o[1] >= 0 && o[1] < strings.names.length, source,
+        `codes[${i}].o[${j}] has an invalid name index`);
+      const profs = Array.isArray(o[2]) ? o[2] : [o[2]];
+      _assertJson(profs.every((p) => _isInteger(p) && p >= 0 && p < strings.profs.length), source,
+        `codes[${i}].o[${j}] has an invalid professor index`);
+      _assertJson(_isInteger(o[3]) && o[3] >= 0 && o[3] < strings.depts.length, source,
+        `codes[${i}].o[${j}] has an invalid department index`);
+      _assertJson(_isInteger(o[4]), source, `codes[${i}].o[${j}].credits must be an integer`);
+      _assertJson(_isString(o[5]), source, `codes[${i}].o[${j}].lt_no must be a string`);
+    });
+  });
+  return raw;
+}
+
+function _validateStoredEntry(c, source = "stored entry") {
+  if (!_isRecord(c)) return `${source} must be an object`;
+  if (c.manual != null && typeof c.manual !== "boolean") return `${source}.manual must be boolean`;
+  for (const key of ["year", "term", "sbjt_cd", "lt_no"])
+    if (!_isString(c[key])) return `${source}.${key} must be a string`;
+  if (c.manual === true && !_isString(c.name))
+    return `${source}.name must be a string for manual entries`;
+  for (const key of ["name", "professor"])
+    if (!_isNullable(c[key], _isString)) return `${source}.${key} must be a string or null`;
+  if (!_isNullable(c.credits, _isInteger)) return `${source}.credits must be an integer or null`;
+  for (const key of ["manual", "removed", "timeChanged"])
+    if (c[key] != null && typeof c[key] !== "boolean") return `${source}.${key} must be boolean`;
+  if (c.slots != null) {
+    if (!Array.isArray(c.slots)) return `${source}.slots must be an array`;
+    for (let i = 0; i < c.slots.length; i++) {
+      const error = _validateStoredSlot(c.slots[i], `${source}.slots[${i}]`);
+      if (error) return error;
+    }
+  }
+  return null;
+}
+function _validateStoredEntries(raw, source = "stored entries") {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  raw.forEach((entry, i) => {
+    const error = _validateStoredEntry(entry, `${source}[${i}]`);
+    if (error) console.warn(`${error} — entry skipped`);
+    else out.push(entry);
+  });
+  return out;
+}
+function _validateSheetMeta(raw) {
+  if (!_isRecord(raw) || !Array.isArray(raw.ids) || !raw.ids.every(_isInteger)) return null;
+  const objectKeys = ["names", "counts", "seen", "sems"];
+  if (!objectKeys.every((key) => raw[key] == null || _isRecord(raw[key]))) return null;
+  if (raw.active != null && !_isInteger(raw.active)) return null;
+  if (raw.nextId != null && !_isInteger(raw.nextId)) return null;
+  if (raw.names && !Object.values(raw.names).every(_isString)) return null;
+  if (raw.counts && !Object.values(raw.counts).every((v) => _isInteger(v) && v >= 0)) return null;
+  if (raw.sems && !Object.values(raw.sems).every((v) => v == null || _isString(v))) return null;
+  if (raw.seen && !Object.values(raw.seen).every(_isString)) return null;
+  if (raw.cur != null && !_isString(raw.cur)) return null;
+  return raw;
+}
+function _validateImportEntries(raw, label) {
+  _assertJson(Array.isArray(raw), label, "expected an array");
+  raw.forEach((entry, i) => {
+    const error = _validateStoredEntry(entry, `${label}[${i}]`);
+    if (error) throw _jsonError(label, error);
+  });
+  return raw;
+}
+
+function _validateGradIndex(raw, source = "graduation index") {
+  _assertJson(Array.isArray(raw), source, "expected an array");
+  return raw.filter((entry, i) => {
+    const valid = _isRecord(entry) && _isString(entry.id) && _isString(entry.major)
+      && _isString(entry.batch) && _safeJsonFile(entry.file);
+    if (!valid) console.warn(`${source}[${i}] is invalid — entry skipped`);
+    return valid;
+  });
+}
+function _validateGradSpec(raw, source = "graduation spec") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  for (const key of ["id", "major"])
+    _assertJson(_isString(raw[key]), source, `${key} must be a string`);
+  _assertJson(_isString(raw.batch) || _validStringArray(raw.batch), source,
+    "batch must be a string or an array of strings");
+  for (const key of ["college", "source"])
+    _assertJson(raw[key] == null || _isString(raw[key]), source, `${key} must be a string`);
+  for (const key of ["total_credits", "major_min_credits", "major_double_credits", "minor_credits", "english_min_courses"])
+    _assertJson(raw[key] == null || _isFiniteNumber(raw[key]), source, `${key} must be a number`);
+  _assertJson(raw.general == null || (_isString(raw.general) && _safeJsonFile(`${raw.general}.json`)), source,
+    "general must be a safe JSON file stem");
+  _assertJson(raw.notes == null || _validStringArray(raw.notes), source, "notes must be an array of strings");
+  for (const [key, validator] of [
+    ["major_required_known", _validateCourseRules],
+    ["dept_required_general", _validateDeptGeneral],
+    ["major_required_match", _validateMatchRule],
+    ["major_select_match", _validateMatchRule],
+    ["external_recognition", _validateExternalRecognition],
+    ["suri", _validateSuri],
+  ]) {
+    const error = validator(raw[key], `${source}.${key}`);
+    _assertJson(!error, source, error || `${key} has an invalid type`);
+  }
+  _assertJson(raw.track == null || _isRecord(raw.track) || _isString(raw.track), source,
+    "track has an invalid type");
+  if (raw.tracks != null) {
+    _assertJson(Array.isArray(raw.tracks), source, "tracks must be an array");
+    raw.tracks.forEach((track, i) => {
+      const error = _validateTrack(track, `${source}.tracks[${i}]`);
+      _assertJson(!error, source, error || "track has an invalid type");
+    });
+  }
+  return raw;
+}
+function _emptyAreaCodes() {
+  return { codes: {}, exceptions: {}, flex_recognition: {}, gwonjang: [], junggeup: [] };
+}
+function _validateAreaCodes(raw, source = "general-education area codes") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  for (const key of ["codes", "exceptions"]) {
+    _assertJson(raw[key] == null || _isRecord(raw[key]), source, `${key} must be an object`);
+    if (raw[key]) for (const [name, value] of Object.entries(raw[key]))
+      _assertJson(_isString(value), source, `${key}.${name} must be a string`);
+  }
+  _assertJson(raw.flex_recognition == null || _isRecord(raw.flex_recognition), source,
+    "flex_recognition must be an object");
+  if (raw.flex_recognition) for (const [name, value] of Object.entries(raw.flex_recognition))
+    _assertJson(name.startsWith("_") ? _isString(value) : _validStringArray(value), source,
+      `flex_recognition.${name} must be a string array`);
+  for (const key of ["gwonjang_codes", "junggeup_codes"])
+    _assertJson(raw[key] == null || _validStringArray(raw[key]), source, `${key} must be an array of strings`);
+  for (const key of ["note", "gwonjang_note", "junggeup_note"])
+    _assertJson(raw[key] == null || _isString(raw[key]), source, `${key} must be a string`);
+  return { codes: raw.codes || {}, exceptions: raw.exceptions || {}, flex_recognition: raw.flex_recognition || {},
+    gwonjang: raw.gwonjang_codes || [], junggeup: raw.junggeup_codes || [] };
+}
+function _validateCodeEquiv(raw, source = "course-code equivalence") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  _assertJson(raw.canon == null || _isRecord(raw.canon), source, "canon must be an object");
+  if (raw.canon) for (const [key, value] of Object.entries(raw.canon))
+    _assertJson(_isString(key) && _isString(value), source, "canon entries must map strings to strings");
+  return raw.canon || {};
+}
+function _validateGyo(raw, source = "general-education rules") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  _assertJson(_isString(raw.id), source, "id must be a string");
+  _assertJson(_isNullable(raw.total_min, _isFiniteNumber), source, "total_min must be a number or null");
+  _assertJson(Array.isArray(raw.buckets), source, "buckets must be an array");
+  raw.buckets.forEach((b, i) => {
+    _assertJson(_isRecord(b) && _isString(b.key) && _isString(b.name) && _isFiniteNumber(b.min), source,
+      `buckets[${i}] has invalid identity or minimum`);
+    _assertJson(b.areas == null || _validStringArray(b.areas), source,
+      `buckets[${i}].areas must be an array of strings`);
+    _assertJson(b.pick_min_areas == null || (_isInteger(b.pick_min_areas) && b.pick_min_areas >= 0), source,
+      `buckets[${i}].pick_min_areas must be a non-negative integer`);
+    if (b.area_min != null) {
+      _assertJson(Array.isArray(b.area_min), source, `buckets[${i}].area_min must be an array`);
+      b.area_min.forEach((a, j) => {
+        _assertJson(_isRecord(a) && _validStringArray(a.areas) && _isFiniteNumber(a.min), source,
+          `buckets[${i}].area_min[${j}] has invalid fields`);
+        _assertJson(a.label == null || _isString(a.label), source,
+          `buckets[${i}].area_min[${j}].label must be a string`);
+        _assertJson(a.ref == null || typeof a.ref === "boolean", source,
+          `buckets[${i}].area_min[${j}].ref must be boolean`);
+      });
+    }
+  });
+  _assertJson(raw.college == null || _isString(raw.college), source, "college must be a string");
+  _assertJson(raw.notes == null || _validStringArray(raw.notes), source, "notes must be an array of strings");
+  if (raw.required_one_of != null) {
+    _assertJson(Array.isArray(raw.required_one_of), source, "required_one_of must be an array");
+    raw.required_one_of.forEach((r, i) => {
+      _assertJson(_isRecord(r) && _isString(r.list) && _isInteger(r.min_courses)
+        && r.min_courses >= 0 && _isString(r.label), source,
+        `required_one_of[${i}] has invalid fields`);
+      _assertJson(r.note == null || _isString(r.note), source,
+        `required_one_of[${i}].note must be a string`);
+    });
+  }
+  for (const key of ["applies", "note"])
+    _assertJson(raw[key] == null || _isString(raw[key]), source, `${key} must be a string`);
+  _assertJson(raw.total_min_diagnostic == null || _isFiniteNumber(raw.total_min_diagnostic), source,
+    "total_min_diagnostic must be a number");
+  return raw;
+}
+function _validateStatus(raw, source = "status response") {
+  _assertJson(_isRecord(raw), source, "expected an object");
+  if (raw.counts != null) {
+    _assertJson(_isRecord(raw.counts), source, "counts must be an object");
+    for (const key of ["classes", "slots", "terms"])
+      _assertJson(raw.counts[key] == null || _isFiniteNumber(raw.counts[key]), source, `counts.${key} must be numeric`);
+  }
+  for (const key of ["refresh", "counts_refresh"])
+    _assertJson(raw[key] == null || _isRecord(raw[key]), source, `${key} must be an object`);
+  return raw;
+}
+function _validateTimeStats(raw, source = "time statistics") {
+  _assertJson(Array.isArray(raw), source, "expected an array");
+  raw.forEach((s, i) => {
+    _assertJson(_isRecord(s) && _isString(s.year) && _isString(s.term)
+      && _isFiniteNumber(s.total) && _isFiniteNumber(s.timed), source,
+      `${source}[${i}] has invalid fields`);
+  });
+  return raw;
+}
+
 // ---------- static data layer ----------
 // Catalog comes from prebuilt JSON in /data/classes (index.json + one file per term), so
 // the page needs no backend. The same files are served by the Python server too,
@@ -63,7 +539,16 @@ async function api(path, opts) {
 let _dataIndex = null;
 const _termData = new Map();   // "year|term" -> [class rows]
 async function dataIndex() {
-  if (!_dataIndex) _dataIndex = await fetch("data/classes/index.json").then((r) => r.json());
+  if (!_dataIndex) {
+    try {
+      const r = await fetch("data/classes/index.json");
+      if (!r.ok) throw new Error(`class index HTTP ${r.status}`);
+      _dataIndex = _validateClassIndex(await r.json());
+    } catch (e) {
+      console.error(`class index rejected: ${e.message}`);
+      _dataIndex = _emptyClassIndex();
+    }
+  }
   return _dataIndex;
 }
 async function termRows(year, term) {
@@ -78,7 +563,7 @@ async function termRows(year, term) {
     if (meta) {
       try {
         const r = await fetch("data/classes/" + meta.file);
-        if (r.ok) rows = await r.json();
+        if (r.ok) rows = _validateClassRows(await r.json(), `term ${meta.file}`);
         else console.warn(`term ${meta.file}: HTTP ${r.status} — skipped`);
       } catch (e) {
         console.warn(`term ${meta.file}: unreadable — skipped (${e.message})`);
@@ -542,7 +1027,7 @@ async function loadGradings() {
 async function loadStatus() {
   if (!$("#status")) return;   // status line is dev-only (absent on the production page)
   try {
-    const s = await api("/api/status");
+    const s = _validateStatus(await api("/api/status"));
     const c = s.counts;
     let txt = `강좌 ${c.classes} · 시간셀 ${c.slots} · 학기 ${c.terms}`;
     if (s.backend) txt += ` · DB ${s.backend}`;
@@ -565,8 +1050,9 @@ let timeStats = [];
 async function loadTimeStats() {
   if (!$("#statTerm")) return;   // stats panel — absent on a production page
   try {
-    const { stats } = await api("/api/timestats");
-    timeStats = stats || [];
+    const payload = await api("/api/timestats");
+    _assertJson(_isRecord(payload), "time statistics response", "expected an object");
+    timeStats = _validateTimeStats(payload.stats || []);
     const ysel = $("#statYear"), tsel = $("#statTerm");
     const keepY = ysel.value, keepT = tsel.value;
     ysel.replaceChildren(); tsel.replaceChildren();
@@ -757,7 +1243,7 @@ function slotSummary(slots) {
 function activeId() { return meta.active >= 0 ? meta.ids[meta.active] : null; }
 function _sheetKey(id) { return SHEET_PREFIX + id; }
 function _readSheet(id) {
-  try { const a = JSON.parse(localStorage.getItem(_sheetKey(id))); return Array.isArray(a) ? a : []; }
+  try { return _validateStoredEntries(JSON.parse(localStorage.getItem(_sheetKey(id))), `sheet ${id}`); }
   catch { return []; }
 }
 function _onQuota(e) {                       // surface a full localStorage instead of silent data loss
@@ -801,8 +1287,8 @@ function _evict() {
 
 function initSheets() {
   try {
-    const m = JSON.parse(localStorage.getItem(META_KEY));
-    if (m && Array.isArray(m.ids) && m.ids.length) {
+    const m = _validateSheetMeta(JSON.parse(localStorage.getItem(META_KEY)));
+    if (m && m.ids.length) {
       meta = { active: Math.min(Math.max(0, m.active | 0), m.ids.length - 1),
                ids: m.ids, names: m.names || {}, counts: m.counts || {}, seen: m.seen || {},
                nextId: m.nextId || (m.ids.reduce((mx, x) => (x > mx ? x : mx), 0) + 1),
@@ -814,16 +1300,19 @@ function initSheets() {
   meta = { active: 0, ids: [], names: {}, counts: {}, nextId: 1, seen: {}, cur: null, sems: {} };
   let v1 = null;
   try { v1 = JSON.parse(localStorage.getItem(SHEETS_KEY)); } catch { /* none */ }
-  if (v1 && Array.isArray(v1.sheets) && v1.sheets.length) {
-    v1.sheets.forEach((s, i) => {
+  const v1Sheets = _isRecord(v1) && Array.isArray(v1.sheets) ? v1.sheets.filter(_isRecord) : [];
+  if (v1Sheets.length) {
+    v1Sheets.forEach((s, i) => {
       const id = meta.nextId++; meta.ids.push(id);
       meta.names[id] = s.name || `시간표 ${i + 1}`;
-      const cls = s.classes || []; meta.counts[id] = cls.length; _writeSheet(id, cls);
+      const cls = _validateStoredEntries(s.classes, `legacy sheet ${i}`);
+      meta.counts[id] = cls.length; _writeSheet(id, cls);
     });
     meta.active = Math.min(Math.max(0, v1.active | 0), meta.ids.length - 1);
   } else {
     let legacy = [];
     try { legacy = JSON.parse(localStorage.getItem(TT_KEY)) || []; } catch { /* none */ }
+    legacy = _validateStoredEntries(legacy, "legacy timetable");
     const id = meta.nextId++; meta.ids = [id]; meta.names[id] = "시간표 1";
     meta.counts[id] = legacy.length; _writeSheet(id, legacy);
   }
@@ -1066,7 +1555,7 @@ function refreshCardStatesNow() {
 
 // ---------- wishlist (bookmarked courses, separate from any sheet) ----------
 function _loadWishlist() {
-  try { const a = JSON.parse(localStorage.getItem(WISHLIST_KEY)); return Array.isArray(a) ? a : []; }
+  try { return _validateStoredEntries(JSON.parse(localStorage.getItem(WISHLIST_KEY)), "wishlist"); }
   catch { return []; }
 }
 function saveWishlist() {
@@ -1118,7 +1607,11 @@ function pushUndo() {
   updateUndoButtons();
 }
 function _applySnapshot(json) {
-  timetable = JSON.parse(json);
+  let parsed;
+  try { parsed = JSON.parse(json); }
+  catch { console.warn("undo snapshot is not valid JSON — ignored"); return; }
+  if (!Array.isArray(parsed)) { console.warn("undo snapshot is not an array — ignored"); return; }
+  timetable = _validateStoredEntries(parsed, "undo snapshot");
   liveSheets.set(activeId(), timetable);
   saveTT(); renderSheets(); renderTT(); refreshCardStates();
   if (detailClass) renderDetail();
@@ -1692,8 +2185,10 @@ async function readImportFile(file, key, label) {
   let data;
   try { data = JSON.parse(await file.text()); }
   catch { alert(`불러올 수 없는 ${label} 파일입니다.`); return null; }
-  const arr = Array.isArray(data) ? data : data[key];
+  const arr = Array.isArray(data) ? data : (_isRecord(data) ? data[key] : null);
   if (!Array.isArray(arr)) { alert(`불러올 수 없는 ${label} 파일입니다.`); return null; }
+  try { _validateImportEntries(arr, label); }
+  catch (e) { alert(`${label} JSON 형식이 올바르지 않습니다.`); console.warn(e.message); return null; }
   return await resolveEntries(arr);
 }
 
@@ -2071,8 +2566,17 @@ async function loadTrendTerm() {
   }
   showTrendMsg("불러오는 중…");
   let data;
-  try { data = await fetch("data/trend/" + meta.trend).then((r) => r.json()); }
-  catch { showTrendMsg("데이터를 불러오지 못했습니다."); return; }
+  try {
+    const r = await fetch("data/trend/" + meta.trend);
+    if (!r.ok) throw new Error(`trend HTTP ${r.status}`);
+    data = _validateTrendData(await r.json(), `trend ${meta.trend}`);
+  } catch (e) {
+    console.warn(`trend ${meta.trend} rejected: ${e.message}`);
+    _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map(), year, term };
+    setTrendPickerEnabled(false);
+    showTrendMsg("데이터를 불러오지 못했습니다.");
+    return;
+  }
   const rows = await termRows(year, term);   // names/prof for the picker
   const info = new Map(rows.map((c) =>
     [`${c.sbjt_cd}(${c.lt_no})`, { name: c.name, prof: c.professor || "" }]));
@@ -2240,10 +2744,16 @@ function drawTrendChart() {
     i = Math.max(0, Math.min(n - 1, i));
     const gx = X(i);
     guide.setAttribute("x1", gx); guide.setAttribute("x2", gx); guide.setAttribute("visibility", "visible");
-    const rows = visible.map((d) =>
-      `<div class="tip-row"><span><span class="dot" style="background:${d.color}"></span>${d.name}</span><b>${s[d.k][i] ?? "—"}</b></div>`).join("");
-    tip.innerHTML = `<div class="tip-t">${fmtTsFull(ts[i])}</div>${rows}` +
-      (s.q && s.q[i] != null ? `<div class="tip-row"><span>정원</span><b>${s.q[i]}</b></div>` : "");
+    const rows = visible.map((d) => {
+      const dot = el("span", { className: "dot" }); dot.style.background = d.color;
+      return el("div", { className: "tip-row" },
+        el("span", {}, dot, d.name),
+        el("b", {}, s[d.k][i] ?? "—"));
+    });
+    const tipKids = [el("div", { className: "tip-t" }, fmtTsFull(ts[i])), ...rows];
+    if (s.q && s.q[i] != null)
+      tipKids.push(el("div", { className: "tip-row" }, el("span", {}, "정원"), el("b", {}, s.q[i])));
+    tip.replaceChildren(...tipKids);
     const wr = wrap.getBoundingClientRect();
     const topVal = Math.max(0, ...visible.map((d) => s[d.k][i] ?? 0));
     tip.style.left = ((gx / W) * r.width + (r.left - wr.left)) + "px";
@@ -2271,24 +2781,55 @@ let _gradIndex = null;
 const _gradSpecCache = {}, _gradReqCache = {};   // spec by file; 전필 set by batch-year
 let _gradAreaOv = _gradLoad(GRAD_AREA_KEY, {});
 let _gradState = _gradLoad(GRAD_STATE_KEY, { picks: {}, list: null, eng: {} });
-if (!_gradState.picks || typeof _gradState.picks !== "object") _gradState.picks = {};
+if (!_isRecord(_gradAreaOv)) _gradAreaOv = {};
+if (!_isRecord(_gradState)) _gradState = { picks: {}, list: null, eng: {} };
+if (!_isRecord(_gradState.picks)) _gradState.picks = {};
+if (_gradState.list != null) {
+  _gradState.list = Array.isArray(_gradState.list)
+    ? _gradState.list.filter((e) => _isRecord(e) && _isString(e.type) && _isString(e.major))
+    : null;
+}
+if (!_isRecord(_gradState.eng)) _gradState.eng = {};
 delete _gradState.sheets;   // drop legacy flat selection → blank start (spec §4)
 function _gradLoad(k, dflt) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? dflt; } catch { return dflt; } }
 function _gradSave(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); _quotaWarned = false; } catch (e) { _onQuota(e); } }
 async function _loadGradIndex() {
-  if (!_gradIndex) _gradIndex = await fetch("data/grad_req/index.json").then((r) => r.json());
+  if (!_gradIndex) {
+    try {
+      const r = await fetch("data/grad_req/index.json");
+      if (!r.ok) throw new Error(`graduation index HTTP ${r.status}`);
+      _gradIndex = _validateGradIndex(await r.json());
+    } catch (e) {
+      console.error(`graduation index rejected: ${e.message}`);
+      _gradIndex = [];
+    }
+  }
   return _gradIndex;
 }
 async function _loadGradSpec(file) {
-  if (!_gradSpecCache[file]) _gradSpecCache[file] = await fetch("data/grad_req/" + file).then((r) => r.json());
+  if (file in _gradSpecCache) return _gradSpecCache[file];
+  try {
+    const r = await fetch("data/grad_req/" + file);
+    if (!r.ok) throw new Error(`graduation spec HTTP ${r.status}`);
+    _gradSpecCache[file] = _validateGradSpec(await r.json(), `graduation spec ${file}`);
+  } catch (e) {
+    console.warn(`graduation spec ${file} rejected: ${e.message}`);
+    _gradSpecCache[file] = null;
+  }
   return _gradSpecCache[file];
 }
 // 단일 소스(full granularity): 코드 접두사 규칙 + 예외 목록. 교양 강좌 → 세부영역.
 let _gradAreaCodes = null;
 async function _loadAreaCodes() {
   if (!_gradAreaCodes) {
-    const d = await fetch("data/grad_req/gyo/area_codes.json").then((r) => r.json());
-    _gradAreaCodes = { codes: d.codes || {}, exceptions: d.exceptions || {}, flex_recognition: d.flex_recognition || {}, gwonjang: d.gwonjang_codes || [], junggeup: d.junggeup_codes || [] };
+    try {
+      const r = await fetch("data/grad_req/gyo/area_codes.json");
+      if (!r.ok) throw new Error(`area codes HTTP ${r.status}`);
+      _gradAreaCodes = _validateAreaCodes(await r.json());
+    } catch (e) {
+      console.warn(`area codes rejected: ${e.message}`);
+      _gradAreaCodes = _emptyAreaCodes();
+    }
   }
   return _gradAreaCodes;
 }
@@ -2296,16 +2837,30 @@ async function _loadAreaCodes() {
 let _gradCodeEquiv = null;
 async function _loadCodeEquiv() {
   if (!_gradCodeEquiv) {
-    try { _gradCodeEquiv = (await fetch("data/grad_req/code_equiv.json").then((r) => r.json())).canon || {}; }
-    catch { _gradCodeEquiv = {}; }
+    try {
+      const r = await fetch("data/grad_req/code_equiv.json");
+      if (!r.ok) throw new Error(`code equivalence HTTP ${r.status}`);
+      _gradCodeEquiv = _validateCodeEquiv(await r.json());
+    } catch (e) {
+      console.warn(`code equivalence rejected: ${e.message}`);
+      _gradCodeEquiv = {};
+    }
   }
   return _gradCodeEquiv;
 }
 // 단대/학부 교양 어댑터(self-contained): 세부영역 → 버킷 할당 + 최저학점.
 const _gyoCache = {};
 async function _loadGyo(id) {
-  if (!id) return null;
-  if (!_gyoCache[id]) _gyoCache[id] = await fetch("data/grad_req/gyo/" + id + ".json").then((r) => r.json());
+  if (!id || !_safeJsonFile(`${id}.json`)) return null;
+  if (id in _gyoCache) return _gyoCache[id];
+  try {
+    const r = await fetch("data/grad_req/gyo/" + id + ".json");
+    if (!r.ok) throw new Error(`general-education rules HTTP ${r.status}`);
+    _gyoCache[id] = _validateGyo(await r.json(), `general-education rules ${id}`);
+  } catch (e) {
+    console.warn(`general-education rules ${id} rejected: ${e.message}`);
+    _gyoCache[id] = null;
+  }
   return _gyoCache[id];
 }
 // the chosen subset of timetables the audit runs against (NOT all sheets; managed on this
@@ -2327,7 +2882,7 @@ function _gradTaken(ids) {                   // union of chosen sheets, deduped 
 async function _gradRequired(spec, year) {
   const ck = spec.id + "|" + year;            // key by dept-spec too: same year, different major
   if (_gradReqCache[ck]) return _gradReqCache[ck];
-  const want = spec.major_required_match, map = new Map();
+  const want = spec.major_required_match || { departments: [], classifications: [] }, map = new Map();
   try {
     const ix = await dataIndex();
     for (const t of (ix.terms || []).filter((t) => String(t.year) === String(year)))
@@ -2466,6 +3021,10 @@ function _renderGradSheets() {
 async function renderGrad() {
   const host = $("#gradBody"); if (!host) return;
   const idx = await _loadGradIndex();
+  if (!idx.length) {
+    host.replaceChildren(el("div", { className: "grad-note" }, "졸업요건 데이터를 불러오지 못했습니다."));
+    return;
+  }
   const majors = [...new Set(idx.map((e) => e.major))].sort((a, b) => a.localeCompare(b, "ko"));
   _gradResolveList(idx, majors);
   _renderGradSheets();
@@ -2489,6 +3048,7 @@ async function renderGrad() {
     const ie = idx.find((x) => x.major === entry.major && String(x.batch) === String(entry.year));
     if (!ie) continue;
     const spec = await _loadGradSpec(ie.file);
+    if (!spec) continue;
     const track = _gradTrackOf(spec, entry, _gradState.list);
     const required = await _gradRequired(spec, entry.year);
     const ruleset = await _loadGyo(spec.general);
@@ -3002,23 +3562,29 @@ async function ensureExploreData() {
   if (_EX) return _EX;
   if (_exLoading) return _exLoading;
   _exLoading = (async () => {
-    const raw = await fetch("data/explore-index.json").then((r) => {
-      if (!r.ok) throw new Error(`explore-index ${r.status}`);
-      return r.json();
-    });
-    const byCode = new Map();
-    for (const c of raw.codes) {
-      // searchable string built once: all distinct names for this code + the code itself
-      c.q = (c.names.map((i) => raw.strings.names[i]).join(" ") + " " + c.c).toLowerCase();
-      byCode.set(c.c, c);
+    try {
+      const raw = await fetch("data/explore-index.json").then((r) => {
+        if (!r.ok) throw new Error(`explore-index ${r.status}`);
+        return r.json();
+      });
+      _validateExploreData(raw);
+      const byCode = new Map();
+      for (const c of raw.codes) {
+        // searchable string built once: all distinct names for this code + the code itself
+        c.q = (c.names.map((i) => raw.strings.names[i]).join(" ") + " " + c.c).toLowerCase();
+        byCode.set(c.c, c);
+      }
+      const profById = new Map();
+      raw.strings.profs.forEach((p, i) => profById.set(p.id, i));
+      _EX = {
+        version: raw.version, generated: raw.generated,
+        names: raw.strings.names, profs: raw.strings.profs, depts: raw.strings.depts,
+        terms: raw.terms, codes: raw.codes, byCode, profById,
+      };
+    } catch (e) {
+      console.error(`explore index rejected: ${e.message}`);
+      _EX = _emptyExploreData();
     }
-    const profById = new Map();
-    raw.strings.profs.forEach((p, i) => profById.set(p.id, i));
-    _EX = {
-      version: raw.version, generated: raw.generated,
-      names: raw.strings.names, profs: raw.strings.profs, depts: raw.strings.depts,
-      terms: raw.terms, codes: raw.codes, byCode, profById,
-    };
     return _EX;
   })();
   return _exLoading;
