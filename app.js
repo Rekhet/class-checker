@@ -577,7 +577,7 @@ async function termRows(year, term) {
 function hasOtherFilters(f) {
   return !!(f.name || f.department || f.day != null || f.period != null
     || f.classifications?.length || f.levels?.length || f.grades?.length
-    || f.gradings?.length || f.switchableOnly);
+    || f.gradings?.length || f.switchableOnly || f.seatsOnly);
 }
 // which term files to load. Year/term scope them; otherwise every matching term
 // is searched so "all years" is complete. Only a TRULY empty query (no filters at
@@ -632,6 +632,8 @@ function matchRow(c, f) {
   // 평가방식 미수집(옛 데이터, c.grading 없음) 강좌는 평가방식 필터에서 제외된다
   if (f.gradings?.length && !f.gradings.includes(c.grading)) return false;
   if (f.switchableOnly && c.grading_switch !== "Y") return false;
+  // 여석 = 정원 − 신청; 인원 미수집(null) 강좌는 여석 필터에서 제외된다
+  if (f.seatsOnly && !(c.quota != null && c.applied != null && c.quota - c.applied > 0)) return false;
   if (f.day != null || f.period != null) {
     if (!(c.slots || []).some((s) =>
       (f.day == null || s.day_index === f.day) && (f.period == null || s.period === f.period)))
@@ -852,11 +854,13 @@ function buildFilters() {
   const timed = el("input", { type: "checkbox", id: "timedOnly" });   // only classes with a scheduled time
   const eng = el("input", { type: "checkbox", id: "englishOnly" });   // only 영어강의
   const sw = el("input", { type: "checkbox", id: "switchableOnly" }); // only 평가방식 전환가능
+  const seat = el("input", { type: "checkbox", id: "seatsOnly" });    // only 여석(정원−신청) 있음
   adv.append(el("div", { className: "adv-checks" },
     el("label", {}, empty, " 빈 시간만"),
     el("label", {}, timed, " 시간 배정만"),
     el("label", {}, eng, " 영어강의만"),
-    el("label", {}, sw, " 평가방식 전환가능만")));
+    el("label", {}, sw, " 평가방식 전환가능만"),
+    el("label", {}, seat, " 여석 있음만")));
   form.append(adv);
 
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
@@ -1113,6 +1117,7 @@ function currentFilters() {
     switchableOnly: $("#switchableOnly")?.checked || false,   // 평가방식 전환가능만
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
+    seatsOnly: $("#seatsOnly")?.checked || false,
   };
 }
 
