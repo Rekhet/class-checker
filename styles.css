@@ -213,6 +213,12 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .rtag.sw { background: var(--cp-ok); color: #fff; }              /* 평가방식 전환가능 */
 .rtag.cancel { background: #7c4dbe; color: #fff; }               /* 취소여석 (지정 시간대 신청) */
 
+/* 인원 추이 시간-구간 이동 (live + 아카이브 청크) */
+.trend-win-nav { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.trend-win-nav button { padding: 4px 10px; }
+.trend-win-nav button:disabled { opacity: .45; cursor: default; }
+#trendWinLabel { font-size: 13px; color: var(--cp-sub, #666); }
+
 /* wishlist bar + panel */
 .wish-bar { display: flex; align-items: center; gap: 8px; padding: 8px 18px 0; }
 .wish-mini { margin-left: 0; background: none; border: 1px solid var(--cp-line); border-radius: 7px;

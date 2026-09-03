@@ -25,6 +25,14 @@
 
   <div id="trendMsg" class="trend-msg">강좌를 선택하면 신청·장바구니 인원 추이가 표시됩니다.</div>
 
+  <!-- 시간 구간 이동: live 파일은 최신 240개 시점만 담으므로, 그 이전 이력은
+       고정 아카이브 청크(trend_..._wNNN.json)를 ◀/▶로 오가며 본다 -->
+  <div id="trendWinNav" class="trend-win-nav hidden">
+    <button id="trendPrev" type="button">◀ 이전 구간</button>
+    <span id="trendWinLabel"></span>
+    <button id="trendNext" type="button">다음 구간 ▶</button>
+  </div>
+
   <div id="trendChartWrap" class="trend-chart-wrap hidden">
     <div id="trendTitle" class="trend-title"></div>
     <div id="trendChart"></div>

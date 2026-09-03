@@ -2557,6 +2557,8 @@ async function ensureTrend() {
   inp.addEventListener("focus", () => renderTrendResults(inp.value));
   inp.addEventListener("keydown", trendResultsKey);
   $("#trendMetric").addEventListener("change", () => { if (_trend.key) drawTrendChart(); });
+  $("#trendPrev")?.addEventListener("click", () => shiftTrendWindow(-1));
+  $("#trendNext")?.addEventListener("click", () => shiftTrendWindow(1));
   document.addEventListener("click", (e) => {     // close the results list on outside click
     if (!e.target.closest(".trend-search")) $("#trendResults")?.classList.add("hidden");
   });
@@ -2572,6 +2574,7 @@ async function loadTrendTerm() {
   const meta = idx.terms.find((t) => t.year === year && t.term === term);
   if (!meta || !meta.trend) {
     _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map() };
+    updateTrendWinNav();
     setTrendPickerEnabled(false);
     showTrendMsg("이 학기는 아직 수집된 인원 데이터가 없습니다.");
     return;
@@ -2585,6 +2588,7 @@ async function loadTrendTerm() {
   } catch (e) {
     console.warn(`trend ${meta.trend} rejected: ${e.message}`);
     _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map(), year, term };
+    updateTrendWinNav();
     setTrendPickerEnabled(false);
     showTrendMsg("데이터를 불러오지 못했습니다.");
     return;
@@ -2597,14 +2601,69 @@ async function loadTrendTerm() {
     return { key, name: m.name || key, prof: m.prof || "",
              label: `${m.name || key}${m.prof ? " · " + m.prof : ""}` };
   }).sort((a, b) => a.name.localeCompare(b.name));
+  const archives = meta.trendArchives || 0;   // frozen chunks before the live window
   _trend = { key: null, data, ts: data.ts || [], classes,
-             byKey: new Map(classes.map((c) => [c.key, c.label])), year, term };
+             byKey: new Map(classes.map((c) => [c.key, c.label])), year, term,
+             file: meta.trend, archives, win: archives,
+             winCache: new Map([[archives, data]]) };
+  updateTrendWinNav();
   setTrendPickerEnabled(classes.length > 0);
   const closedNote = data.closed ? ` · 마감${data.closedAt ? " " + data.closedAt.slice(0, 10) : ""}` : "";
   showTrendMsg(classes.length
     ? `강좌를 검색해 선택하세요 (${classes.length.toLocaleString()}개 강좌 · ${(data.ts || []).length}개 시점)${closedNote}`
     : "이 학기는 아직 수집된 인원 데이터가 없습니다.");
 }
+// ---------- trend time-window paging (live file + frozen archive chunks) ----------
+function trendWinFile(i) {
+  // archive i < archives: trend_<year>_<term>_wNNN.json; i == archives: live file
+  if (i >= _trend.archives) return _trend.file;
+  return _trend.file.replace(/\.json$/, `_w${String(i).padStart(3, "0")}.json`);
+}
+function trendWinRange(d) {
+  const day = (t) => `${t.slice(5, 7)}/${t.slice(8, 10)}`;
+  const ts = d.ts || [];
+  return ts.length ? `${day(ts[0])}~${day(ts[ts.length - 1])}` : "-";
+}
+function updateTrendWinNav() {
+  const nav = $("#trendWinNav"); if (!nav) return;
+  const has = !!_trend.data;
+  nav.classList.toggle("hidden", !has);
+  if (!has) return;
+  const live = _trend.win >= _trend.archives;
+  $("#trendWinLabel").textContent = live
+    ? `최신 구간 (${trendWinRange(_trend.data)})`
+    : `구간 ${_trend.win + 1}/${_trend.archives + 1} (${trendWinRange(_trend.data)})`;
+  $("#trendPrev").disabled = _trend.win <= 0;
+  $("#trendNext").disabled = live;
+}
+async function shiftTrendWindow(delta) {
+  const target = _trend.win + delta;
+  if (!_trend.data || target < 0 || target > _trend.archives) return;
+  let data = _trend.winCache.get(target);
+  if (!data) {
+    const file = trendWinFile(target);
+    $("#trendWinLabel").textContent = "불러오는 중…";
+    try {
+      const r = await fetch("data/trend/" + file);
+      if (!r.ok) throw new Error(`trend HTTP ${r.status}`);
+      data = _validateTrendData(await r.json(), `trend ${file}`);
+      _trend.winCache.set(target, data);
+    } catch (e) {
+      console.warn(`trend window ${file} rejected: ${e.message}`);
+      updateTrendWinNav();   // restore the label; stay on the current window
+      return;
+    }
+  }
+  _trend.win = target;
+  _trend.data = data;
+  _trend.ts = data.ts || [];
+  updateTrendWinNav();
+  if (_trend.key) {
+    if (data.series[_trend.key]) drawTrendChart();
+    else showTrendMsg("이 구간에는 선택한 강좌의 표본이 없습니다.");
+  }
+}
+
 function setTrendPickerEnabled(on) {
   const inp = $("#trendClass"), m = $("#trendMetric");
   if (inp) { inp.disabled = !on; inp.placeholder = on ? "강좌 검색 (이름)" : "수집된 데이터 없음"; if (!on) inp.value = ""; }
