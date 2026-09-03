@@ -23,3 +23,6 @@ __pycache__/
 # Editor / OS
 .DS_Store
 *.swp
+
+# Internal scrape working documents (root-repo scratch; never publish).
+/data/grad_req/_scrape/

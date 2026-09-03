@@ -211,6 +211,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .rtag.warn { background: var(--cp-conflict); color: #fff; }
 .rtag.su { background: var(--cp-warn); color: #fff; }            /* 평가방식 S/U 계열 */
 .rtag.sw { background: var(--cp-ok); color: #fff; }              /* 평가방식 전환가능 */
+.rtag.cancel { background: #7c4dbe; color: #fff; }               /* 취소여석 (지정 시간대 신청) */
 
 /* wishlist bar + panel */
 .wish-bar { display: flex; align-items: center; gap: 8px; padding: 8px 18px 0; }

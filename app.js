@@ -244,7 +244,7 @@ function _validateClassRow(row, source = "class row") {
     if (!_isInteger(row[key])) return `${source}.${key} must be an integer`;
   if (!_validStringArray(row.classification))
     return `${source}.classification must be an array of strings`;
-  for (const key of ["enrolled", "quota", "quota_returning", "cart"])
+  for (const key of ["enrolled", "quota", "quota_returning", "cart", "cancel_vacancy"])
     if (!_isNullable(row[key], _isInteger)) return `${source}.${key} must be an integer or null`;
   for (const key of ["grade", "college", "language", "status", "room", "grading", "grading_switch"])
     if (!_isNullable(row[key], _isString)) return `${source}.${key} must be a string or null`;
@@ -577,7 +577,7 @@ async function termRows(year, term) {
 function hasOtherFilters(f) {
   return !!(f.name || f.department || f.day != null || f.period != null
     || f.classifications?.length || f.levels?.length || f.grades?.length
-    || f.gradings?.length || f.switchableOnly || f.seatsOnly);
+    || f.gradings?.length || f.switchableOnly || f.seatsOnly || f.cancelOnly);
 }
 // which term files to load. Year/term scope them; otherwise every matching term
 // is searched so "all years" is complete. Only a TRULY empty query (no filters at
@@ -634,6 +634,8 @@ function matchRow(c, f) {
   if (f.switchableOnly && c.grading_switch !== "Y") return false;
   // 여석 = 정원 − 신청; 인원 미수집(null) 강좌는 여석 필터에서 제외된다
   if (f.seatsOnly && !(c.quota != null && c.applied != null && c.quota - c.applied > 0)) return false;
+  // 취소여석 배지(지정 시간대 신청 대상); 미수집(null)은 필터에서 제외된다
+  if (f.cancelOnly && c.cancel_vacancy !== 1) return false;
   if (f.day != null || f.period != null) {
     if (!(c.slots || []).some((s) =>
       (f.day == null || s.day_index === f.day) && (f.period == null || s.period === f.period)))
@@ -855,12 +857,14 @@ function buildFilters() {
   const eng = el("input", { type: "checkbox", id: "englishOnly" });   // only 영어강의
   const sw = el("input", { type: "checkbox", id: "switchableOnly" }); // only 평가방식 전환가능
   const seat = el("input", { type: "checkbox", id: "seatsOnly" });    // only 여석(정원−신청) 있음
+  const cancel = el("input", { type: "checkbox", id: "cancelOnly" }); // only 취소여석 배지
   adv.append(el("div", { className: "adv-checks" },
     el("label", {}, empty, " 빈 시간만"),
     el("label", {}, timed, " 시간 배정만"),
     el("label", {}, eng, " 영어강의만"),
     el("label", {}, sw, " 평가방식 전환가능만"),
-    el("label", {}, seat, " 여석 있음만")));
+    el("label", {}, seat, " 여석 있음만"),
+    el("label", {}, cancel, " 취소여석만")));
   form.append(adv);
 
   form.append(el("button", { type: "submit", className: "primary" }, "검색 Search"));
@@ -1118,6 +1122,7 @@ function currentFilters() {
     emptyOnly: $("#emptyOnly")?.checked || false,
     timedOnly: $("#timedOnly")?.checked || false,
     seatsOnly: $("#seatsOnly")?.checked || false,
+    cancelOnly: $("#cancelOnly")?.checked || false,   // 취소여석 배지만
   };
 }
 
@@ -1214,6 +1219,8 @@ function renderResults(classes, append = false) {
     const tags = [];
     if (c.language === "영어") tags.push(el("span", { className: "rtag eng" }, "영어"));
     if (c.status === "폐강대상") tags.push(el("span", { className: "rtag warn" }, "폐강대상"));
+    // 취소여석: 정원이 찼다가 취소로 자리가 난 강좌 (지정 시간대에만 신청 가능)
+    if (c.cancel_vacancy === 1) tags.push(el("span", { className: "rtag cancel" }, "취소여석"));
     // A~F가 기본이므로 S/U 계열만 태그로 표시; 전환가능은 별도 태그
     if (c.grading && c.grading !== "A~F") tags.push(el("span", { className: "rtag su" }, c.grading));
     if (c.grading_switch === "Y") tags.push(el("span", { className: "rtag sw" }, "전환가능"));
