@@ -3057,17 +3057,15 @@ function _cpAt(enc, i) {
   for (let k = 0; k < enc.length && enc[k] <= i; k += 2) v = enc[k + 1];
   return v;
 }
-// Newest pass index after `after` where the series changes, or -1.
-function _cpLastChange(enc, after) {
-  if (!Array.isArray(enc)) return -1;
-  const i = enc[enc.length - 2];
-  return i > after ? i : -1;
-}
-// Classes whose numbers moved in the newest `hours` of `data` (hours <= 0:
-// all of it). mode "open": 여석(정원−신청) grew and is now above zero; "all":
-// any change. `data` is the live window or several windows joined by
-// joinTrendWindows. The array carries `from`: the time the changes are
-// measured from.
+// One row per class: its NEWEST change inside the period — the step between
+// two consecutive passes, not the net difference from the period's start.
+// The period (`hours`; <= 0 = all of `data`) only decides how far back a
+// change may lie, so a shorter period's list is always the head of a longer
+// one's: the newest rows never depend on the window chosen.
+// mode "open": the newest step in which 여석(정원−신청) grew to above zero;
+// "all": the newest step in which 신청, 정원 or 수강 changed.
+// `data` is the live window or several windows joined by joinTrendWindows.
+// The array carries `from`: the start of the period.
 function trendFeed(data, hours, mode) {
   const t = data.t, last = t.length - 1;
   let base = 0;                                  // last pass at or before the cutoff
@@ -3075,22 +3073,31 @@ function trendFeed(data, hours, mode) {
     const since = t[last] - hours * 3600;
     while (base < last && t[base + 1] <= since) base++;
   }
+  const seats = (q, a) => (q != null && a != null ? q - a : null);
   const items = [];
   for (const [key, enc] of Object.entries(data.series)) {
-    const at = Math.max(_cpLastChange(enc.a, base), _cpLastChange(enc.q, base),
-      _cpLastChange(enc.e, base));
-    if (at < 0) continue;
-    const a0 = _cpAt(enc.a, base), a1 = _cpAt(enc.a, last);
-    const q0 = _cpAt(enc.q, base), q1 = _cpAt(enc.q, last);
-    const e0 = _cpAt(enc.e, base), e1 = _cpAt(enc.e, last);
-    const s0 = q0 != null && a0 != null ? q0 - a0 : null;
-    const s1 = q1 != null && a1 != null ? q1 - a1 : null;
-    if (mode === "open" && !(s1 > 0 && (s0 == null || s1 > s0))) continue;
-    items.push({ key, at: t[at], s0, s1, a0, a1, e0, e1 });
+    const steps = new Set();                     // passes where a metric changed
+    for (const m of ["a", "q", "e"]) {
+      const cp = enc[m];
+      if (Array.isArray(cp)) for (let k = 0; k < cp.length; k += 2) if (cp[k] > base) steps.add(cp[k]);
+    }
+    const newestFirst = [...steps].sort((x, y) => y - x);
+    for (const i of newestFirst) {
+      const a0 = _cpAt(enc.a, i - 1), a1 = _cpAt(enc.a, i);
+      const q0 = _cpAt(enc.q, i - 1), q1 = _cpAt(enc.q, i);
+      const e0 = _cpAt(enc.e, i - 1), e1 = _cpAt(enc.e, i);
+      const s0 = seats(q0, a0), s1 = seats(q1, a1);
+      if (mode === "open") {
+        if (s0 == null || s1 == null || !(s1 > s0 && s1 > 0)) continue;
+      } else if (![[a0, a1], [q0, q1], [e0, e1]].some(([x, y]) => x != null && y != null && x !== y)) {
+        continue;                                // a class appearing or leaving is not a change
+      }
+      items.push({ key, at: t[i], s0, s1, a0, a1, e0, e1,
+        now: seats(_cpAt(enc.q, last), _cpAt(enc.a, last)) });
+      break;
+    }
   }
-  items.sort(mode === "open"
-    ? (x, y) => (y.s1 - (y.s0 ?? 0)) - (x.s1 - (x.s0 ?? 0)) || y.at - x.at
-    : (x, y) => y.at - x.at);
+  items.sort((x, y) => y.at - x.at || (x.key < y.key ? -1 : x.key > y.key ? 1 : 0));
   items.from = t[base];
   return items;
 }
@@ -3222,7 +3229,8 @@ async function renderTrendFeed(e) {
         $("#trendChartWrap")?.scrollIntoView({ block: "center" });
       } }, c ? c.label : it.key);
     list.append(el("li", {}, btn,
-      el("span", { className: "tf-seat" + (it.s1 > 0 ? " open" : "") }, `여석 ${arrow(it.s0, it.s1)}`),
+      el("span", { className: "tf-seat" + (it.s1 > 0 ? " open" : "") }, `여석 ${arrow(it.s0, it.s1)}`
+        + (it.now != null && it.now !== it.s1 ? ` · 현재 ${it.now}` : "")),
       el("span", { className: "tf-num" }, `신청 ${arrow(it.a0, it.a1)} · 수강 ${arrow(it.e0, it.e1)}`),
       el("time", { className: "tf-at", dateTime: new Date(it.at * 1000).toISOString() },
         fmtTsFull(it.at, tz))));

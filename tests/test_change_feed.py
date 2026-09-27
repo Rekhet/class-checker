@@ -66,25 +66,35 @@ def _dense(wins: list[dict]) -> tuple[list[int], dict]:
     return t, out
 
 
-def expected_feed(hours: int, mode: str) -> set[str]:
-    """Independent reading of the feed rule over fully decoded series."""
+def expected_feed(hours: int, mode: str) -> list[tuple]:
+    """Independent reading of the feed rule over fully decoded series: per
+    class, the newest step (pass i-1 -> i, after the period's base pass) that
+    qualifies; newest first."""
     t, series = _dense(_windows_for(hours))
     n, last = len(t), len(t) - 1
     base = 0
     if hours > 0:
         since = t[last] - hours * 3600
         base = max([i for i in range(n) if t[i] <= since] or [0])
-    keys = set()
+
+    def seats(q, a):
+        return None if q is None or a is None else q - a
+
+    rows = []
     for key, s in series.items():
         a, q, e = s["a"], s["q"], s["e"]
-        if all(v[i] == v[base] for v in (a, q, e) for i in range(base, n)):
-            continue                                   # nothing moved after base
-        s0 = q[base] - a[base] if None not in (q[base], a[base]) else None
-        s1 = q[last] - a[last] if None not in (q[last], a[last]) else None
-        if mode == "open" and not (s1 is not None and s1 > 0 and (s0 is None or s1 > s0)):
-            continue
-        keys.add(key)
-    return keys
+        for i in range(last, base, -1):
+            s0, s1 = seats(q[i - 1], a[i - 1]), seats(q[i], a[i])
+            if mode == "open":
+                ok = s0 is not None and s1 is not None and s1 > s0 and s1 > 0
+            else:
+                ok = any(v[i - 1] is not None and v[i] is not None and v[i] != v[i - 1]
+                         for v in (a, q, e))
+            if ok:
+                rows.append((t[i], key, s0, s1))
+                break
+    rows.sort(key=lambda r: (-r[0], r[1]))
+    return rows
 
 
 class _Quiet(SimpleHTTPRequestHandler):
@@ -127,11 +137,28 @@ class ChangeFeedTests(unittest.TestCase):
             # semester join archive windows
             for hours in (3, 24, 168, 0):
                 for mode in ("open", "all"):
-                    got = set(page.evaluate(
-                        "async ([h, m]) => trendFeed(await feedData(h), h, m).map((x) => x.key)",
-                        [hours, mode]))
+                    got = [tuple(r) for r in page.evaluate(
+                        "async ([h, m]) => trendFeed(await feedData(h), h, m)"
+                        ".map((x) => [x.at, x.key, x.s0, x.s1])",
+                        [hours, mode])]
                     with self.subTest(hours=hours, mode=mode):
                         self.assertEqual(got, expected_feed(hours, mode))
+
+        self._run(steps)
+
+    def test_a_shorter_period_is_the_head_of_a_longer_one(self) -> None:
+        """The newest rows must not depend on the period chosen."""
+        def steps(page):
+            for mode in ("open", "all"):
+                lists = page.evaluate(
+                    "async (m) => { const out = [];"
+                    " for (const h of [3, 24, 72, 168, 336, 0])"
+                    "   out.push(trendFeed(await feedData(h), h, m).map((x) => JSON.stringify(x)));"
+                    " return out; }", mode)
+                for shorter, longer in zip(lists, lists[1:]):
+                    with self.subTest(mode=mode, sizes=(len(shorter), len(longer))):
+                        self.assertLessEqual(len(shorter), len(longer))
+                        self.assertEqual(longer[:len(shorter)], shorter)
 
         self._run(steps)
 
