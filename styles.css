@@ -800,3 +800,5 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
 }
 #trendFeedMore { margin-top: 10px; width: 100%; }
+.home-link { color: inherit; text-decoration: none; }
+.home-link:hover { color: var(--cp-accent); }

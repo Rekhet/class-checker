@@ -103,3 +103,32 @@ class ShareLinkTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HomeLinkTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        handler = partial(_Quiet, directory=str(WEB_ROOT))
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.root = f"http://127.0.0.1:{cls.server.server_port}/"
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.server.shutdown()
+        cls.server.server_close()
+
+    def test_title_returns_to_the_site_root(self) -> None:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            try:
+                page = browser.new_page()
+                page.goto(self.root + "index.html#trend", wait_until="domcontentloaded")
+                page.wait_for_selector(".home-link")
+                page.click(".home-link")
+                page.wait_for_url(self.root)
+                page.wait_for_function(
+                    "() => document.querySelector('.page.active')?.dataset.page === 'timetable'")
+                self.assertEqual(page.evaluate("() => location.hash"), "")
+            finally:
+                browser.close()

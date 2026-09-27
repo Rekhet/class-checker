@@ -2748,7 +2748,12 @@ async function loadTrendTerm() {
              label: `${m.name || key}${m.prof ? " · " + m.prof : ""}` };
   }).sort((a, b) => a.name.localeCompare(b.name));
   const archives = meta.trendArchives || 0;   // frozen chunks before the live window
-  _trend = { key: null, data, live: data, t: data.t, classes,
+  // each archive's first pass time: lets the feed fetch the chunks a period
+  // needs in one go (older exports lack it; the feed then walks back)
+  const starts = Array.isArray(meta.trendArchiveStarts)
+    && meta.trendArchiveStarts.length === archives
+    && meta.trendArchiveStarts.every(_isInteger) ? meta.trendArchiveStarts : null;
+  _trend = { key: null, data, live: data, t: data.t, classes, archiveStarts: starts,
              byKey: new Map(classes.map((c) => [c.key, c.label])), year, term,
              file: meta.trend, archives, win: archives,
              winCache: new Map([[archives, data]]) };
@@ -3145,11 +3150,16 @@ async function feedData(hours) {
   const key = `${_trend.file}|${hours}|${live.t[live.t.length - 1]}`;
   if (_feedJoined?.key === key) return _feedJoined.data;
   const wins = [live];
-  if (hours <= 0) {                               // every window: fetch them all at once
-    const all = await Promise.all(
-      Array.from({ length: _trend.archives }, (_, i) => _trendWindow(i)));
-    wins.unshift(...all);
-  } else {                                        // just far enough back, newest first
+  const starts = _trend.archiveStarts;
+  if (starts || hours <= 0) {
+    // The index says where each chunk starts, so the chunks the period needs
+    // (from the newest one starting at or before `since`) are known up front
+    // and fetched together; one round trip instead of one per chunk.
+    let first = 0;
+    if (hours > 0) for (let i = starts.length - 1; i >= 0; i--) if (starts[i] <= since) { first = i; break; }
+    const need = Array.from({ length: _trend.archives - first }, (_, k) => _trendWindow(first + k));
+    wins.unshift(...await Promise.all(need));
+  } else {                                        // no start times: walk back one by one
     for (let i = _trend.archives - 1; i >= 0 && wins[0].t[0] > since; i--)
       wins.unshift(await _trendWindow(i));
   }
