@@ -90,8 +90,10 @@ class JsonBoundaryValidationTests(unittest.TestCase):
                         content_type="application/json",
                         body=json.dumps(
                             {
-                                "updated": "2026-08-05T09:00:00+09:00",
-                                "ts": ["2026-08-04T09:00:00+09:00"],
+                                "v": 2,
+                                "updated": "2026-08-05T09:00:00",
+                                "t": [1785801600],
+                                "m": {"a": 1, "e": 1},
                                 "series": None,
                             }
                         ),
@@ -126,16 +128,18 @@ class JsonBoundaryValidationTests(unittest.TestCase):
                         content_type="application/json",
                         body=json.dumps(
                             {
-                                "updated": "2026-08-05T09:00:00+09:00",
-                                "ts": ["2026-08-04T09:00:00+09:00"],
+                                "v": 2,
+                                "updated": "2026-08-05T09:00:00",
+                                "t": [1785801600],
+                                "m": {"a": 1, "e": 1},
                                 "series": {
                                     "MALICIOUS(001)": {
                                         "a": [
+                                            0,
                                             '<img src=x onerror="document.body.dataset.validationProbe=\'xss\'">'
                                         ],
-                                        "c": [1],
-                                        "e": [1],
-                                        "q": [1],
+                                        "e": 1,
+                                        "q": 1,
                                     }
                                 },
                             }

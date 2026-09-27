@@ -266,26 +266,70 @@ function _validateClassRows(raw, source = "class rows") {
   return rows;
 }
 
+// Trend payload v2 (scraper/export_json.py): `t` = pass times (epoch seconds),
+// `m` = which metrics each pass collected, and per class the points where each
+// metric changes — null/absent (all null), an integer (constant), or a flat
+// [i0, v0, i1, v1, …] list with i0 = 0 and strictly rising indices.
+const TREND_METRICS = ["a", "c", "e", "q"];
+function _validChangePoints(enc, n) {
+  if (enc == null || _isInteger(enc)) return true;
+  if (!Array.isArray(enc) || enc.length < 2 || enc.length % 2 || enc[0] !== 0) return false;
+  for (let k = 0; k < enc.length; k += 2) {
+    if (!_isInteger(enc[k]) || enc[k] >= n || (k && enc[k] <= enc[k - 2])) return false;
+    if (!(enc[k + 1] == null || _isInteger(enc[k + 1]))) return false;
+  }
+  return true;
+}
 function _validateTrendData(raw, source = "trend data") {
   _assertJson(_isRecord(raw), source, "expected an object");
-  _assertJson(Array.isArray(raw.ts), source, "ts must be an array");
-  _assertJson(raw.ts.every((v) => _isString(v) && !Number.isNaN(Date.parse(v))), source,
-    "ts must contain valid date strings");
+  _assertJson(raw.v === 2, source, "unsupported trend format (expected v 2)");
+  _assertJson(Array.isArray(raw.t) && raw.t.length > 0, source, "t must be a non-empty array");
+  _assertJson(raw.t.every((v, i) => _isInteger(v) && (i === 0 || v > raw.t[i - 1])), source,
+    "t must hold rising epoch seconds");
+  const n = raw.t.length;
+  _assertJson(_isRecord(raw.m), source, "m must be an object");
+  for (const [k, enc] of Object.entries(raw.m))
+    _assertJson(TREND_METRICS.includes(k) && _validChangePoints(enc, n), source, `m.${k} is malformed`);
   _assertJson(_isRecord(raw.series), source, "series must be an object");
   for (const [key, series] of Object.entries(raw.series)) {
     _assertJson(_isRecord(series), source, `series.${key} must be an object`);
-    for (const metric of ["a", "c", "e", "q"]) {
-      const values = series[metric];
-      _assertJson(Array.isArray(values) && values.length === raw.ts.length, source,
-        `series.${key}.${metric} must match ts length`);
-      _assertJson(values.every((v) => v == null || _isInteger(v)), source,
-        `series.${key}.${metric} must contain integers or null`);
-    }
+    for (const metric of TREND_METRICS)
+      _assertJson(_validChangePoints(series[metric], n), source,
+        `series.${key}.${metric} is malformed`);
   }
+  _assertJson(raw.tz == null || _isString(raw.tz), source, "tz must be a string");
   _assertJson(raw.updated == null || _isString(raw.updated), source, "updated must be a string");
   _assertJson(raw.closed == null || typeof raw.closed === "boolean", source, "closed must be boolean");
   _assertJson(raw.closedAt == null || _isString(raw.closedAt), source, "closedAt must be a string");
   return raw;
+}
+function _cpDecode(enc, n) {
+  if (enc == null || _isInteger(enc)) return new Array(n).fill(enc ?? null);
+  const out = new Array(n);
+  for (let k = 0; k < enc.length; k += 2) {
+    const end = k + 2 < enc.length ? enc[k + 2] : n;
+    out.fill(enc[k + 1], enc[k], end);
+  }
+  return out;
+}
+// Dense {a, c, e, q} arrays for one class of a validated v2 payload, or null.
+// A value is nulled where its pass did not collect that metric (quota always is).
+function trendSeriesOf(data, key) {
+  const enc = data.series[key];
+  if (!enc) return null;
+  const memo = data._decoded || (data._decoded = new Map());
+  if (memo.has(key)) return memo.get(key);
+  const n = data.t.length;
+  if (!data._mask) data._mask = Object.fromEntries(
+    ["a", "c", "e"].map((k) => [k, _cpDecode(data.m[k] ?? 0, n)]));
+  const out = { q: _cpDecode(enc.q, n) };
+  for (const k of ["a", "c", "e"]) {
+    const values = _cpDecode(enc[k], n), mask = data._mask[k];
+    out[k] = values.map((v, i) => (mask[i] ? v : null));
+  }
+  if (memo.size >= 64) memo.delete(memo.keys().next().value);   // bounded memo
+  memo.set(key, out);
+  return out;
 }
 
 function _emptyExploreData() {
@@ -2537,7 +2581,7 @@ const TREND_SERIES = [
   { k: "e", name: "수강", color: "#2E9E6B" },
 ];
 const TREND_FAINT = "#A2A29C", TREND_GRID = "#ECEBE7", TREND_LINE = "#DCDBD7";
-let _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map() };
+let _trend = { key: null, data: null, t: [], classes: [], byKey: new Map() };
 let _trendInited = false;
 
 // lazy: build the term picker + load the default term the first time the page shows
@@ -2573,7 +2617,7 @@ async function loadTrendTerm() {
   const idx = await dataIndex();
   const meta = idx.terms.find((t) => t.year === year && t.term === term);
   if (!meta || !meta.trend) {
-    _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map() };
+    _trend = { key: null, data: null, t: [], classes: [], byKey: new Map() };
     updateTrendWinNav();
     setTrendPickerEnabled(false);
     showTrendMsg("이 학기는 아직 수집된 인원 데이터가 없습니다.");
@@ -2587,7 +2631,7 @@ async function loadTrendTerm() {
     data = _validateTrendData(await r.json(), `trend ${meta.trend}`);
   } catch (e) {
     console.warn(`trend ${meta.trend} rejected: ${e.message}`);
-    _trend = { key: null, data: null, ts: [], classes: [], byKey: new Map(), year, term };
+    _trend = { key: null, data: null, t: [], classes: [], byKey: new Map(), year, term };
     updateTrendWinNav();
     setTrendPickerEnabled(false);
     showTrendMsg("데이터를 불러오지 못했습니다.");
@@ -2602,7 +2646,7 @@ async function loadTrendTerm() {
              label: `${m.name || key}${m.prof ? " · " + m.prof : ""}` };
   }).sort((a, b) => a.name.localeCompare(b.name));
   const archives = meta.trendArchives || 0;   // frozen chunks before the live window
-  _trend = { key: null, data, ts: data.ts || [], classes,
+  _trend = { key: null, data, t: data.t, classes,
              byKey: new Map(classes.map((c) => [c.key, c.label])), year, term,
              file: meta.trend, archives, win: archives,
              winCache: new Map([[archives, data]]) };
@@ -2610,7 +2654,7 @@ async function loadTrendTerm() {
   setTrendPickerEnabled(classes.length > 0);
   const closedNote = data.closed ? ` · 마감${data.closedAt ? " " + data.closedAt.slice(0, 10) : ""}` : "";
   showTrendMsg(classes.length
-    ? `강좌를 검색해 선택하세요 (${classes.length.toLocaleString()}개 강좌 · ${(data.ts || []).length}개 시점)${closedNote}`
+    ? `강좌를 검색해 선택하세요 (${classes.length.toLocaleString()}개 강좌 · ${data.t.length}개 시점)${closedNote}`
     : "이 학기는 아직 수집된 인원 데이터가 없습니다.");
 }
 // ---------- trend time-window paging (live file + frozen archive chunks) ----------
@@ -2620,9 +2664,8 @@ function trendWinFile(i) {
   return _trend.file.replace(/\.json$/, `_w${String(i).padStart(3, "0")}.json`);
 }
 function trendWinRange(d) {
-  const day = (t) => `${t.slice(5, 7)}/${t.slice(8, 10)}`;
-  const ts = d.ts || [];
-  return ts.length ? `${day(ts[0])}~${day(ts[ts.length - 1])}` : "-";
+  const t = d.t || [], tz = d.tz || TREND_TZ;
+  return t.length ? `${fmtTs(t[0], tz)}~${fmtTs(t[t.length - 1], tz)}` : "-";
 }
 function updateTrendWinNav() {
   const nav = $("#trendWinNav"); if (!nav) return;
@@ -2640,7 +2683,10 @@ async function shiftTrendWindow(delta) {
   const target = _trend.win + delta;
   if (!_trend.data || target < 0 || target > _trend.archives) return;
   let data = _trend.winCache.get(target);
-  if (!data) {
+  if (data) {                        // LRU: re-insert so it is the newest entry
+    _trend.winCache.delete(target);
+    _trend.winCache.set(target, data);
+  } else {
     const file = trendWinFile(target);
     $("#trendWinLabel").textContent = "불러오는 중…";
     try {
@@ -2648,6 +2694,12 @@ async function shiftTrendWindow(delta) {
       if (!r.ok) throw new Error(`trend HTTP ${r.status}`);
       data = _validateTrendData(await r.json(), `trend ${file}`);
       _trend.winCache.set(target, data);
+      // Bounded: paging back through a whole semester used to keep every
+      // window alive at once. The live window (the entry point) is kept.
+      for (const k of _trend.winCache.keys()) {
+        if (_trend.winCache.size <= TREND_WIN_CACHE) break;
+        if (k !== _trend.archives && k !== target) _trend.winCache.delete(k);
+      }
     } catch (e) {
       console.warn(`trend window ${file} rejected: ${e.message}`);
       updateTrendWinNav();   // restore the label; stay on the current window
@@ -2656,7 +2708,7 @@ async function shiftTrendWindow(delta) {
   }
   _trend.win = target;
   _trend.data = data;
-  _trend.ts = data.ts || [];
+  _trend.t = data.t;
   updateTrendWinNav();
   if (_trend.key) {
     if (data.series[_trend.key]) drawTrendChart();
@@ -2747,16 +2799,52 @@ function niceCeil(v) {
   const n = v / pow;
   return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * pow;
 }
-const _tsDate = (iso) => new Date(iso);
-const fmtTs = (iso) => { const d = _tsDate(iso); return `${d.getMonth() + 1}/${d.getDate()}`; };
-const fmtTsFull = (iso) => { const d = _tsDate(iso);
-  return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+// Pass times are absolute epoch seconds; labels are always in the collection
+// timezone (KST), so a viewer abroad sees the same clock as the site's users.
+const TREND_TZ = "Asia/Seoul";
+const TREND_WIN_CACHE = 4;          // trend windows kept in memory at once
+const TREND_GAP_S = 3 * 3600;       // no pass for this long: break the line
+const _trendFmtCache = new Map();
+function _trendParts(epoch, tz) {
+  let f = _trendFmtCache.get(tz);
+  if (!f) {
+    f = new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric", month: "numeric",
+      day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+    _trendFmtCache.set(tz, f);
+  }
+  const p = {};
+  for (const x of f.formatToParts(new Date(epoch * 1000))) p[x.type] = x.value;
+  return p;
+}
+const fmtTs = (epoch, tz = TREND_TZ) => { const p = _trendParts(epoch, tz); return `${+p.month}/${+p.day}`; };
+const fmtTsFull = (epoch, tz = TREND_TZ) => {
+  const p = _trendParts(epoch, tz); return `${+p.month}/${+p.day} ${p.hour}:${p.minute}`; };
+function _tzOffset(epoch, tz) {     // seconds east of UTC at `epoch`
+  const p = _trendParts(epoch, tz);
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) / 1000 - epoch;
+}
+// Time ticks: local midnights for multi-day spans, round hours for short ones.
+function _trendTicks(t0, t1, tz) {
+  const span = Math.max(1, t1 - t0);
+  const steps = [3600, 3 * 3600, 6 * 3600, 12 * 3600, 86400, 2 * 86400, 7 * 86400, 14 * 86400];
+  const step = steps.find((s) => span / s <= 6) || steps[steps.length - 1];
+  const off = _tzOffset(t0, tz);
+  const ticks = [];
+  for (let x = Math.ceil((t0 + off) / step) * step - off; x <= t1; x += step) {
+    const p = _trendParts(x, tz);
+    const midnight = p.hour === "00" && p.minute === "00";
+    ticks.push({ t: x, label: step >= 86400 || midnight ? `${+p.month}/${+p.day}` : `${p.hour}:00` });
+  }
+  return ticks;
+}
 
-function _trendPath(svg, arr, X, Y, color, n, dashed) {
+function _trendPath(svg, arr, X, Y, color, t, dashed) {
   if (!arr) return;
+  const n = t.length;
   let d = "", started = false;
   for (let i = 0; i < n; i++) {
     if (arr[i] == null) { started = false; continue; }   // break line over gaps
+    if (i && t[i] - t[i - 1] > TREND_GAP_S) started = false;   // …and over collection gaps
     d += (started ? "L" : "M") + X(i) + " " + Y(arr[i]) + " ";
     started = true;
   }
@@ -2766,11 +2854,17 @@ function _trendPath(svg, arr, X, Y, color, n, dashed) {
   if (!dashed) for (let i = 0; i < n; i++) if (arr[i] != null)
     svg.append(svgEl("circle", { cx: X(i), cy: Y(arr[i]), r: 2.5, fill: color }));
 }
+// index of the pass nearest to time `x` (t is sorted ascending)
+function _nearestPass(t, x) {
+  let lo = 0, hi = t.length - 1;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (t[mid] < x) lo = mid + 1; else hi = mid; }
+  return lo > 0 && x - t[lo - 1] < t[lo] - x ? lo - 1 : lo;
+}
 
 function drawTrendChart() {
-  const { data, key, ts } = _trend;
-  const s = data.series[key]; if (!s) return;
-  const n = ts.length;
+  const { data, key, t } = _trend;
+  const s = trendSeriesOf(data, key); if (!s) return;
+  const n = t.length, tz = data.tz || TREND_TZ;
   // metric chooser: 전체(all) or one of 신청/장바구니/수강 (so the cart→enrolled drop is readable)
   const metric = $("#trendMetric")?.value || "all";
   const visible = metric === "all" ? TREND_SERIES : TREND_SERIES.filter((d) => d.k === metric);
@@ -2780,22 +2874,24 @@ function drawTrendChart() {
   for (const def of visible) for (const v of (s[def.k] || [])) if (v != null && v > max) max = v;
   for (const v of (s.q || [])) if (v != null && v > max) max = v;
   const niceMax = niceCeil(max);
-  const X = (i) => n <= 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW;
+  // x is TIME, not pass index: a night without passes or a weeks-long gap
+  // between collection windows takes its real width instead of one step
+  const t0 = t[0], span = t[n - 1] - t0;
+  const XT = (x) => span <= 0 ? padL + plotW / 2 : padL + ((x - t0) / span) * plotW;
+  const X = (i) => XT(t[i]);
   const Y = (v) => padT + plotH - (v / niceMax) * plotH;
 
-  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}` });
+  const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, role: "img",
+    "aria-label": `${(_trend.byKey && _trend.byKey.get(key)) || key} 인원 추이 차트` });
   for (let g = 0; g <= 4; g++) {
     const val = niceMax * g / 4, y = Y(val);
     svg.append(svgEl("line", { x1: padL, y1: y, x2: W - padR, y2: y, stroke: TREND_GRID, "stroke-width": 1 }));
     svg.append(svgEl("text", { x: padL - 6, y: y + 3, "text-anchor": "end", "font-size": 10, fill: TREND_FAINT }, String(Math.round(val))));
   }
-  const xticks = Math.min(n, 5);
-  for (let t = 0; t < xticks; t++) {
-    const i = xticks <= 1 ? 0 : Math.round(t * (n - 1) / (xticks - 1));
-    svg.append(svgEl("text", { x: X(i), y: H - 10, "text-anchor": "middle", "font-size": 10, fill: TREND_FAINT }, fmtTs(ts[i])));
-  }
-  _trendPath(svg, s.q, X, Y, TREND_FAINT, n, true);                 // quota reference
-  for (const def of visible) _trendPath(svg, s[def.k], X, Y, def.color, n, false);
+  for (const tick of (span > 0 ? _trendTicks(t0, t[n - 1], tz) : [{ t: t0, label: fmtTs(t0, tz) }]))
+    svg.append(svgEl("text", { x: XT(tick.t), y: H - 10, "text-anchor": "middle", "font-size": 10, fill: TREND_FAINT }, tick.label));
+  _trendPath(svg, s.q, X, Y, TREND_FAINT, t, true);                 // quota reference
+  for (const def of visible) _trendPath(svg, s[def.k], X, Y, def.color, t, false);
 
   const guide = svgEl("line", { x1: 0, y1: padT, x2: 0, y2: padT + plotH, stroke: TREND_LINE, "stroke-width": 1, visibility: "hidden" });
   svg.append(guide);
@@ -2811,8 +2907,8 @@ function drawTrendChart() {
   const wrap = $("#trendChartWrap"), tip = $("#trendTip");
   overlay.addEventListener("mousemove", (ev) => {
     const r = svg.getBoundingClientRect();
-    let i = n <= 1 ? 0 : Math.round(((ev.clientX - r.left) / r.width * W - padL) / plotW * (n - 1));
-    i = Math.max(0, Math.min(n - 1, i));
+    const px = (ev.clientX - r.left) / r.width * W;
+    const i = n <= 1 || span <= 0 ? 0 : _nearestPass(t, t0 + ((px - padL) / plotW) * span);
     const gx = X(i);
     guide.setAttribute("x1", gx); guide.setAttribute("x2", gx); guide.setAttribute("visibility", "visible");
     const rows = visible.map((d) => {
@@ -2821,7 +2917,7 @@ function drawTrendChart() {
         el("span", {}, dot, d.name),
         el("b", {}, s[d.k][i] ?? "—"));
     });
-    const tipKids = [el("div", { className: "tip-t" }, fmtTsFull(ts[i])), ...rows];
+    const tipKids = [el("div", { className: "tip-t" }, fmtTsFull(t[i], tz)), ...rows];
     if (s.q && s.q[i] != null)
       tipKids.push(el("div", { className: "tip-row" }, el("span", {}, "정원"), el("b", {}, s.q[i])));
     tip.replaceChildren(...tipKids);
