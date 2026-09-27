@@ -6,13 +6,17 @@
   const mount = document.getElementById("app");
   const parts = (mount.dataset.partials || "")
     .split(",").map((s) => s.trim()).filter(Boolean);
-  for (const name of parts) {
-    try {
-      const r = await fetch(name, { cache: "no-cache" });   // revalidate so edited/redeployed partials aren't served stale
-      if (r.ok) mount.insertAdjacentHTML("beforeend", await r.text());
-    } catch { /* optional partial unavailable (e.g. dev.html on a static host) — skip */ }
-  }
+  // "no-cache" revalidates instead of re-downloading: GitHub Pages answers an
+  // unchanged file with 304 (ETag), so a redeploy is picked up immediately and
+  // a repeat visit costs a round trip per file rather than its body. All
+  // requests go out together; the partials are still mounted in listed order.
+  const get = (url) => fetch(url, { cache: "no-cache" })
+    .then((r) => (r.ok ? r.text() : null))
+    .catch(() => null);   // optional partial unavailable (e.g. dev.html on a static host)
+  const [app, ...html] = await Promise.all([get("app.js"), ...parts.map(get)]);
+  for (const h of html) if (h != null) mount.insertAdjacentHTML("beforeend", h);
   const s = document.createElement("script");
-  s.src = "app.js?v=" + Date.now();   // cache-bust so redeploys load fresh app.js (no stale pre-refactor build)
+  if (app != null) s.textContent = app + "\n//# sourceURL=app.js";
+  else s.src = "app.js?v=" + Date.now();   // fetch failed: let the browser try itself
   document.body.appendChild(s);
 })();

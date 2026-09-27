@@ -630,9 +630,8 @@ async function rowsForScope(f) {
   const idx = await dataIndex();
   let ts = idx.terms.filter((t) => (!f.year || t.year === f.year) && (!f.term || t.term === f.term));
   if (!f.year && !f.term && !hasOtherFilters(f)) ts = idx.terms.slice(0, 1);
-  const out = [];
-  for (const t of ts) out.push(...await termRows(t.year, t.term));
-  return out;
+  // fetched in parallel (termRows isolates each term's failure), kept in order
+  return (await Promise.all(ts.map((t) => termRows(t.year, t.term)))).flat();
 }
 // subsequence: query chars appear in order in the haystack
 function subseqMatch(hay, needle) {
@@ -711,7 +710,25 @@ function overlapsBusy(c, busy) {
   }
   return false;
 }
+// Same order as String#localeCompare with the default locale, without
+// re-resolving the locale on every comparison of a multi-thousand-row sort.
+const _collate = new Intl.Collator().compare;
+// The filtered + sorted result of the last query. "더 보기" pages through the
+// SAME filters object, so it slices this instead of re-filtering and
+// re-sorting the whole scope for every 100 rows.
+let _searchCache = null;
 async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
+  const busyKey = f.emptyOnly ? JSON.stringify(timetableBusy()) : "";
+  let rows;
+  if (_searchCache && _searchCache.f === f && _searchCache.busyKey === busyKey) {
+    rows = _searchCache.rows;
+  } else {
+    rows = await _searchRows(f);
+    _searchCache = { f, busyKey, rows };
+  }
+  return { total: rows.length, classes: limit == null ? rows : rows.slice(offset, offset + limit) };
+}
+async function _searchRows(f) {
   let rows = (await rowsForScope(f)).filter((c) => matchRow(c, f));
   if (f.emptyOnly) {   // only classes that fit the timetable's free slots (no overlap)
     const busy = timetableBusy();
@@ -721,15 +738,16 @@ async function searchLocal(f, { limit = 100, offset = 0 } = {}) {
     rows = rows.filter((c) => (c.slots || []).some((s) => s.day_index != null && s.start_time));
   }
   if (f.name) {   // rank by name relevance so a shorthand surfaces the best match first
-    rows.sort((a, b) => nameScore(b.name, f.name) - nameScore(a.name, f.name)
-      || (a.professor || "").localeCompare(b.professor || "")
-      || (a.name || "").localeCompare(b.name || "")
-      || (a.lt_no || "").localeCompare(b.lt_no || ""));
+    const score = new Map(rows.map((c) => [c, nameScore(c.name, f.name)]));
+    rows.sort((a, b) => score.get(b) - score.get(a)
+      || _collate(a.professor || "", b.professor || "")
+      || _collate(a.name || "", b.name || "")
+      || _collate(a.lt_no || "", b.lt_no || ""));
   } else {
-    rows.sort((a, b) => (a.name || "").localeCompare(b.name || "")
-      || (a.lt_no || "").localeCompare(b.lt_no || ""));
+    rows.sort((a, b) => _collate(a.name || "", b.name || "")
+      || _collate(a.lt_no || "", b.lt_no || ""));
   }
-  return { total: rows.length, classes: limit == null ? rows : rows.slice(offset, offset + limit) };
+  return rows;
 }
 async function lookupLocal(keys) {
   const want = new Set(keys.map((k) => k.join("|")));
