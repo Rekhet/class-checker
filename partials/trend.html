@@ -36,12 +36,24 @@
   <div id="trendChartWrap" class="trend-chart-wrap hidden">
     <div class="trend-title-row">
       <div id="trendTitle" class="trend-title"></div>
-      <button type="button" id="trendShare" class="wish-mini hidden" title="이 강좌의 인원 추이를 링크로 복사">링크 복사</button>
+      <span class="trend-title-actions">
+        <span id="trendWatchSlot"></span>
+        <button type="button" id="trendShare" class="wish-mini hidden" title="이 강좌의 인원 추이를 링크로 복사">링크 복사</button>
+      </span>
     </div>
     <div id="trendChart"></div>
     <div id="trendTip" class="trend-tip hidden"></div>
   </div>
   <div id="trendLegend" class="trend-legend hidden"></div>
+
+  <!-- 여석 알림: classes watched in this browser (localStorage), checked while the site is open -->
+  <section id="trendWatch" class="trend-feed hidden" aria-labelledby="trendWatchTitle">
+    <div class="trend-feed-head">
+      <h3 id="trendWatchTitle">여석 알림 <span class="sub">Seat alerts</span></h3>
+    </div>
+    <p id="trendWatchMeta" class="trend-feed-meta"></p>
+    <ul id="trendWatchList" class="trend-feed-list watch-list"></ul>
+  </section>
 
   <!-- 최근 변동: the newest (live) window, independent of the window paged to above -->
   <section id="trendFeed" class="trend-feed hidden" aria-labelledby="trendFeedTitle">

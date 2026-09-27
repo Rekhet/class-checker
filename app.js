@@ -1898,9 +1898,14 @@ function renderDetail() {
     const key = `${c.sbjt_cd}(${c.lt_no})`;
     const meta = _dataIndex?.terms.find((t) => t.year === c.year && t.term === c.term);
     const links = el("div", { className: "d-links" });
-    if (meta?.trend) links.append(el("a", {
-      className: "d-link", href: trendHash(c.year, c.term, key),
-      onclick: () => closeDetail(false) }, "인원 추이 보기"));
+    if (meta?.trend) {
+      links.append(el("a", {
+        className: "d-link", href: trendHash(c.year, c.term, key),
+        onclick: () => closeDetail(false) }, "인원 추이 보기"));
+      const seats = c.quota != null && c.applied != null ? c.quota - c.applied : null;
+      links.append(watchButton({ year: c.year, term: c.term, key,
+        label: `${c.name}${c.professor ? " · " + c.professor : ""}`, seats }, "d-link"));
+    }
     links.append(el("button", { type: "button", className: "d-link",
       onclick: (e) => copyLink(shareUrl(classHash(c.year, c.term, key)), e.currentTarget) },
       "링크 복사"));
@@ -2951,6 +2956,13 @@ function drawTrendChart() {
 
   $("#trendChart").replaceChildren(svg);
   const disp = (_trend.byKey && _trend.byKey.get(key)) || key;
+  const slot = $("#trendWatchSlot");
+  if (slot && _trend.live?.series[key]) {
+    const enc = _trend.live.series[key], last = _trend.live.t.length - 1;
+    const q = _cpAt(enc.q, last), a = _cpAt(enc.a, last);
+    slot.replaceChildren(watchButton({ year: _trend.year, term: _trend.term, key,
+      label: disp, seats: q != null && a != null ? q - a : null }, "wish-mini"));
+  } else if (slot) slot.replaceChildren();
   $("#trendTitle").textContent = disp + (_trend.data && _trend.data.closed ? " · 마감" : "");
   renderTrendLegend(s, visible);
   setTrendChartVisible(true);
@@ -3673,6 +3685,145 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   return { node, ok };
 }
 
+// ---------- 여석 알림 (in-tab seat alerts) ----------
+// A watched class is checked against the live trend file while any tab of the
+// site is open: every WATCH_POLL_MS (a revalidating fetch — 304 when nothing
+// was published) and whenever the tab comes back into view. An alert fires on
+// the transition to 여석 > 0, not while seats merely stay open.
+const WATCH_KEY = "snu_seat_watch";
+const WATCH_POLL_MS = 10 * 60 * 1000;
+let _watch = _loadWatch();
+let _watchTimer = 0;
+function _loadWatch() {
+  try {
+    const v = JSON.parse(localStorage.getItem(WATCH_KEY));
+    if (_isRecord(v) && _isRecord(v.items)) {
+      const items = {};
+      for (const [id, it] of Object.entries(v.items))
+        if (_isRecord(it) && _isString(it.label) && _isString(it.year) && _isString(it.term)
+            && _isString(it.key) && _isNullable(it.seats, _isInteger)) items[id] = it;
+      return { items };
+    }
+  } catch { /* unreadable: start empty */ }
+  return { items: {} };
+}
+function _saveWatch() {
+  try { localStorage.setItem(WATCH_KEY, JSON.stringify(_watch)); _quotaWarned = false; }
+  catch (e) { _onQuota(e); }
+}
+const watchId = (year, term, key) => `${year}|${term}|${key}`;
+function watchButton(c, className) {
+  const id = watchId(c.year, c.term, c.key);
+  const b = el("button", { type: "button", className: className + " watch-btn" });
+  const paint = () => {
+    const on = !!_watch.items[id];
+    b.textContent = on ? "🔕 여석 알림 끄기" : "🔔 여석 알림";
+    b.setAttribute("aria-pressed", String(on));
+    b.title = on ? "이 강좌의 여석 알림을 끕니다" : "여석이 생기면 알려 드립니다 (이 사이트가 열려 있는 동안)";
+  };
+  b.addEventListener("click", async () => {
+    if (_watch.items[id]) delete _watch.items[id];
+    else {
+      _watch.items[id] = { year: c.year, term: c.term, key: c.key, label: c.label,
+        seats: c.seats ?? null, added: Math.floor(Date.now() / 1000) };
+      if ("Notification" in window && Notification.permission === "default") {
+        try { await Notification.requestPermission(); } catch { /* unsupported */ }
+      }
+      showToast(c.seats > 0
+        ? `알림 등록 · 지금 여석 ${c.seats}개 — 여석이 0이 됐다가 다시 생기면 알려 드립니다.`
+        : "알림 등록 · 여석이 생기면 알려 드립니다 (사이트가 열려 있는 동안).");
+    }
+    _saveWatch();
+    paint();
+    renderWatchList();
+    startWatchPolling();
+  });
+  paint();
+  return b;
+}
+async function checkWatches() {
+  const byTerm = new Map();
+  for (const [id, it] of Object.entries(_watch.items)) {
+    const k = `${it.year}|${it.term}`;
+    if (!byTerm.has(k)) byTerm.set(k, []);
+    byTerm.get(k).push([id, it]);
+  }
+  if (!byTerm.size) return;
+  const idx = await dataIndex();
+  for (const [k, entries] of byTerm) {
+    const [year, term] = k.split("|");
+    const meta = idx.terms.find((t) => t.year === year && t.term === term);
+    if (!meta?.trend) continue;
+    let data;
+    try {
+      const r = await fetch("data/trend/" + meta.trend, { cache: "no-cache" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      data = _validateTrendData(await r.json(), `trend ${meta.trend}`);
+    } catch (e) { console.warn(`seat watch: ${e.message}`); continue; }
+    const last = data.t.length - 1;
+    for (const [id, it] of entries) {
+      const enc = data.series[it.key];
+      if (!enc) continue;
+      const q = _cpAt(enc.q, last), a = _cpAt(enc.a, last);
+      if (q == null || a == null) continue;
+      const seats = q - a;
+      if (seats > 0 && !(it.seats > 0)) notifySeat(id, it, seats);
+      it.seats = seats;
+      it.checked = data.t[last];
+    }
+  }
+  _saveWatch();
+  renderWatchList();
+}
+function notifySeat(id, it, seats) {
+  const body = `${it.label} — 여석 ${seats}개`;
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      const n = new Notification("여석이 생겼습니다", { body, tag: id });
+      n.onclick = () => { window.focus(); location.hash = trendHash(it.year, it.term, it.key); };
+    } catch { /* e.g. mobile browsers that only allow service-worker notifications */ }
+  }
+  showToast("여석이 생겼습니다 · " + body);
+}
+function startWatchPolling() {
+  const any = Object.keys(_watch.items).length > 0;
+  if (!any && _watchTimer) { clearInterval(_watchTimer); _watchTimer = 0; }
+  if (!any || _watchTimer) return;
+  _watchTimer = setInterval(checkWatches, WATCH_POLL_MS);
+  checkWatches();
+}
+function renderWatchList() {
+  const box = $("#trendWatch"); if (!box) return;
+  const items = Object.entries(_watch.items);
+  box.classList.toggle("hidden", !items.length);
+  const list = $("#trendWatchList"); list.replaceChildren();
+  for (const [id, it] of items) {
+    const open = it.seats > 0;
+    list.append(el("li", {},
+      el("a", { className: "tf-name", href: trendHash(it.year, it.term, it.key) }, it.label),
+      el("span", { className: "tf-seat" + (open ? " open" : "") },
+        it.seats == null ? "여석 —" : `여석 ${it.seats}`),
+      el("span", { className: "tf-at" }, it.checked ? `확인 ${fmtTsFull(it.checked, TREND_TZ)}` : "확인 전"),
+      el("button", { type: "button", className: "wish-mini", title: "알림 해제",
+        "aria-label": `${it.label} 알림 해제`,
+        onclick: () => { delete _watch.items[id]; _saveWatch(); renderWatchList(); startWatchPolling();
+          if (_trend.key) drawTrendChart(); } }, "해제")));
+  }
+  const perm = "Notification" in window ? Notification.permission : "unsupported";
+  $("#trendWatchMeta").textContent = perm === "granted"
+    ? "사이트가 열려 있는 동안 10분마다 확인하고, 여석이 생기면 브라우저 알림을 보냅니다."
+    : "사이트가 열려 있는 동안 10분마다 확인합니다. 브라우저 알림이 꺼져 있어 화면 안에만 표시됩니다.";
+}
+let _toastTimer = 0;
+function showToast(text) {
+  let t = $("#toast");
+  if (!t) { t = el("div", { id: "toast", className: "toast", role: "status", "aria-live": "polite" }); document.body.append(t); }
+  t.textContent = text;
+  t.classList.add("show");
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove("show"), 6000);
+}
+
 // ---------- share links ----------
 // #search/<query>          a search: filters as short URL parameters
 // #class/<year|term>/<key> one class's detail drawer
@@ -3834,6 +3985,11 @@ function init() {
     e.target.value = "";                     // allow re-importing the same file
   });
   renderWishlist();                          // seed the count
+  renderWatchList();
+  startWatchPolling();                       // 여석 알림: resume watching saved classes
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && Object.keys(_watch.items).length) checkWatches();
+  });
   $("#detailOverlay").addEventListener("click", closeDetail);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
   document.addEventListener("keydown", (e) => {

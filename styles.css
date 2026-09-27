@@ -725,3 +725,14 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   .trend-feed-list li { grid-template-columns: minmax(0, 1fr) auto; }
   .tf-num { grid-column: 1 / -1; }
 }
+
+/* ===== 여석 알림 (seat alerts) ===== */
+.trend-title-actions { display: inline-flex; gap: 6px; align-items: center; }
+.watch-btn[aria-pressed="true"] { color: var(--cp-ok); border-color: var(--cp-ok); }
+.watch-list li { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.watch-list .tf-name { text-decoration: none; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0;
+  pointer-events: none; background: var(--cp-ink); color: var(--cp-paper); font-size: 13px;
+  padding: 10px 16px; border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  transition: opacity .2s, transform .2s; z-index: 60; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
