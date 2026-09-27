@@ -43,5 +43,26 @@
   </div>
   <div id="trendLegend" class="trend-legend hidden"></div>
 
+  <!-- 최근 변동: the newest (live) window, independent of the window paged to above -->
+  <section id="trendFeed" class="trend-feed hidden" aria-labelledby="trendFeedTitle">
+    <div class="trend-feed-head">
+      <h3 id="trendFeedTitle">최근 변동 <span class="sub">Recent changes</span></h3>
+      <div class="trend-feed-ctl">
+        <select id="trendFeedMode" aria-label="변동 종류">
+          <option value="open">여석이 생긴 강좌</option>
+          <option value="all">인원이 바뀐 모든 강좌</option>
+        </select>
+        <select id="trendFeedHours" aria-label="기간">
+          <option value="3">최근 3시간</option>
+          <option value="12">최근 12시간</option>
+          <option value="24" selected>최근 24시간</option>
+          <option value="0">최신 구간 전체</option>
+        </select>
+      </div>
+    </div>
+    <p id="trendFeedMeta" class="trend-feed-meta"></p>
+    <ol id="trendFeedList" class="trend-feed-list"></ol>
+  </section>
+
 </div>
 </div>

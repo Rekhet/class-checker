@@ -2640,6 +2640,8 @@ async function _initTrend() {
   $("#trendMetric").addEventListener("change", () => { if (_trend.key) drawTrendChart(); });
   $("#trendPrev")?.addEventListener("click", () => shiftTrendWindow(-1));
   $("#trendNext")?.addEventListener("click", () => shiftTrendWindow(1));
+  $("#trendFeedMode")?.addEventListener("change", renderTrendFeed);
+  $("#trendFeedHours")?.addEventListener("change", renderTrendFeed);
   $("#trendShare")?.addEventListener("click", (e) => {
     if (_trend.key) copyLink(shareUrl(trendHash(_trend.year, _trend.term, _trend.key)), e.currentTarget);
   });
@@ -2663,6 +2665,7 @@ async function loadTrendTerm() {
     _trend = { key: null, data: null, t: [], classes: [], byKey: new Map() };
     updateTrendWinNav();
     setTrendPickerEnabled(false);
+    renderTrendFeed();
     showTrendMsg("이 학기는 아직 수집된 인원 데이터가 없습니다.");
     return;
   }
@@ -2677,6 +2680,7 @@ async function loadTrendTerm() {
     _trend = { key: null, data: null, t: [], classes: [], byKey: new Map(), year, term };
     updateTrendWinNav();
     setTrendPickerEnabled(false);
+    renderTrendFeed();
     showTrendMsg("데이터를 불러오지 못했습니다.");
     return;
   }
@@ -2689,10 +2693,11 @@ async function loadTrendTerm() {
              label: `${m.name || key}${m.prof ? " · " + m.prof : ""}` };
   }).sort((a, b) => a.name.localeCompare(b.name));
   const archives = meta.trendArchives || 0;   // frozen chunks before the live window
-  _trend = { key: null, data, t: data.t, classes,
+  _trend = { key: null, data, live: data, t: data.t, classes,
              byKey: new Map(classes.map((c) => [c.key, c.label])), year, term,
              file: meta.trend, archives, win: archives,
              winCache: new Map([[archives, data]]) };
+  renderTrendFeed();
   updateTrendWinNav();
   setTrendPickerEnabled(classes.length > 0);
   const closedNote = data.closed ? ` · 마감${data.closedAt ? " " + data.closedAt.slice(0, 10) : ""}` : "";
@@ -2974,6 +2979,81 @@ function drawTrendChart() {
     tip.classList.remove("hidden");
   });
   overlay.addEventListener("mouseleave", () => { tip.classList.add("hidden"); guide.setAttribute("visibility", "hidden"); });
+}
+
+// ---------- 최근 변동 (change feed) ----------
+// Value of a change-point series at pass i, without decoding the whole array.
+function _cpAt(enc, i) {
+  if (enc == null || _isInteger(enc)) return enc ?? null;
+  let v = null;
+  for (let k = 0; k < enc.length && enc[k] <= i; k += 2) v = enc[k + 1];
+  return v;
+}
+// Newest pass index after `after` where the series changes, or -1.
+function _cpLastChange(enc, after) {
+  if (!Array.isArray(enc)) return -1;
+  const i = enc[enc.length - 2];
+  return i > after ? i : -1;
+}
+// Classes whose numbers moved in the newest `hours` of the live window.
+// mode "open": 여석(정원−신청) grew and is now above zero; "all": any change.
+function trendFeed(data, hours, mode) {
+  const t = data.t, last = t.length - 1;
+  let base = 0;                                  // last pass at or before the cutoff
+  if (hours > 0) {
+    const since = t[last] - hours * 3600;
+    while (base < last && t[base + 1] <= since) base++;
+  }
+  const items = [];
+  for (const [key, enc] of Object.entries(data.series)) {
+    const at = Math.max(_cpLastChange(enc.a, base), _cpLastChange(enc.q, base),
+      _cpLastChange(enc.e, base));
+    if (at < 0) continue;
+    const a0 = _cpAt(enc.a, base), a1 = _cpAt(enc.a, last);
+    const q0 = _cpAt(enc.q, base), q1 = _cpAt(enc.q, last);
+    const e0 = _cpAt(enc.e, base), e1 = _cpAt(enc.e, last);
+    const s0 = q0 != null && a0 != null ? q0 - a0 : null;
+    const s1 = q1 != null && a1 != null ? q1 - a1 : null;
+    if (mode === "open" && !(s1 > 0 && (s0 == null || s1 > s0))) continue;
+    items.push({ key, at: t[at], s0, s1, a0, a1, e0, e1 });
+  }
+  items.sort(mode === "open"
+    ? (x, y) => (y.s1 - (y.s0 ?? 0)) - (x.s1 - (x.s0 ?? 0)) || y.at - x.at
+    : (x, y) => y.at - x.at);
+  return items;
+}
+const TREND_FEED_MAX = 50;
+function renderTrendFeed() {
+  const box = $("#trendFeed"); if (!box) return;
+  const data = _trend.live;
+  box.classList.toggle("hidden", !data);
+  if (!data) return;
+  const mode = $("#trendFeedMode").value, hours = Number($("#trendFeedHours").value);
+  const items = trendFeed(data, hours, mode);
+  const tz = data.tz || TREND_TZ, t = data.t;
+  $("#trendFeedMeta").textContent =
+    `${items.length.toLocaleString()}개 강좌 · 기준 ${fmtTsFull(t[t.length - 1], tz)}`
+    + (items.length > TREND_FEED_MAX ? ` · 상위 ${TREND_FEED_MAX}개 표시` : "");
+  const list = $("#trendFeedList"); list.replaceChildren();
+  const arrow = (from, to) => (from == null || from === to ? `${to ?? "—"}` : `${from} → ${to}`);
+  const byKey = new Map(_trend.classes.map((c) => [c.key, c]));
+  for (const it of items.slice(0, TREND_FEED_MAX)) {
+    const c = byKey.get(it.key);
+    const btn = el("button", { type: "button", className: "tf-name", title: "인원 추이 보기",
+      onclick: () => {
+        if (!c) return;
+        pickTrendClass(c);
+        $("#trendChartWrap")?.scrollIntoView({ block: "center" });
+      } }, c ? c.label : it.key);
+    list.append(el("li", {}, btn,
+      el("span", { className: "tf-seat" + (it.s1 > 0 ? " open" : "") }, `여석 ${arrow(it.s0, it.s1)}`),
+      el("span", { className: "tf-num" }, `신청 ${arrow(it.a0, it.a1)} · 수강 ${arrow(it.e0, it.e1)}`),
+      el("time", { className: "tf-at", dateTime: new Date(it.at * 1000).toISOString() },
+        fmtTsFull(it.at, tz))));
+  }
+  if (!items.length)
+    list.append(el("li", { className: "tf-empty" },
+      mode === "open" ? "이 기간에 여석이 생긴 강좌가 없습니다." : "이 기간에 인원이 바뀐 강좌가 없습니다."));
 }
 
 function renderTrendLegend(s, visible) {
