@@ -687,3 +687,14 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .cl-conf-high { background: var(--cp-warn-bg, #fde68a); color: #7c2d12; }
 .cl-conf-low { background: var(--cp-line); color: var(--cp-muted); }
 .cl-confirm, .cl-reject { font-size: 12px; }
+
+/* ===== share links (2026-09-27) ===== */
+.result-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.result-meta-row .result-meta { flex: 1; }
+.trend-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.d-links { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.d-link { font: inherit; font-size: 12px; color: var(--cp-accent); background: transparent;
+  border: 1px solid var(--cp-line); border-radius: 4px; padding: 5px 10px; cursor: pointer;
+  text-decoration: none; }
+.d-link:hover { border-color: var(--cp-accent); }
+.result-meta-row #shareSearch { margin-right: 18px; }

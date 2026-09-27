@@ -1223,6 +1223,7 @@ function updateResultMeta() {
   const loaded = lastResults.length;
   $("#resultCount").textContent = `${loaded} / ${searchTotal}건 검색됨`;
   $("#loadMore").classList.toggle("hidden", loaded >= searchTotal);
+  $("#shareSearch")?.classList.toggle("hidden", lastFilters === null);
 }
 
 // export the full filtered result set, built client-side (no backend needed)
@@ -1826,7 +1827,9 @@ async function openDetail(c) {
   $("#detailOverlay").classList.remove("hidden");
   $("#detailDrawer").classList.remove("hidden");
 }
-function closeDetail() {
+function closeDetail(resetHash = true) {
+  if (resetHash && parseHash().route === "class")
+    history.replaceState(null, "", location.pathname + location.search);
   detailClass = null;
   $("#detailOverlay").classList.add("hidden");
   $("#detailDrawer").classList.add("hidden");
@@ -1890,6 +1893,19 @@ function renderDetail() {
     slotRows.append(el("div", { className: "d-slot" },
       el("span", { className: "day" }, d), el("span", { className: "time" }, t))));
   body.append(slotRows);
+
+  if (c.term !== "MANUAL" && c.sbjt_cd) {
+    const key = `${c.sbjt_cd}(${c.lt_no})`;
+    const meta = _dataIndex?.terms.find((t) => t.year === c.year && t.term === c.term);
+    const links = el("div", { className: "d-links" });
+    if (meta?.trend) links.append(el("a", {
+      className: "d-link", href: trendHash(c.year, c.term, key),
+      onclick: () => closeDetail(false) }, "인원 추이 보기"));
+    links.append(el("button", { type: "button", className: "d-link",
+      onclick: (e) => copyLink(shareUrl(classHash(c.year, c.term, key)), e.currentTarget) },
+      "링크 복사"));
+    body.append(links);
+  }
 
   const foot = el("div", { className: "d-foot" },
     el("button", {
@@ -2602,11 +2618,14 @@ const TREND_FAINT = "#A2A29C", TREND_GRID = "#ECEBE7", TREND_LINE = "#DCDBD7";
 let _trend = { key: null, data: null, t: [], classes: [], byKey: new Map() };
 let _trendInited = false;
 
-// lazy: build the term picker + load the default term the first time the page shows
-async function ensureTrend() {
-  if (_trendInited) return;
+// lazy: build the term picker + load the default term the first time the page shows.
+// Returns the same promise to every caller, so a deep link can wait for it.
+function ensureTrend() {
+  if (!_trendInited) _trendInited = _initTrend();
+  return _trendInited;
+}
+async function _initTrend() {
   const sel = $("#trendTerm"); if (!sel) return;
-  _trendInited = true;
   const idx = await dataIndex();
   sel.replaceChildren();
   idx.terms.forEach((t) => sel.append(el("option",
@@ -2621,6 +2640,9 @@ async function ensureTrend() {
   $("#trendMetric").addEventListener("change", () => { if (_trend.key) drawTrendChart(); });
   $("#trendPrev")?.addEventListener("click", () => shiftTrendWindow(-1));
   $("#trendNext")?.addEventListener("click", () => shiftTrendWindow(1));
+  $("#trendShare")?.addEventListener("click", (e) => {
+    if (_trend.key) copyLink(shareUrl(trendHash(_trend.year, _trend.term, _trend.key)), e.currentTarget);
+  });
   document.addEventListener("click", (e) => {     // close the results list on outside click
     if (!e.target.closest(".trend-search")) $("#trendResults")?.classList.add("hidden");
   });
@@ -2630,6 +2652,9 @@ async function ensureTrend() {
 async function loadTrendTerm() {
   const sel = $("#trendTerm"); if (!sel || !sel.value) return;
   const [year, term] = sel.value.split("|");
+  // a new term drops the old class from the address bar (a deep link re-adds it)
+  if (parseHash().route === "trend" && parseHash().param) history.replaceState(null, "", "#trend");
+  $("#trendShare")?.classList.add("hidden");
   $("#trendClass").value = "";
   $("#trendResults").replaceChildren(); $("#trendResults").classList.add("hidden");
   const idx = await dataIndex();
@@ -2799,6 +2824,9 @@ function pickTrendClass(c) {
   _trend.key = c.key;
   $("#trendClass").value = c.label;
   $("#trendResults").classList.add("hidden");
+  // the address bar always names the chart on screen, so it can be shared as is
+  history.replaceState(null, "", trendHash(_trend.year, _trend.term, c.key));
+  $("#trendShare")?.classList.remove("hidden");
   drawTrendChart();
 }
 
@@ -3565,12 +3593,91 @@ function _gradAuditBlock(spec, track, rows, required, entry, blkIdx, ruleset, ar
   return { node, ok };
 }
 
+// ---------- share links ----------
+// #search/<query>          a search: filters as short URL parameters
+// #class/<year|term>/<key> one class's detail drawer
+// #trend/<year|term>/<key> one class's 인원 추이 chart
+let _filtersReadyResolve;
+const _filtersReady = new Promise((resolve) => { _filtersReadyResolve = resolve; });
+const SHARE_FIELDS = [["year", "y", "year"], ["term", "t", "term"], ["name", "q", "name"],
+  ["department", "d", "department"], ["room", "r", "roomFilter"], ["day", "day", "day"],
+  ["period", "p", "period"], ["credits", "cr", "credits"]];
+const SHARE_CHIPS = [["classifications", "c", "typeChips"], ["levels", "lv", "levelChips"],
+  ["grades", "g", "gradeChips"], ["gradings", "gd", "gradingChips"]];
+const SHARE_FLAGS = [["englishOnly", "en"], ["switchableOnly", "sw"], ["emptyOnly", "fit"],
+  ["timedOnly", "tm"], ["seatsOnly", "seat"], ["cancelOnly", "cv"]];
+const shareUrl = (hash) => location.origin + location.pathname + location.search + hash;
+const classHash = (year, term, key) =>
+  `#class/${encodeURIComponent(`${year}|${term}`)}/${encodeURIComponent(key)}`;
+const trendHash = (year, term, key) =>
+  `#trend/${encodeURIComponent(`${year}|${term}`)}/${encodeURIComponent(key)}`;
+function searchHash(f) {
+  const p = new URLSearchParams();
+  for (const [k, short] of SHARE_FIELDS) if (f[k] != null && f[k] !== "") p.set(short, f[k]);
+  for (const [k, short] of SHARE_CHIPS) if (f[k]?.length) p.set(short, f[k].join(","));
+  for (const [k, short] of SHARE_FLAGS) if (f[k]) p.set(short, "1");
+  return "#search/" + p.toString();
+}
+// "year|term/SBJT(LT)" -> { year, term, sbjt, lt, key } or null
+function parseClassParam(param) {
+  const m = /^(\d{4})\|([^/]+)\/(.+)\(([^()]+)\)$/.exec(param || "");
+  return m ? { year: m[1], term: m[2], sbjt: m[3], lt: m[4], key: `${m[3]}(${m[4]})` } : null;
+}
+async function copyLink(url, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(url); ok = true; } catch { /* insecure context */ }
+  if (!ok) { window.prompt("아래 링크를 복사하세요", url); return; }
+  if (!btn) return;
+  const text = btn.textContent;
+  btn.textContent = "복사됨 ✓";
+  setTimeout(() => { btn.textContent = text; }, 1500);
+}
+async function applySearchLink(query) {
+  await _filtersReady;
+  const p = new URLSearchParams(query);
+  for (const [, short, id] of SHARE_FIELDS) { const e = $("#" + id); if (e) e.value = p.get(short) ?? ""; }
+  let advanced = !!(p.get("d") || p.get("r") || p.get("day") || p.get("p") || p.get("cr"));
+  for (const [, short, id] of SHARE_CHIPS) {
+    const want = new Set((p.get(short) || "").split(",").filter(Boolean));
+    if (want.size) advanced = true;
+    $$(`#${id} .chip-tog`).forEach((ch) => ch.classList.toggle("on", want.has(ch.dataset.value)));
+  }
+  for (const [k, short] of SHARE_FLAGS) {
+    const e = $("#" + k); if (!e) continue;
+    e.checked = p.get(short) === "1";
+    if (e.checked) advanced = true;
+  }
+  if (advanced && !$("#advFilters")?.classList.contains("open")) setAdvancedOpen(true);
+  updateScope();
+  await doSearch();
+}
+async function openClassLink(param) {
+  const k = parseClassParam(param); if (!k) return;
+  const found = (await lookupLocal([[k.year, k.term, k.sbjt, k.lt]]))[0];
+  if (found) openDetail(found);
+  else console.warn(`shared class ${param} not found`);
+}
+async function openTrendLink(param) {
+  const k = parseClassParam(param); if (!k) return;
+  await ensureTrend();
+  const sel = $("#trendTerm"); if (!sel) return;
+  const value = `${k.year}|${k.term}`;
+  if (sel.value !== value && [...sel.options].some((o) => o.value === value)) {
+    sel.value = value;
+    await loadTrendTerm();
+  }
+  const c = (_trend.classes || []).find((x) => x.key === k.key);
+  if (c) pickTrendClass(c);
+  else showTrendMsg("이 학기의 인원 추이 데이터에 해당 강좌가 없습니다.");
+}
+
 // ---------- wire up ----------
 // ---------- pages (top-nav router) ----------
 // Hash routing: a bare "#trend" is route "trend"/no-param; "#code/M3502.019800"
 // is route "code"/param "M3502.019800". Param-routes render a sub-view inside a
 // host page (code -> explore). Spec 2 adds { prof: "explore" }.
-const PAGE_FOR_ROUTE = { code: "explore", prof: "explore" };
+const PAGE_FOR_ROUTE = { code: "explore", prof: "explore",
+  search: "timetable", class: "timetable" };
 function parseHash() {
   const raw = (location.hash || "").slice(1);
   const i = raw.indexOf("/");
@@ -3592,6 +3699,9 @@ function route() {
   const page = PAGE_FOR_ROUTE[r] || r || (($$(".page")[0] || {}).dataset?.page);
   showPage(page);
   if (page === "explore") renderExplore(r, param);
+  if (r === "search" && param) applySearchLink(param);
+  if (r === "class" && param) openClassLink(param);
+  if (r === "trend" && param) openTrendLink(param);
 }
 function setupNav() {
   const nav = $("#topnav"); if (!nav) return;
@@ -3612,11 +3722,8 @@ function init() {
   setupNav();        // build the nav from every .page partial that mounted
   buildFilters();   // construct the filter fields/dropdowns before anything fills them
   fillSelects();
-  loadTerms();
-  loadDepartments();
-  loadClassifications();
-  loadGrades();
-  loadGradings();
+  Promise.allSettled([loadTerms(), loadDepartments(), loadClassifications(),
+    loadGrades(), loadGradings()]).then(() => _filtersReadyResolve());
   loadTimeStats();
   loadStatus().then((s) => {
     // if a refresh is already running (e.g. page reload), resume polling
@@ -3669,6 +3776,9 @@ function init() {
   const clBtn = $("#codeLinkReviewLoad");   // dev panel — absent in production
   if (clBtn) clBtn.addEventListener("click", loadCodeLinkReview);
   $("#loadMore").addEventListener("click", loadMore);
+  $("#shareSearch")?.addEventListener("click", (e) => {
+    if (lastFilters) copyLink(shareUrl(searchHash(lastFilters)), e.currentTarget);
+  });
   $("#expXlsx").addEventListener("click", () => exportSearch("xlsx"));
   $("#expCsv").addEventListener("click", () => exportSearch("csv"));
   $("#ttPng").addEventListener("click", exportTTPng);

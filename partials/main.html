@@ -32,7 +32,10 @@
         <input type="file" id="wishImportFile" accept="application/json,.json" hidden>
       </div>
       <div id="wishPanel" class="wish-panel hidden"></div>
-      <div class="result-meta" id="resultCount">검색어를 입력하세요</div>
+      <div class="result-meta-row">
+        <div class="result-meta" id="resultCount" role="status" aria-live="polite">검색어를 입력하세요</div>
+        <button type="button" id="shareSearch" class="wish-mini hidden" title="이 검색 조건을 링크로 복사">검색 링크 복사</button>
+      </div>
       <ul id="results" class="results"></ul>
       <button type="button" id="loadMore" class="loadmore hidden">더 보기 Load more</button>
     </section>
