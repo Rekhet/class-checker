@@ -96,3 +96,97 @@ class SeatAlertTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AlertExtensionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        handler = partial(_Quiet, directory=str(WEB_ROOT))
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.data = json.loads(LIVE.read_text())
+        cls.base = f"http://127.0.0.1:{cls.server.server_port}/index.html"
+        rows = json.loads((WEB_ROOT / "data" / "classes" / f"{YEAR}_{TERM}.json").read_text())
+        timed = [r for r in rows
+                 if any(s["day_index"] is not None and s["start_time"] for s in r["slots"])
+                 and f"{r['sbjt_cd']}({r['lt_no']})" in cls.data["series"]]
+        cls.row = timed[0]
+        cls.key = f"{cls.row['sbjt_cd']}({cls.row['lt_no']})"
+        cls.others = timed[1:3]
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.server.shutdown()
+        cls.server.server_close()
+
+    def _page(self, playwright, payload):
+        browser = playwright.chromium.launch(headless=True)
+        ctx = browser.new_context()
+        page = ctx.new_page()
+        page.add_init_script("""
+          window.__notes = [];
+          window.Notification = class { constructor(t, o) { window.__notes.push([t, o.body]); } };
+          window.Notification.permission = "granted";
+          window.Notification.requestPermission = async () => "granted";
+          window.confirm = () => true;
+        """)
+        page.route(f"**/data/trend/trend_{YEAR}_{TERM}.json",
+                   lambda route: route.fulfill(content_type="application/json",
+                                               body=payload["body"]))
+        return browser, page
+
+    def test_watch_every_bookmarked_class_at_once(self) -> None:
+        payload = {"body": LIVE.read_text()}
+        with sync_playwright() as playwright:
+            browser, page = self._page(playwright, payload)
+            try:
+                page.goto(self.base, wait_until="domcontentloaded")
+                page.wait_for_function("() => typeof wishlist !== 'undefined'")
+                page.evaluate("rows => { wishlist = rows.concat([{...rows[0], year: '2019'}]);"
+                              " renderWishlist(); }", [self.row, *self.others])
+                page.click("#wishToggle")
+                page.click(".wish-actions button")
+                page.wait_for_function("() => Object.keys(_watch.items).length === 3")
+                toast = page.text_content("#toast")
+                self.assertIn("3개 알림 등록", toast)
+                self.assertIn("인원 데이터가 없는 학기 1개 제외", toast)
+                # running it again adds nothing
+                page.click(".wish-actions button")
+                page.wait_for_function(
+                    "() => /이미 등록 3개/.test(document.querySelector('#toast').textContent)")
+            finally:
+                browser.close()
+
+    def test_a_clashing_class_is_not_announced_while_the_option_is_on(self) -> None:
+        payload = {"body": _with_seats(self.data, self.key, 0)}
+        with sync_playwright() as playwright:
+            browser, page = self._page(playwright, payload)
+            try:
+                link = f"#trend/{quote(YEAR + '|' + TERM, safe='')}/{quote(self.key, safe='')}"
+                page.goto(self.base + link, wait_until="domcontentloaded")
+                page.wait_for_function("k => typeof _trend !== 'undefined' && _trend.key === k",
+                                       arg=self.key, timeout=20000)
+                page.click("#trendWatchSlot .watch-btn")
+                page.evaluate("() => _watchCheck")
+                page.check("#watchSkipConflicts")
+                # a class on the timetable at the same time as the watched one
+                page.evaluate("row => { timetable.push({...row, sbjt_cd: 'CLASH', lt_no: '999'}); }",
+                              self.row)
+                payload["body"] = _with_seats(self.data, self.key, 2)
+                page.evaluate("() => checkWatches()")
+                self.assertEqual(page.evaluate("() => window.__notes.length"), 0)
+                self.assertIn("시간표와 겹침", page.text_content("#trendWatchList"))
+                # option off, seats gone and back: announced
+                page.uncheck("#watchSkipConflicts")
+                payload["body"] = _with_seats(self.data, self.key, 0)
+                page.evaluate("() => checkWatches()")
+                payload["body"] = _with_seats(self.data, self.key, 1)
+                page.evaluate("() => checkWatches()")
+                self.assertEqual(page.evaluate("() => window.__notes.length"), 1)
+                # the option persists
+                self.assertTrue(page.evaluate(
+                    "() => JSON.parse(localStorage.getItem('snu_seat_watch')).opts.skipConflicts === false"))
+                page.click("#watchClearAll")
+                self.assertEqual(page.evaluate("() => Object.keys(_watch.items).length"), 0)
+            finally:
+                browser.close()

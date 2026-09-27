@@ -1677,7 +1677,11 @@ function renderWishlist() {
     return;
   }
   const inTT = new Set(timetable.map(classKey));
-  panel.replaceChildren(...wishlist.map((c) => {
+  const bar0 = el("div", { className: "wish-actions" },
+    el("button", { type: "button", className: "wish-mini", onclick: () => watchWishlist(),
+      title: "찜한 강좌에 여석이 생기면 알려 드립니다 (사이트가 열려 있는 동안)" },
+      "🔔 찜한 강좌 모두 여석 알림"));
+  panel.replaceChildren(bar0, ...wishlist.map((c) => {
     const added = inTT.has(classKey(c));
     const bar = el("span", { className: "wbar" }); bar.style.background = colorFor(c);
     return el("div", { className: "wish-item" }, bar,
@@ -2980,7 +2984,10 @@ function drawTrendChart() {
   // metric chooser: 전체(all) or one of 신청/장바구니/수강 (so the cart→enrolled drop is readable)
   const metric = $("#trendMetric")?.value || "all";
   const visible = metric === "all" ? TREND_SERIES : TREND_SERIES.filter((d) => d.k === metric);
-  const W = 900, H = 360, padL = 44, padR = 16, padT = 14, padB = 30;
+  // Drawn at (about) the on-screen width, so a phone does not shrink 10px
+  // axis labels to 4px by scaling a 900-unit chart down.
+  const W = Math.round(Math.min(900, Math.max(320, window.innerWidth - 72)));
+  const H = W < 560 ? 260 : 360, padL = 44, padR = 16, padT = 14, padB = 30;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   let max = 1;
   for (const def of visible) for (const v of (s[def.k] || [])) if (v != null && v > max) max = v;
@@ -3007,7 +3014,10 @@ function drawTrendChart() {
 
   const guide = svgEl("line", { x1: 0, y1: padT, x2: 0, y2: padT + plotH, stroke: TREND_LINE, "stroke-width": 1, visibility: "hidden" });
   svg.append(guide);
-  const overlay = svgEl("rect", { x: padL, y: padT, width: plotW, height: plotH, fill: "transparent" });
+  // touch-action pan-y: a vertical swipe still scrolls the page, a horizontal
+  // drag scrubs the chart, and a tap shows that pass
+  const overlay = svgEl("rect", { x: padL, y: padT, width: plotW, height: plotH, fill: "transparent",
+    style: "touch-action: pan-y" });
   svg.append(overlay);
 
   $("#trendChart").replaceChildren(svg);
@@ -3024,7 +3034,7 @@ function drawTrendChart() {
   setTrendChartVisible(true);
 
   const wrap = $("#trendChartWrap"), tip = $("#trendTip");
-  overlay.addEventListener("mousemove", (ev) => {
+  const showTip = (ev) => {
     const r = svg.getBoundingClientRect();
     const px = (ev.clientX - r.left) / r.width * W;
     const i = n <= 1 || span <= 0 ? 0 : _nearestPass(t, t0 + ((px - padL) / plotW) * span);
@@ -3045,8 +3055,13 @@ function drawTrendChart() {
     tip.style.left = ((gx / W) * r.width + (r.left - wr.left)) + "px";
     tip.style.top = ((Y(topVal) / H) * r.height + (r.top - wr.top)) + "px";
     tip.classList.remove("hidden");
+  };
+  overlay.addEventListener("pointermove", showTip);
+  overlay.addEventListener("pointerdown", showTip);
+  overlay.addEventListener("pointerleave", (ev) => {
+    if (ev.pointerType === "touch") return;      // keep a tapped tooltip on screen
+    tip.classList.add("hidden"); guide.setAttribute("visibility", "hidden");
   });
-  overlay.addEventListener("mouseleave", () => { tip.classList.add("hidden"); guide.setAttribute("visibility", "hidden"); });
 }
 
 // ---------- 최근 변동 (change feed) ----------
@@ -3879,16 +3894,51 @@ function _loadWatch() {
       for (const [id, it] of Object.entries(v.items))
         if (_isRecord(it) && _isString(it.label) && _isString(it.year) && _isString(it.term)
             && _isString(it.key) && _isNullable(it.seats, _isInteger)) items[id] = it;
-      return { items };
+      const opts = _isRecord(v.opts) ? { skipConflicts: v.opts.skipConflicts === true } : {};
+      return { items, opts };
     }
   } catch { /* unreadable: start empty */ }
-  return { items: {} };
+  return { items: {}, opts: {} };
 }
 function _saveWatch() {
   try { localStorage.setItem(WATCH_KEY, JSON.stringify(_watch)); _quotaWarned = false; }
   catch (e) { _onQuota(e); }
 }
 const watchId = (year, term, key) => `${year}|${term}|${key}`;
+function _addWatch(c) {
+  _watch.items[watchId(c.year, c.term, c.key)] = { year: c.year, term: c.term, key: c.key,
+    label: c.label, seats: c.seats ?? null, added: Math.floor(Date.now() / 1000) };
+}
+async function _askNotifyPermission() {
+  if ("Notification" in window && Notification.permission === "default") {
+    try { await Notification.requestPermission(); } catch { /* unsupported */ }
+  }
+}
+// Watch every bookmarked class whose term has live 인원 data (other terms
+// cannot be checked). Classes already watched are left as they are.
+async function watchWishlist() {
+  const idx = await dataIndex();
+  const live = new Set(idx.terms.filter((t) => t.trend).map((t) => `${t.year}|${t.term}`));
+  let added = 0, already = 0, unsupported = 0;
+  for (const c of wishlist) {
+    if (c.term === "MANUAL" || !live.has(`${c.year}|${c.term}`)) { unsupported++; continue; }
+    const key = `${c.sbjt_cd}(${c.lt_no})`;
+    if (_watch.items[watchId(c.year, c.term, key)]) { already++; continue; }
+    _addWatch({ year: c.year, term: c.term, key,
+      label: `${c.name}${c.professor ? " · " + c.professor : ""}`,
+      seats: c.quota != null && c.applied != null ? c.quota - c.applied : null });
+    added++;
+  }
+  if (added) await _askNotifyPermission();
+  _saveWatch();
+  renderWatchList();
+  startWatchPolling();
+  if (_trend.key) drawTrendChart();               // repaint the chart's toggle
+  showToast(`찜한 강좌 ${added}개 알림 등록`
+    + (already ? ` · 이미 등록 ${already}개` : "")
+    + (unsupported ? ` · 인원 데이터가 없는 학기 ${unsupported}개 제외` : ""));
+  return { added, already, unsupported };
+}
 function watchButton(c, className) {
   const id = watchId(c.year, c.term, c.key);
   const b = el("button", { type: "button", className: className + " watch-btn" });
@@ -3901,11 +3951,8 @@ function watchButton(c, className) {
   b.addEventListener("click", async () => {
     if (_watch.items[id]) delete _watch.items[id];
     else {
-      _watch.items[id] = { year: c.year, term: c.term, key: c.key, label: c.label,
-        seats: c.seats ?? null, added: Math.floor(Date.now() / 1000) };
-      if ("Notification" in window && Notification.permission === "default") {
-        try { await Notification.requestPermission(); } catch { /* unsupported */ }
-      }
+      _addWatch(c);
+      await _askNotifyPermission();
       showToast(c.seats > 0
         ? `알림 등록 · 지금 여석 ${c.seats}개 — 여석이 0이 됐다가 다시 생기면 알려 드립니다.`
         : "알림 등록 · 여석이 생기면 알려 드립니다 (사이트가 열려 있는 동안).");
@@ -3952,13 +3999,29 @@ async function _checkWatches() {
       const q = _cpAt(enc.q, last), a = _cpAt(enc.a, last);
       if (q == null || a == null) continue;
       const seats = q - a;
-      if (seats > 0 && !(it.seats > 0)) notifySeat(id, it, seats);
+      if (seats > 0 && !(it.seats > 0)) {
+        const why = await _watchSuppressed(it);
+        it.suppressed = why;                      // shown in the list; null = alerted
+        if (!why) notifySeat(id, it, seats);
+      } else if (seats <= 0) it.suppressed = null;
       it.seats = seats;
       it.checked = data.t[last];
     }
   }
   _saveWatch();
   renderWatchList();
+}
+// With "시간표와 겹치면 알리지 않기" on, an opening is not announced for a class
+// already on the current timetable or one that clashes with it. Returns the
+// reason, or null to alert.
+async function _watchSuppressed(it) {
+  if (!_watch.opts?.skipConflicts) return null;
+  const k = parseClassParam(`${it.year}|${it.term}/${it.key}`);
+  if (!k) return null;
+  const row = (await lookupLocal([[k.year, k.term, k.sbjt, k.lt]]))[0];
+  if (!row) return null;
+  if (timetable.some((c) => classKey(c) === classKey(row))) return "이미 시간표에 있음";
+  return overlapsBusy(row, timetableBusy()) ? "시간표와 겹침" : null;
 }
 function notifySeat(id, it, seats) {
   const body = `${it.label} — 여석 ${seats}개`;
@@ -3980,6 +4043,8 @@ function startWatchPolling() {
 function renderWatchList() {
   const box = $("#trendWatch"); if (!box) return;
   const items = Object.entries(_watch.items);
+  const skip = $("#watchSkipConflicts");
+  if (skip) skip.checked = !!_watch.opts?.skipConflicts;
   box.classList.toggle("hidden", !items.length);
   const list = $("#trendWatchList"); list.replaceChildren();
   for (const [id, it] of items) {
@@ -3988,7 +4053,9 @@ function renderWatchList() {
       el("a", { className: "tf-name", href: trendHash(it.year, it.term, it.key) }, it.label),
       el("span", { className: "tf-seat" + (open ? " open" : "") },
         it.seats == null ? "여석 —" : `여석 ${it.seats}`),
-      el("span", { className: "tf-at" }, it.checked ? `확인 ${fmtTsFull(it.checked, TREND_TZ)}` : "확인 전"),
+      el("span", { className: "tf-at" },
+        (it.suppressed && it.seats > 0 ? `${it.suppressed} · 알림 생략 · ` : "")
+        + (it.checked ? `확인 ${fmtTsFull(it.checked, TREND_TZ)}` : "확인 전")),
       el("button", { type: "button", className: "wish-mini", title: "알림 해제",
         "aria-label": `${it.label} 알림 해제`,
         onclick: () => { delete _watch.items[id]; _saveWatch(); renderWatchList(); startWatchPolling();
@@ -4030,6 +4097,11 @@ function cycleTheme() {
   catch { /* private mode: applies to this page only */ }
   applyTheme(next);
 }
+let _trendResize = 0;                            // redraw at the new width (rotation)
+window.addEventListener("resize", () => {
+  clearTimeout(_trendResize);
+  _trendResize = setTimeout(() => { if (_trend.key && _trend.data) drawTrendChart(); }, 150);
+});
 window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => {
   if (currentTheme() === "system" && _trend.key && _trend.data) drawTrendChart();
 });
@@ -4139,6 +4211,9 @@ function showPage(name) {
 function route() {
   const { route: r, param } = parseHash();
   const page = PAGE_FOR_ROUTE[r] || r || (($$(".page")[0] || {}).dataset?.page);
+  // any other route (back button, a pasted link) must not stay covered by an
+  // open detail drawer
+  if (r !== "class" && detailClass) closeDetail(false);
   showPage(page);
   if (page === "explore") renderExplore(r, param);
   if (r === "search" && param) applySearchLink(param);
@@ -4200,6 +4275,16 @@ function init() {
   renderWishlist();                          // seed the count
   renderWatchList();
   startWatchPolling();                       // 여석 알림: resume watching saved classes
+  $("#watchSkipConflicts")?.addEventListener("change", (e) => {
+    _watch.opts = { ..._watch.opts, skipConflicts: e.target.checked };
+    _saveWatch();
+  });
+  $("#watchClearAll")?.addEventListener("click", () => {
+    if (!confirm("여석 알림을 모두 해제할까요?")) return;
+    _watch.items = {};
+    _saveWatch(); renderWatchList(); startWatchPolling();
+    if (_trend.key) drawTrendChart();
+  });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible" && Object.keys(_watch.items).length) checkWatches();
   });

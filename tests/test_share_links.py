@@ -132,3 +132,21 @@ class HomeLinkTests(unittest.TestCase):
                 self.assertEqual(page.evaluate("() => location.hash"), "")
             finally:
                 browser.close()
+
+
+class RouteClosesDrawerTests(HomeLinkTests):
+    def test_leaving_a_class_link_closes_its_drawer(self) -> None:
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            try:
+                page = browser.new_page()
+                rows = json.loads((WEB_ROOT / "data" / "classes" / f"{YEAR}_{TERM}.json").read_text())
+                key = f"{rows[0]['sbjt_cd']}({rows[0]['lt_no']})"
+                page.goto(self.root + f"index.html#class/{quote(YEAR + '|' + TERM, safe='')}/"
+                          f"{quote(key, safe='')}", wait_until="domcontentloaded")
+                page.wait_for_selector("#detailDrawer:not(.hidden) h3", timeout=15000)
+                page.evaluate("() => { location.hash = '#trend'; }")
+                page.wait_for_selector("#detailDrawer", state="hidden", timeout=5000)
+                self.assertTrue(page.is_hidden("#detailOverlay"))
+            finally:
+                browser.close()

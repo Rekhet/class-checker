@@ -52,8 +52,11 @@
   <section id="trendWatch" class="trend-feed hidden" aria-labelledby="trendWatchTitle">
     <div class="trend-feed-head">
       <h3 id="trendWatchTitle">여석 알림 <span class="sub">Seat alerts</span></h3>
+      <button type="button" id="watchClearAll" class="wish-mini">모두 해제</button>
     </div>
     <p id="trendWatchMeta" class="trend-feed-meta"></p>
+    <label class="watch-opt"><input type="checkbox" id="watchSkipConflicts">
+      내 시간표에 이미 있거나 시간이 겹치는 강좌는 알리지 않기</label>
     <ul id="trendWatchList" class="trend-feed-list watch-list"></ul>
   </section>
 

@@ -533,6 +533,10 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 @media (max-width: 560px) {
   .topbar { padding: 14px 16px; gap: 6px 14px; flex-wrap: wrap; }
   .topbar h1 { font-size: 16px; }
+  /* the theme toggle sits beside the title instead of wrapping onto a row of its own */
+  .topbar { position: relative; }
+  .theme-toggle { position: absolute; top: 10px; right: 16px; margin: 0; }
+  #scopeInfo + .theme-toggle { margin-left: 0; }
   /* scope drops to its own line so the title + nav never get pushed off-screen */
   #scopeInfo { margin-left: 0; flex-basis: 100%; order: 3; }
   .tt-wrap { padding: 16px; }
@@ -774,8 +778,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .tf-at { font-variant-numeric: tabular-nums; color: var(--cp-faint); font-size: 11.5px; }
 .trend-feed-list li.tf-empty { display: block; color: var(--cp-muted); }
 @media (max-width: 720px) {
-  .trend-feed-list li { grid-template-columns: minmax(0, 1fr) auto; }
-  .tf-num { grid-column: 1 / -1; }
+  .trend-feed-list li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 2px; }
+  .tf-num { grid-column: 1; }              /* numbers and time share the second line */
 }
 
 /* ===== 여석 알림 (seat alerts) ===== */
@@ -802,3 +806,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 #trendFeedMore { margin-top: 10px; width: 100%; }
 .home-link { color: inherit; text-decoration: none; }
 .home-link:hover { color: var(--cp-accent); }
+.watch-opt { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--cp-muted);
+  margin: 0 0 6px; }
+.wish-actions { display: flex; justify-content: flex-end; padding: 6px 0 8px; }
