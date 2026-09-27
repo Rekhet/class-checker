@@ -3133,8 +3133,15 @@ async function _trendWindow(i) {
   if (cached) return cached;
   const file = trendWinFile(i);
   if (!_feedWindows.has(file)) {
-    const r = await fetch("data/trend/" + file);
-    if (!r.ok) throw new Error(`trend HTTP ${r.status}`);
+    // Several chunks are fetched at once; one dropped request ("Failed to
+    // fetch", seen on the deployed site) must not sink the whole feed.
+    let r, last;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt) await new Promise((ok) => setTimeout(ok, 300 * attempt));
+      try { r = await fetch("data/trend/" + file); if (r.ok) break; last = new Error(`trend HTTP ${r.status}`); }
+      catch (e) { last = e; r = null; }
+    }
+    if (!r?.ok) throw last;
     _feedWindows.set(file, _validateTrendData(await r.json(), `trend ${file}`));
   }
   return _feedWindows.get(file);

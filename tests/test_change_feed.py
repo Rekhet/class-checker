@@ -165,3 +165,40 @@ class ChangeFeedTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FeedRetryTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        handler = partial(_Quiet, directory=str(WEB_ROOT))
+        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        threading.Thread(target=cls.server.serve_forever, daemon=True).start()
+        cls.base = f"http://127.0.0.1:{cls.server.server_port}/index.html#trend"
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.server.shutdown()
+        cls.server.server_close()
+
+    def test_a_dropped_archive_request_is_retried(self) -> None:
+        failed = []
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            try:
+                page = browser.new_page()
+
+                def flaky(route):
+                    if route.request.url.endswith("_w003.json") and not failed:
+                        failed.append(route.request.url)
+                        route.abort("failed")          # the first attempt drops
+                    else:
+                        route.continue_()
+                page.route("**/data/trend/*_w0*.json", flaky)
+                page.goto(self.base, wait_until="domcontentloaded")
+                page.wait_for_function(
+                    "() => typeof _trend !== 'undefined' && !!_trend.live", timeout=20000)
+                passes = page.evaluate("async () => (await feedData(0)).t.length")
+            finally:
+                browser.close()
+        self.assertEqual(len(failed), 1)
+        self.assertGreater(passes, 4000)
