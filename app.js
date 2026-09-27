@@ -3145,8 +3145,14 @@ async function feedData(hours) {
   const key = `${_trend.file}|${hours}|${live.t[live.t.length - 1]}`;
   if (_feedJoined?.key === key) return _feedJoined.data;
   const wins = [live];
-  for (let i = _trend.archives - 1; i >= 0 && wins[0].t[0] > since; i--)
-    wins.unshift(await _trendWindow(i));
+  if (hours <= 0) {                               // every window: fetch them all at once
+    const all = await Promise.all(
+      Array.from({ length: _trend.archives }, (_, i) => _trendWindow(i)));
+    wins.unshift(...all);
+  } else {                                        // just far enough back, newest first
+    for (let i = _trend.archives - 1; i >= 0 && wins[0].t[0] > since; i--)
+      wins.unshift(await _trendWindow(i));
+  }
   const data = wins.length === 1 ? live : joinTrendWindows(wins);
   _feedJoined = { key, data };
   return data;
