@@ -799,3 +799,4 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }
 }
+#trendFeedMore { margin-top: 10px; width: 100%; }

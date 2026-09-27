@@ -2690,8 +2690,12 @@ async function _initTrend() {
   $("#trendMetric").addEventListener("change", () => { if (_trend.key) drawTrendChart(); });
   $("#trendPrev")?.addEventListener("click", () => shiftTrendWindow(-1));
   $("#trendNext")?.addEventListener("click", () => shiftTrendWindow(1));
-  $("#trendFeedMode")?.addEventListener("change", renderTrendFeed);
-  $("#trendFeedHours")?.addEventListener("change", renderTrendFeed);
+  $("#trendFeedMode")?.addEventListener("change", () => renderTrendFeed());
+  $("#trendFeedHours")?.addEventListener("change", () => renderTrendFeed());
+  $("#trendFeedMore")?.addEventListener("click", () => {
+    _feedShown += TREND_FEED_PAGE;
+    renderTrendFeed("more");
+  });
   $("#trendShare")?.addEventListener("click", (e) => {
     if (_trend.key) copyLink(shareUrl(trendHash(_trend.year, _trend.term, _trend.key)), e.currentTarget);
   });
@@ -2707,6 +2711,7 @@ async function loadTrendTerm() {
   // a new term drops the old class from the address bar (a deep link re-adds it)
   if (parseHash().route === "trend" && parseHash().param) history.replaceState(null, "", "#trend");
   $("#trendShare")?.classList.add("hidden");
+  _feedWindows.clear(); _feedJoined = null;   // the feed's archive windows belong to one term
   $("#trendClass").value = "";
   $("#trendResults").replaceChildren(); $("#trendResults").classList.add("hidden");
   const idx = await dataIndex();
@@ -3053,8 +3058,11 @@ function _cpLastChange(enc, after) {
   const i = enc[enc.length - 2];
   return i > after ? i : -1;
 }
-// Classes whose numbers moved in the newest `hours` of the live window.
-// mode "open": 여석(정원−신청) grew and is now above zero; "all": any change.
+// Classes whose numbers moved in the newest `hours` of `data` (hours <= 0:
+// all of it). mode "open": 여석(정원−신청) grew and is now above zero; "all":
+// any change. `data` is the live window or several windows joined by
+// joinTrendWindows. The array carries `from`: the time the changes are
+// measured from.
 function trendFeed(data, hours, mode) {
   const t = data.t, last = t.length - 1;
   let base = 0;                                  // last pass at or before the cutoff
@@ -3078,24 +3086,111 @@ function trendFeed(data, hours, mode) {
   items.sort(mode === "open"
     ? (x, y) => (y.s1 - (y.s0 ?? 0)) - (x.s1 - (x.s0 ?? 0)) || y.at - x.at
     : (x, y) => y.at - x.at);
+  items.from = t[base];
   return items;
 }
-const TREND_FEED_MAX = 50;
-function renderTrendFeed() {
+
+// Join consecutive trend windows (oldest first) into one change-point payload
+// over their concatenated time axis, so the feed can look past the live file.
+// Every window re-states each class at its first pass; a value equal to the
+// previous one is dropped, so a window edge is never mistaken for a change.
+// A window that did not collect a metric at all carries the last value over
+// (it says nothing about it); a class absent from a window that did collect
+// the metric is null there, as within a single window.
+function joinTrendWindows(wins) {
+  const t = [], offset = [];
+  for (const w of wins) { offset.push(t.length); for (const x of w.t) t.push(x); }
+  const keys = new Set();
+  for (const w of wins) for (const k of Object.keys(w.series)) keys.add(k);
+  const series = {};
+  for (const key of keys) {
+    const out = {};
+    for (const m of ["a", "e", "q"]) {
+      const cps = [];
+      let last;                                   // undefined: nothing seen yet
+      wins.forEach((w, wi) => {
+        if (m !== "q" && w.m[m] == null) return;  // not collected: carry over
+        const enc = w.series[key]?.[m];
+        const put = (i, v) => { if (v !== last) { cps.push(offset[wi] + i, v); last = v; } };
+        if (enc == null || _isInteger(enc)) put(0, enc ?? null);
+        else for (let k = 0; k < enc.length; k += 2) put(enc[k], enc[k + 1]);
+      });
+      if (cps.length) out[m] = cps.length === 2 && cps[0] === 0 ? cps[1] : cps;
+    }
+    series[key] = out;
+  }
+  return { t, series, tz: wins[wins.length - 1].tz };
+}
+// Archive window i of the current term, shared with the chart's window cache.
+const _feedWindows = new Map();                   // file name -> validated payload
+async function _trendWindow(i) {
+  const cached = _trend.winCache?.get(i);
+  if (cached) return cached;
+  const file = trendWinFile(i);
+  if (!_feedWindows.has(file)) {
+    const r = await fetch("data/trend/" + file);
+    if (!r.ok) throw new Error(`trend HTTP ${r.status}`);
+    _feedWindows.set(file, _validateTrendData(await r.json(), `trend ${file}`));
+  }
+  return _feedWindows.get(file);
+}
+// The payload the feed reads for a period: the live window alone when it
+// reaches back far enough, else the live window joined with just enough
+// archive windows (all of them for the whole semester, hours <= 0).
+let _feedJoined = null;                           // { key, data }
+async function feedData(hours) {
+  const live = _trend.live;
+  const since = hours > 0 ? live.t[live.t.length - 1] - hours * 3600 : -Infinity;
+  if (live.t[0] <= since) return live;
+  const key = `${_trend.file}|${hours}|${live.t[live.t.length - 1]}`;
+  if (_feedJoined?.key === key) return _feedJoined.data;
+  const wins = [live];
+  for (let i = _trend.archives - 1; i >= 0 && wins[0].t[0] > since; i--)
+    wins.unshift(await _trendWindow(i));
+  const data = wins.length === 1 ? live : joinTrendWindows(wins);
+  _feedJoined = { key, data };
+  return data;
+}
+const TREND_FEED_PAGE = 50;
+let _feedShown = TREND_FEED_PAGE;                 // rows on screen; "더 보기" adds a page
+let _feedRender = 0;                              // newest render wins
+async function renderTrendFeed(e) {
   const box = $("#trendFeed"); if (!box) return;
-  const data = _trend.live;
-  box.classList.toggle("hidden", !data);
-  if (!data) return;
+  const live = _trend.live;
+  box.classList.toggle("hidden", !live);
+  if (!live) return;
+  const more = e === "more";
+  if (!more) _feedShown = TREND_FEED_PAGE;         // new period/mode/term: back to one page
+  const token = ++_feedRender;
   const mode = $("#trendFeedMode").value, hours = Number($("#trendFeedHours").value);
+  const meta = $("#trendFeedMeta"), moreBtn = $("#trendFeedMore");
+  let data;
+  if (!more) {
+    meta.textContent = "불러오는 중…";
+    moreBtn?.classList.add("hidden");
+  }
+  try {
+    data = await feedData(hours);
+  } catch (err) {
+    if (token !== _feedRender) return;
+    console.warn(`change feed: ${err.message}`);
+    meta.textContent = "이전 구간 데이터를 불러오지 못했습니다.";
+    $("#trendFeedList").replaceChildren();
+    return;
+  }
+  if (token !== _feedRender) return;               // a newer selection took over
   const items = trendFeed(data, hours, mode);
   const tz = data.tz || TREND_TZ, t = data.t;
-  $("#trendFeedMeta").textContent =
-    `${items.length.toLocaleString()}개 강좌 · 기준 ${fmtTsFull(t[t.length - 1], tz)}`
-    + (items.length > TREND_FEED_MAX ? ` · 상위 ${TREND_FEED_MAX}개 표시` : "");
-  const list = $("#trendFeedList"); list.replaceChildren();
+  const shown = Math.min(_feedShown, items.length);
+  meta.textContent = `${items.length.toLocaleString()}개 강좌 · `
+    + `${fmtTsFull(items.from, tz)} ~ ${fmtTsFull(t[t.length - 1], tz)}`
+    + (items.length > shown ? ` · ${shown.toLocaleString()}개 표시` : "");
+  const list = $("#trendFeedList");
   const arrow = (from, to) => (from == null || from === to ? `${to ?? "—"}` : `${from} → ${to}`);
   const byKey = new Map(_trend.classes.map((c) => [c.key, c]));
-  for (const it of items.slice(0, TREND_FEED_MAX)) {
+  const start = more ? list.querySelectorAll("li:not(.tf-empty)").length : 0;
+  if (!more) list.replaceChildren();
+  for (const it of items.slice(start, shown)) {
     const c = byKey.get(it.key);
     const btn = el("button", { type: "button", className: "tf-name", title: "인원 추이 보기",
       onclick: () => {
@@ -3112,6 +3207,11 @@ function renderTrendFeed() {
   if (!items.length)
     list.append(el("li", { className: "tf-empty" },
       mode === "open" ? "이 기간에 여석이 생긴 강좌가 없습니다." : "이 기간에 인원이 바뀐 강좌가 없습니다."));
+  if (moreBtn) {
+    const left = items.length - shown;
+    moreBtn.classList.toggle("hidden", left <= 0);
+    moreBtn.textContent = `${Math.min(TREND_FEED_PAGE, left)}개 더 보기 (남은 ${left.toLocaleString()}개)`;
+  }
 }
 
 function renderTrendLegend(s, visible) {
