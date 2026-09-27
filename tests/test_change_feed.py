@@ -72,7 +72,7 @@ class ChangeFeedTests(unittest.TestCase):
                 page = browser.new_page()
                 page.on("pageerror", lambda e: errors.append(str(e)))
                 page.goto(self.base, wait_until="domcontentloaded")
-                page.wait_for_function("() => !!_trend.live", timeout=20000)
+                page.wait_for_function("() => typeof _trend !== 'undefined' && !!_trend.live", timeout=20000)
                 self.assertTrue(page.is_visible("#trendFeed"))
                 for hours in (3, 24, 0):
                     for mode in ("open", "all"):
@@ -86,7 +86,7 @@ class ChangeFeedTests(unittest.TestCase):
                 page.select_option("#trendFeedHours", "0")
                 first = page.locator("#trendFeedList .tf-name").first
                 first.click()
-                page.wait_for_function("() => !!_trend.key", timeout=10000)
+                page.wait_for_function("() => typeof _trend !== 'undefined' && !!_trend.key", timeout=10000)
             finally:
                 browser.close()
         self.assertEqual(errors, [])

@@ -6,6 +6,7 @@
   <h1>SNU Class Checker</h1>
   <nav class="topnav" id="topnav"></nav>
   <span id="scopeInfo"></span>
+  <button type="button" id="themeToggle" class="theme-toggle">🖥️</button>
 </header>
 
 <div class="page" data-page="timetable" data-title="시간표">
@@ -49,8 +50,8 @@
         </div>
         <div class="tt-head-right">
           <span id="creditSum" class="credit-sum">총 0학점</span>
-          <button type="button" id="undoBtn" class="tt-icon" title="실행 취소 (Ctrl+Z)" disabled>↶</button>
-          <button type="button" id="redoBtn" class="tt-icon" title="다시 실행 (Ctrl+Shift+Z)" disabled>↷</button>
+          <button type="button" id="undoBtn" class="tt-icon" title="실행 취소 (Ctrl+Z)" aria-label="실행 취소" disabled>↶</button>
+          <button type="button" id="redoBtn" class="tt-icon" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행" disabled>↷</button>
           <button id="clearTT" class="tt-clear">비우기 Clear</button>
         </div>
       </div>

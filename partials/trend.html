@@ -9,12 +9,14 @@
       <h2>인원 추이 <span class="sub">Enrollment trend</span></h2>
     </div>
     <div class="trend-pick">
-      <select id="trendTerm"></select>
+      <select id="trendTerm" aria-label="학기"></select>
       <div class="trend-search">
-        <input id="trendClass" placeholder="강좌 검색 (이름)" autocomplete="off">
-        <ul id="trendResults" class="trend-results hidden"></ul>
+        <input id="trendClass" placeholder="강좌 검색 (이름)" autocomplete="off"
+               role="combobox" aria-controls="trendResults" aria-autocomplete="list"
+               aria-label="인원 추이를 볼 강좌 검색">
+        <ul id="trendResults" class="trend-results hidden" role="listbox" aria-label="검색된 강좌"></ul>
       </div>
-      <select id="trendMetric">
+      <select id="trendMetric" aria-label="표시할 인원">
         <option value="all">전체</option>
         <option value="a">신청</option>
         <option value="c">장바구니</option>
@@ -23,7 +25,7 @@
     </div>
   </div>
 
-  <div id="trendMsg" class="trend-msg">강좌를 선택하면 신청·장바구니 인원 추이가 표시됩니다.</div>
+  <div id="trendMsg" class="trend-msg" role="status" aria-live="polite">강좌를 선택하면 신청·장바구니 인원 추이가 표시됩니다.</div>
 
   <!-- 시간 구간 이동: live 파일은 최신 240개 시점만 담으므로, 그 이전 이력은
        고정 아카이브 청크(trend_..._wNNN.json)를 ◀/▶로 오가며 본다 -->

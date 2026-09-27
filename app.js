@@ -46,10 +46,29 @@ let hoverPreview = null;   // ghost preview of a hovered search result
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 const el = (tag, props = {}, ...kids) => {
-  const e = Object.assign(document.createElement(tag), props);
+  const e = document.createElement(tag);
+  // aria-*, data-* and role are attributes, not properties: Object.assign put
+  // them on the JS object where assistive technology never saw them.
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "role" || k.startsWith("aria-") || k.startsWith("data-")) e.setAttribute(k, v);
+    else e[k] = v;
+  }
   for (const k of kids) e.append(k.nodeType ? k : document.createTextNode(k));
   return e;
 };
+// Keyboard parity for a clickable non-button element: focusable, announced as
+// a button, and Enter/Space act like a click.
+function activatable(node, label) {
+  node.tabIndex = 0;
+  if (!node.hasAttribute("role")) node.setAttribute("role", "button");
+  if (label) node.setAttribute("aria-label", label);
+  node.addEventListener("keydown", (e) => {
+    if (e.target !== node || (e.key !== "Enter" && e.key !== " ")) return;
+    e.preventDefault();
+    node.click();
+  });
+  return node;
+}
 async function api(path, opts) {
   const r = await fetch(path, opts);
   if (!r.ok && r.status !== 409) throw new Error(`${r.status}`);
@@ -936,9 +955,11 @@ function fillChips(containerId, tokens, labelOf = (t) => t) {
   const box = $("#" + containerId); if (!box) return;
   box.replaceChildren();
   tokens.forEach((t) => {
-    const chip = el("span", { className: "chip-tog" }, labelOf(t));
+    const chip = el("span", { className: "chip-tog", "aria-pressed": "false" }, labelOf(t));
     chip.dataset.value = t;
-    chip.addEventListener("click", () => chip.classList.toggle("on"));
+    chip.addEventListener("click", () =>
+      chip.setAttribute("aria-pressed", String(chip.classList.toggle("on"))));
+    activatable(chip);
     box.append(chip);
   });
 }
@@ -1266,17 +1287,20 @@ function renderResults(classes, append = false) {
     }
     const card = el("li", { className: "rcard" });
     card.addEventListener("click", () => openDetail(c));        // open the detail drawer
+    activatable(card, `${c.name} ${c.professor || ""} 상세 보기`);
     card.addEventListener("mouseenter", () => startHoverPreview(c));
     card.addEventListener("mouseleave", cancelHoverPreview);
     const bar = el("span", { className: "rbar" }); bar.style.background = colorFor(c);
     const addBtn = el("button", {
       className: "radd" + (added ? " added" : ""), textContent: added ? "✓" : "담기",
+      "aria-label": added ? `${c.name} 시간표에서 빼기` : `${c.name} 시간표에 담기`,
       onclick: (e) => { e.stopPropagation(); added ? removeFromTT(c) : addToTT(c); },
     });
     const wished = inWish(c);
     const wishBtn = el("button", {
       className: "rwish" + (wished ? " on" : ""), textContent: wished ? "★" : "☆",
-      title: wished ? "찜 해제" : "찜하기",
+      title: wished ? "찜 해제" : "찜하기", "aria-pressed": String(wished),
+      "aria-label": `${c.name} ${wished ? "찜 해제" : "찜하기"}`,
       onclick: (e) => { e.stopPropagation(); toggleWish(c); },
     });
     const tags = [];
@@ -1812,7 +1836,9 @@ function cancelHoverPreview() {
 
 // ---------- course detail drawer ----------
 let detailClass = null;
+let _detailReturnFocus = null;
 async function openDetail(c) {
+  if (!detailClass) _detailReturnFocus = document.activeElement;
   let full = c;
   // a timetable entry is a trimmed snapshot — pull the full catalog row for the
   // detail fields (seats, grade, classification) if they're missing.
@@ -1825,15 +1851,23 @@ async function openDetail(c) {
   detailClass = full;
   renderDetail();
   $("#detailOverlay").classList.remove("hidden");
-  $("#detailDrawer").classList.remove("hidden");
+  const drawer = $("#detailDrawer");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
+  drawer.setAttribute("aria-labelledby", "detailTitle");
+  drawer.classList.remove("hidden");
+  drawer.querySelector(".d-close")?.focus();
 }
 function closeDetail(resetHash = true) {
   if (resetHash && parseHash().route === "class")
     history.replaceState(null, "", location.pathname + location.search);
+  const wasOpen = !!detailClass;
   detailClass = null;
   $("#detailOverlay").classList.add("hidden");
   $("#detailDrawer").classList.add("hidden");
   $("#detailDrawer").replaceChildren();
+  if (wasOpen && _detailReturnFocus?.isConnected) _detailReturnFocus.focus();
+  _detailReturnFocus = null;
 }
 function renderDetail() {
   const c = detailClass; if (!c) return;
@@ -1844,8 +1878,9 @@ function renderDetail() {
   const bar = el("span", { className: "d-bar" }); bar.style.background = colorFor(c);
   const head = el("div", { className: "d-head" },
     el("div", { className: "d-head-row" },
-      el("div", { className: "d-title" }, bar, el("h3", {}, c.name)),
-      el("button", { className: "d-close", title: "닫기", textContent: "×", onclick: closeDetail })),
+      el("div", { className: "d-title" }, bar, el("h3", { id: "detailTitle" }, c.name)),
+      el("button", { className: "d-close", title: "닫기", "aria-label": "닫기", textContent: "×",
+        onclick: () => closeDetail() })),
     el("div", { className: "d-sub" }, `${c.professor || "미정"} · ${c.department || "-"}`));
 
   const body = el("div", { className: "d-body" });
@@ -2033,6 +2068,7 @@ function renderTTNow() {
       if (h > 34) b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
       if (h > 52 && c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
       b.addEventListener("click", () => openDetail(c));   // open the detail drawer
+      activatable(b, `${c.name} ${DAYS[d]} ${hhmm(m.a)}~${hhmm(m.b)}`);
       col.append(b);
     }
     for (const m of preview.filter((x) => x.day === d)) {
@@ -2068,6 +2104,7 @@ function renderTTNow() {
         }, c.name);
         chip.style.borderLeftColor = colorFor(c);
         chip.addEventListener("click", () => openDetail(c));
+        activatable(chip, `${c.name} (시간미정) 상세 보기`);
         tbaBox.append(chip);
       }
     }
@@ -2619,7 +2656,15 @@ const TREND_SERIES = [
   { k: "c", name: "장바구니", color: "#C87A37" },
   { k: "e", name: "수강", color: "#2E9E6B" },
 ];
-const TREND_FAINT = "#A2A29C", TREND_GRID = "#ECEBE7", TREND_LINE = "#DCDBD7";
+// Neutral chart colors come from the theme tokens (light/dark), read at draw time.
+let TREND_FAINT = "#A2A29C", TREND_GRID = "#ECEBE7", TREND_LINE = "#DCDBD7";
+function _trendThemeColors() {
+  const css = getComputedStyle(document.documentElement);
+  const v = (name, dflt) => css.getPropertyValue(name).trim() || dflt;
+  TREND_FAINT = v("--cp-faint", TREND_FAINT);
+  TREND_GRID = v("--cp-gridLine", TREND_GRID);
+  TREND_LINE = v("--cp-line", TREND_LINE);
+}
 let _trend = { key: null, data: null, t: [], classes: [], byKey: new Map() };
 let _trendInited = false;
 
@@ -2798,7 +2843,7 @@ function renderTrendResults(q) {
     return;
   }
   _trend._results.forEach((c) => {
-    const li = el("li", {},
+    const li = el("li", { role: "option" },
       el("div", { className: "r-name" }, c.name),
       el("div", { className: "r-sub" }, `${c.prof ? c.prof + " · " : ""}${c.key}`));
     li.addEventListener("mousedown", (e) => { e.preventDefault(); pickTrendClass(c); });
@@ -2918,6 +2963,7 @@ function _nearestPass(t, x) {
 }
 
 function drawTrendChart() {
+  _trendThemeColors();
   const { data, key, t } = _trend;
   const s = trendSeriesOf(data, key); if (!s) return;
   const n = t.length, tz = data.tz || TREND_TZ;
@@ -3741,7 +3787,15 @@ function watchButton(c, className) {
   paint();
   return b;
 }
-async function checkWatches() {
+// One check at a time: the interval, a tab coming back into view, and a newly
+// added watch can overlap, and two concurrent checks would both see the old
+// seat count and alert twice.
+let _watchCheck = null;
+function checkWatches() {
+  if (!_watchCheck) _watchCheck = _checkWatches().finally(() => { _watchCheck = null; });
+  return _watchCheck;
+}
+async function _checkWatches() {
   const byTerm = new Map();
   for (const [id, it] of Object.entries(_watch.items)) {
     const k = `${it.year}|${it.term}`;
@@ -3824,6 +3878,31 @@ function showToast(text) {
   _toastTimer = setTimeout(() => t.classList.remove("show"), 6000);
 }
 
+// ---------- theme (system / light / dark) ----------
+const THEME_KEY = "snu_theme";
+const THEME_LABEL = { system: "테마: 시스템", light: "테마: 라이트", dark: "테마: 다크" };
+function currentTheme() {
+  try { const v = localStorage.getItem(THEME_KEY); return v === "light" || v === "dark" ? v : "system"; }
+  catch { return "system"; }
+}
+function applyTheme(theme) {
+  if (theme === "system") delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  const b = $("#themeToggle");
+  if (b) { b.textContent = theme === "dark" ? "🌙" : theme === "light" ? "☀️" : "🖥️";
+    b.title = THEME_LABEL[theme]; b.setAttribute("aria-label", THEME_LABEL[theme] + " (바꾸기)"); }
+  if (_trend.key && _trend.data) drawTrendChart();   // chart colors are drawn in
+}
+function cycleTheme() {
+  const next = { system: "light", light: "dark", dark: "system" }[currentTheme()];
+  try { if (next === "system") localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY, next); }
+  catch { /* private mode: applies to this page only */ }
+  applyTheme(next);
+}
+window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", () => {
+  if (currentTheme() === "system" && _trend.key && _trend.data) drawTrendChart();
+});
+
 // ---------- share links ----------
 // #search/<query>          a search: filters as short URL parameters
 // #class/<year|term>/<key> one class's detail drawer
@@ -3871,7 +3950,8 @@ async function applySearchLink(query) {
   for (const [, short, id] of SHARE_CHIPS) {
     const want = new Set((p.get(short) || "").split(",").filter(Boolean));
     if (want.size) advanced = true;
-    $$(`#${id} .chip-tog`).forEach((ch) => ch.classList.toggle("on", want.has(ch.dataset.value)));
+    $$(`#${id} .chip-tog`).forEach((ch) => ch.setAttribute("aria-pressed",
+      String(ch.classList.toggle("on", want.has(ch.dataset.value)))));
   }
   for (const [k, short] of SHARE_FLAGS) {
     const e = $("#" + k); if (!e) continue;
@@ -3950,6 +4030,8 @@ function setupNav() {
 }
 
 function init() {
+  applyTheme(currentTheme());
+  $("#themeToggle")?.addEventListener("click", cycleTheme);
   setupNav();        // build the nav from every .page partial that mounted
   buildFilters();   // construct the filter fields/dropdowns before anything fills them
   fillSelects();

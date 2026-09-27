@@ -67,11 +67,12 @@ class SeatAlertTests(unittest.TestCase):
                                                        body=payload["body"]))
                 link = f"#trend/{quote(YEAR + '|' + TERM, safe='')}/{quote(self.key, safe='')}"
                 page.goto(self.base + link, wait_until="domcontentloaded")
-                page.wait_for_function("k => _trend.key === k", arg=self.key, timeout=20000)
+                page.wait_for_function("k => typeof _trend !== 'undefined' && _trend.key === k", arg=self.key, timeout=20000)
                 page.click("#trendWatchSlot .watch-btn")
                 self.assertEqual(page.get_attribute("#trendWatchSlot .watch-btn", "aria-pressed"), "true")
                 page.wait_for_function("() => document.querySelector('#trendWatchList li') !== null")
 
+                page.evaluate("() => _watchCheck")   # the check the click started
                 # still full: no alert
                 page.evaluate("() => checkWatches()")
                 self.assertEqual(page.evaluate("() => window.__notes.length"), 0)

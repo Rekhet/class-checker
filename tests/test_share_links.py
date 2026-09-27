@@ -85,7 +85,7 @@ class ShareLinkTests(unittest.TestCase):
             page.click("#detailDrawer a.d-link")
             page.wait_for_function(
                 "k => (document.querySelector('#trendTitle')?.textContent || '').length > 0"
-                " && _trend.key === k", arg=self.key, timeout=20000)
+                " && typeof _trend !== 'undefined' && _trend.key === k", arg=self.key, timeout=20000)
             self.assertTrue(page.is_hidden("#detailDrawer"))
 
         self._run(steps)
@@ -93,7 +93,7 @@ class ShareLinkTests(unittest.TestCase):
     def test_trend_link_draws_the_chart_and_keeps_the_url(self) -> None:
         def steps(page):
             page.goto(self.base + self._hash("trend"), wait_until="domcontentloaded")
-            page.wait_for_function("k => _trend.key === k", arg=self.key, timeout=20000)
+            page.wait_for_function("k => typeof _trend !== 'undefined' && _trend.key === k", arg=self.key, timeout=20000)
             page.wait_for_selector("#trendChart svg", state="attached")
             self.assertIn(self.key, unquote(page.evaluate("() => location.hash")))
             self.assertTrue(page.is_visible("#trendShare"))

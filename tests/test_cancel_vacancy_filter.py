@@ -66,6 +66,12 @@ class CancelVacancyFilterTests(unittest.TestCase):
             "() => document.querySelector('#advFilters').classList.contains('open')"
         ):
             page.click("#filterToggle")
+        # the panel expands with a max-height transition; clicking mid-animation
+        # can land on a moving target
+        page.wait_for_function(
+            "() => getComputedStyle(document.querySelector('#advFilters')).maxHeight === 'none'",
+            timeout=5000,
+        )
         page.set_checked("#cancelOnly", cancel_only)
         page.evaluate("() => { document.querySelector('#resultCount').textContent = ''; }")
         page.click("#searchForm button[type=submit]")
