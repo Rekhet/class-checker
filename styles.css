@@ -825,6 +825,9 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .rooms-form { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 8px 0 12px; }
 .rooms-form label { font-size: 12px; color: var(--cp-muted); display: inline-flex; gap: 6px; align-items: center; }
 .rooms-time { display: inline-flex; gap: 4px; align-items: center; }
+.rooms-form select, .rooms-form input[type=text], .rooms-form input:not([type]), .room-head select {
+  font: inherit; font-size: 12.5px; padding: 6px 8px; border: 1px solid var(--cp-line);
+  border-radius: 6px; background: var(--cp-paper); color: var(--cp-ink); }
 .rooms-summary { margin: 4px 2px 10px; }
 .rooms-count { font-weight: 700; }
 .rooms-note { font-size: 12px; color: var(--cp-muted); }

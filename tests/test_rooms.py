@@ -65,12 +65,12 @@ class RoomsDataTests(unittest.TestCase):
         cls.server.shutdown()
         cls.server.server_close()
 
-    def _run(self, steps) -> None:
+    def _run(self, steps, color_scheme=None) -> None:
         errors: list[str] = []
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
             try:
-                page = browser.new_page()
+                page = browser.new_page(color_scheme=color_scheme)
                 page.on("pageerror", lambda e: errors.append(str(e)))
                 page.goto(self.base, wait_until="domcontentloaded")
                 page.wait_for_function("() => typeof normRoom === 'function'", timeout=20000)
@@ -216,3 +216,31 @@ class RoomsDataTests(unittest.TestCase):
             self.assertGreaterEqual(box[0], box[2] - 1)
             self.assertLessEqual(box[1], box[3] + 1)
         self._run(steps)
+
+    def test_room_controls_match_the_site_control_style(self) -> None:
+        props = ["fontFamily", "fontSize", "padding", "borderTopColor", "borderTopWidth",
+                 "borderRadius", "backgroundColor", "color"]
+        read = """([sel, props]) => { const e = document.querySelector(sel);
+            const cs = getComputedStyle(e); return props.map(p => cs[p]); }"""
+
+        def steps_for(scheme):
+            def steps(page):
+                page.evaluate("() => { location.hash = 'trend'; }")
+                page.wait_for_selector(".trend-feed-ctl select", state="attached")
+                want = page.evaluate(read, [".trend-feed-ctl select", props])
+                page.evaluate("() => { location.hash = 'rooms'; }")
+                page.wait_for_function(
+                    "() => document.querySelector('#roomsSummary')"
+                    " && document.querySelector('#roomsSummary').textContent.includes('빈 강의실')",
+                    timeout=20000)
+                for sel in ("#roomTerm", "#roomCampus", "#roomDay", "#roomFrom", "#roomTo",
+                            "#roomBuilding"):
+                    self.assertEqual(page.evaluate(read, [sel, props]), want, f"{scheme} {sel}")
+                page.evaluate("() => { location.hash = 'room/86-206'; }")
+                page.wait_for_selector("#roomGrid .ttx-block")
+                self.assertEqual(page.evaluate(read, ["#roomHead select", props]), want,
+                                 f"{scheme} #roomHead select")
+            return steps
+
+        for scheme in ("light", "dark"):
+            self._run(steps_for(scheme), color_scheme=scheme)
