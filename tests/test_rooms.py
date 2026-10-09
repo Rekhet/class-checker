@@ -112,3 +112,68 @@ class RoomsDataTests(unittest.TestCase):
                 with self.subTest(q=(day, a, b, campus, bld)):
                     self.assertEqual(got, expected_free(day, a, b, campus, bld))
         self._run(steps)
+
+    def test_finder_lists_the_same_rooms_grouped_by_building(self) -> None:
+        def steps(page):
+            page.wait_for_function("() => /빈 강의실/.test(document.querySelector('#roomsSummary').textContent)")
+            page.select_option("#roomDay", "1"); page.select_option("#roomFrom", str(18 * 60))
+            page.select_option("#roomTo", str(21 * 60))
+            page.wait_for_timeout(200)
+            names = page.eval_on_selector_all("#roomsResults .room-row a", "ns => ns.map(n => n.dataset.key)")
+            self.assertEqual(sorted(names), expected_free(1, 18 * 60, 21 * 60, "관악"))
+            self.assertIn(f"빈 강의실 {len(names)}개", page.text_content("#roomsSummary"))
+            self.assertEqual(page.locator("details.room-bld[open]").count(), 3)
+        self._run(steps)
+
+    def test_campus_change_clears_the_building(self) -> None:
+        def steps(page):
+            page.fill("#roomBuilding", "24")
+            page.select_option("#roomCampus", "연건")
+            self.assertEqual(page.input_value("#roomBuilding"), "")
+            page.wait_for_timeout(200)
+            self.assertGreater(page.locator("#roomsResults .room-row").count(), 0)
+        self._run(steps)
+
+    def test_a_term_without_rooms_says_so(self) -> None:
+        def steps(page):
+            page.select_option("#roomTerm", "2027|U000200001U000300001")
+            page.wait_for_function("() => /공개되지 않았습니다/.test(document.querySelector('#roomsSummary').textContent)")
+            self.assertEqual(page.locator("#roomsResults .room-row").count(), 0)
+        self._run(steps)
+
+    def test_phone_width_has_no_horizontal_scroll(self) -> None:
+        def steps(page):
+            page.set_viewport_size({"width": 390, "height": 800})
+            page.wait_for_timeout(300)
+            self.assertLessEqual(page.evaluate("document.documentElement.scrollWidth"), 390)
+        self._run(steps)
+
+    def test_week_shows_the_rooms_meetings_and_shared_rooms(self) -> None:
+        rows = json.loads((WEB_ROOT / f"data/classes/{YEAR}_{TERM}.json").read_text())
+        # 222-216 has no two-room meeting in this data, so use a Gwanak room that does
+        room = next(r.split("/")[0] for c in rows for s in c["slots"]
+                    for r in [s.get("room") or ""] if "/" in r and r[0] not in "#*"
+                    and s.get("day_index") is not None and s.get("start_time"))
+
+        def steps(page):
+            page.evaluate("(r) => { location.hash = 'room/' + encodeURIComponent(r); }", room)
+            page.wait_for_selector("#roomGrid .ttx-block")
+            blocks = page.locator("#roomGrid .ttx-block:not(.preview)").count()
+            want = sum(1 for c in rows for s in c["slots"] if s.get("day_index") is not None
+                       and s.get("start_time") and room in (s.get("room") or "").split("/"))
+            self.assertEqual(blocks, want)
+            self.assertIn("동시 사용", page.text_content("#roomGrid"))
+            page.locator("#roomGrid .ttx-block").first.click()
+            page.wait_for_selector("#detailTitle")
+        self._run(steps)
+
+    def test_class_detail_room_links_to_the_week(self) -> None:
+        def steps(page):
+            rows = json.loads((WEB_ROOT / f"data/classes/{YEAR}_{TERM}.json").read_text())
+            c = next(x for x in rows if x.get("room") and "/" not in x["room"] and not x["room"][0] in "#*")
+            param = f"{YEAR}|{TERM}/{c['sbjt_cd']}({c['lt_no']})"
+            page.evaluate("(p) => { location.hash = 'class/' + encodeURIComponent(p); }", param)
+            page.wait_for_selector(".d-grid .room-link")
+            page.locator(".d-grid .room-link").first.click()
+            page.wait_for_function("() => location.hash.startsWith('#room/')")
+        self._run(steps)

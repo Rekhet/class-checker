@@ -1315,7 +1315,8 @@ function renderResults(classes, append = false) {
       el("div", { className: "rbody" },
         el("div", { className: "rname" }, c.name, ...tags),
         el("div", { className: "rmeta" },
-          `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점${c.room ? " · " + c.room : ""}${seats}`),
+          `${sem ? sem + " · " : ""}${c.professor || "미정"} · ${c.department || "-"} · ${c.credits ?? "?"}학점`,
+          ...(c.room ? [" · ", roomLinks(c.room)] : []), seats),
         el("div", { className: "rtime" }, times.length ? times.join("  ·  ") : "시간미정")),
       wishBtn, addBtn);
     ul.append(card);
@@ -1901,7 +1902,7 @@ function renderDetail() {
     ? el("div", { className: "d-chips" }, ...cls.map((x) => el("span", { className: "d-chip" }, x)))
     : "-");
   kv("코드", `${c.sbjt_cd || ""}(${c.lt_no || ""})`);
-  if (c.room) kv("강의실", c.room);
+  if (c.room) kv("강의실", el("span", {}, roomLinks(c.room)));
   if (c.grading)
     kv("평가방식", c.grading + (c.grading_switch === "Y" ? " · 전환가능" : ""));
   body.append(grid);
@@ -4287,13 +4288,185 @@ function freeRooms(meetings, pool, q) {
     || (x.room.name < y.room.name ? -1 : x.room.name > y.room.name ? 1 : 0));
 }
 
+const roomsState = { term: "", campus: "관악", building: "", day: 0, a: 9 * 60, b: 10 * 60, past: true };
+let _roomsWired = false;
+// Terms that have at least one class file; the default follows the site's semester.
+async function roomTermOptions() {
+  const idx = await dataIndex();
+  return idx.terms.map((t) => ({ value: `${t.year}|${t.term}`, label: t.label }));
+}
+function _roomTimeOptions(sel, value) {
+  sel.replaceChildren();
+  for (let m = 8 * 60; m <= 23 * 60; m += 30)
+    sel.append(el("option", { value: String(m), selected: m === value }, hhmm(m)));
+}
+async function wireRooms() {
+  if (_roomsWired) return;
+  _roomsWired = true;
+  const terms = await roomTermOptions();
+  const termSel = $("#roomTerm");
+  for (const t of terms) termSel.append(el("option", { value: t.value }, t.label));
+  const want = meta.cur || defaultSemester();
+  roomsState.term = terms.some((t) => t.value === want) ? want : (terms[0]?.value || "");
+  termSel.value = roomsState.term;
+  const daySel = $("#roomDay");
+  DAYS.slice(0, 6).forEach((d, i) => daySel.append(el("option", { value: String(i) }, d)));
+  const now = new Date();
+  roomsState.day = Math.min((now.getDay() + 6) % 7, 5);
+  daySel.value = String(roomsState.day);
+  _roomTimeOptions($("#roomFrom"), roomsState.a);
+  _roomTimeOptions($("#roomTo"), roomsState.b);
+  const rerun = () => { renderRoomsFinder(); };
+  termSel.onchange = () => { roomsState.term = termSel.value; rerun(); };
+  $("#roomCampus").onchange = (e) => {   // another campus has other buildings
+    roomsState.campus = e.target.value; roomsState.building = ""; $("#roomBuilding").value = ""; rerun(); };
+  $("#roomBuilding").oninput = (e) => { roomsState.building = e.target.value.trim(); rerun(); };
+  daySel.onchange = () => { roomsState.day = Number(daySel.value); rerun(); };
+  $("#roomFrom").onchange = (e) => {
+    roomsState.a = Number(e.target.value);
+    if (roomsState.b <= roomsState.a) { roomsState.b = roomsState.a + 60; $("#roomTo").value = String(roomsState.b); }
+    rerun(); };
+  $("#roomTo").onchange = (e) => {
+    roomsState.b = Number(e.target.value);
+    if (roomsState.b <= roomsState.a) { roomsState.a = roomsState.b - 60; $("#roomFrom").value = String(roomsState.a); }
+    rerun(); };
+  $("#roomPast").onchange = (e) => { roomsState.past = e.target.checked; rerun(); };
+  $("#roomNow").onclick = () => {
+    const d = new Date(), day = (d.getDay() + 6) % 7;
+    const m = Math.floor((d.getHours() * 60 + d.getMinutes()) / 30) * 30;
+    const off = day > 5 || m < 8 * 60 || m >= 22 * 60;
+    roomsState.day = Math.min(day, 5);
+    roomsState.a = Math.max(8 * 60, Math.min(m, 22 * 60)); roomsState.b = roomsState.a + 60;
+    daySel.value = String(roomsState.day);
+    $("#roomFrom").value = String(roomsState.a); $("#roomTo").value = String(roomsState.b);
+    rerun();
+    if (off) $("#roomsSummary").prepend(el("div", { className: "rooms-note" },
+      "지금은 수업 시간이 아닙니다 — 가장 가까운 시간으로 맞췄어요."));
+  };
+}
+const _roomMeetCache = new Map();   // "year|term" -> roomMeetings(rows)
+async function roomMeetingsFor(termKey) {
+  if (!_roomMeetCache.has(termKey)) {
+    const [y, t] = termKey.split("|");
+    _roomMeetCache.set(termKey, roomMeetings(await termRows(y, t)));
+  }
+  return _roomMeetCache.get(termKey);
+}
+let _roomsRender = 0;
+async function renderRoomsFinder() {
+  const token = ++_roomsRender;
+  const q = roomsState;
+  const [meetings, pool] = await Promise.all([roomMeetingsFor(q.term), roomsIndex()]);
+  if (token !== _roomsRender) return;
+  const sum = $("#roomsSummary"), box = $("#roomsResults");
+  box.replaceChildren();
+  if (!meetings.size) {
+    sum.textContent = "이 학기는 아직 강의실이 공개되지 않았습니다. 시간표가 공개되면 자동으로 채워집니다.";
+    return;
+  }
+  const free = freeRooms(meetings, pool, q);
+  const groups = new Map();
+  for (const f of free) {
+    if (!groups.has(f.room.building)) groups.set(f.room.building, []);
+    groups.get(f.room.building).push(f);
+  }
+  const past = free.filter((f) => !f.current).length;
+  sum.replaceChildren(
+    el("div", { className: "rooms-count" },
+      `${DAYS[q.day]} ${hhmm(q.a)}~${hhmm(q.b)} · ${q.campus} · 빈 강의실 ${free.length}개 · ${groups.size}개 건물`),
+    el("div", { className: "rooms-note" }, "수업 기준입니다. 행사·시험·대관 예약은 알 수 없어요."
+      + (past ? ` 과거 학기에만 있던 방 ${past}개는 추정입니다.` : "")));
+  if (!free.length) { box.append(el("div", { className: "rooms-empty" }, "조건에 맞는 빈 강의실이 없습니다.")); return; }
+  let i = 0;
+  for (const [bld, list] of groups) {
+    const det = el("details", { className: "room-bld", open: !!q.building || i < 3 },
+      el("summary", {}, `${bld}동 `, el("span", { className: "cnt" }, `빈 방 ${list.length}`)));
+    const ul = el("div", { className: "room-list" });
+    for (const f of list) {
+      const a = el("a", { href: "#room/" + encodeURIComponent(roomParam(f.room)), "data-key": f.room.key },
+        f.room.name);
+      const info = !f.current
+        ? [el("span", { className: "rtag est" }, "추정"),
+           ` 마지막 수업 ${f.last.year} ${(SEMESTER_LABEL[f.last.term] || "").split(" ")[0]}`]
+        : [f.next ? `${hhmm(f.next.a)} 「${f.next.c.name}」 시작` : "이후 수업 없음"];
+      ul.append(el("div", { className: "room-row" }, a, el("span", { className: "room-next" }, ...info)));
+    }
+    det.append(ul); box.append(det); i++;
+  }
+}
+async function renderRooms(route, param) {
+  await wireRooms();
+  const week = route === "room" && param;
+  $("#roomsFinder").classList.toggle("hidden", !!week);
+  $("#roomWeek").classList.toggle("hidden", !week);
+  if (week) await renderRoomWeek(param);
+  else await renderRoomsFinder();
+}
+
+// One link per room of a '/'-joined room string (class detail, search rows).
+function roomLinks(raw) {
+  const frag = document.createDocumentFragment();
+  String(raw || "").split("/").filter(Boolean).forEach((part, i) => {
+    if (i) frag.append("/");
+    const r = normRoom(part);
+    if (!r) { frag.append(part); return; }
+    frag.append(el("a", { className: "room-link", href: "#room/" + encodeURIComponent(roomParam(r)),
+      title: `${roomLabel(r)} 주간 사용표`, onclick: (e) => e.stopPropagation() }, part));
+  });
+  return frag;
+}
+async function renderRoomWeek(param) {
+  const key = parseRoomParam(param);
+  const [meetings, pool] = await Promise.all([roomMeetingsFor(roomsState.term), roomsIndex()]);
+  const hit = meetings.get(key), known = pool.find((r) => r.key === key);
+  const room = hit?.room || known || null;
+  const head = $("#roomHead"), grid = $("#roomGrid"), note = $("#roomNote");
+  head.replaceChildren(); grid.replaceChildren(); note.textContent = "";
+  if (!room) { head.append(el("h2", {}, param)); note.textContent = "강의실을 찾을 수 없습니다."; return; }
+  const [y, t] = roomsState.term.split("|");
+  const termLabel = `${y} ${(SEMESTER_LABEL[t] || "").split(" ")[0]}`;
+  const classes = new Set((hit?.meets || []).map((m) => classKey(m.c)));
+  head.append(el("h2", {}, roomLabel(room)),
+    el("span", { className: "rooms-note" },
+      `${room.campus} · ${room.building}동 · ${termLabel} 수업 ${classes.size}개`
+      + (known ? ` · 수업이 있던 학기 ${known.terms}개` : "")));
+  // the schedule's own term select (spec): mirrors #roomTerm
+  const sel = el("select", { "aria-label": "학기" });
+  for (const o of $("#roomTerm").options)
+    sel.append(el("option", { value: o.value, selected: o.value === roomsState.term }, o.textContent));
+  sel.onchange = () => { roomsState.term = sel.value; $("#roomTerm").value = sel.value; renderRoomWeek(param); };
+  head.append(sel);
+  if (!hit) {
+    note.append(`이번 학기(${termLabel}) 이 방에 배정된 수업이 없습니다. `);
+    if (known) note.append(el("span", { className: "rtag est" }, "추정"),
+      ` 마지막 수업 ${known.year} ${(SEMESTER_LABEL[known.term] || "").split(" ")[0]}`);
+    return;
+  }
+  const ms = hit.meets;
+  const dayN = Math.max(5, ...ms.map((m) => m.day + 1));
+  const startMin = Math.min(9 * 60, Math.floor(Math.min(...ms.map((m) => m.a)) / 60) * 60);
+  const endMin = Math.max(18 * 60, Math.ceil(Math.max(...ms.map((m) => m.b)) / 60) * 60);
+  const q = roomsState;
+  const { head: gh, ttx } = paintWeekGrid(ms, { dayN, startMin, endMin, conflicts: false,
+    decorate: (node, m) => { if (m.others?.length) node.append(el("span", { className: "co" }, `+${m.others.join(", ")} 동시 사용`)); },
+    column: (d, col, yOf) => {
+      if (d !== q.day) return;
+      const w = el("div", { className: "ttx-window", title: "찾기에서 고른 시간" });
+      w.style.top = yOf(Math.max(q.a, startMin)) + "px";
+      w.style.height = Math.max(0, yOf(Math.min(q.b, endMin)) - yOf(Math.max(q.a, startMin))) + "px";
+      col.append(w);
+    } });
+  grid.append(gh, ttx);
+  note.textContent = `점선 = 찾기에서 고른 시간 (${DAYS[q.day]} ${hhmm(q.a)}~${hhmm(q.b)}). 수업 블록을 누르면 강의 상세가 열립니다.`;
+}
+
 // ---------- wire up ----------
 // ---------- pages (top-nav router) ----------
 // Hash routing: a bare "#trend" is route "trend"/no-param; "#code/M3502.019800"
 // is route "code"/param "M3502.019800". Param-routes render a sub-view inside a
 // host page (code -> explore). Spec 2 adds { prof: "explore" }.
 const PAGE_FOR_ROUTE = { code: "explore", prof: "explore",
-  search: "timetable", class: "timetable" };
+  search: "timetable", class: "timetable", room: "rooms" };
 function parseHash() {
   const raw = (location.hash || "").slice(1);
   const i = raw.indexOf("/");
@@ -4318,6 +4491,7 @@ function route() {
   if (r !== "class" && detailClass) closeDetail(false);
   showPage(page);
   if (page === "explore") renderExplore(r, param);
+  if (page === "rooms") renderRooms(r, param);
   if (r === "search" && param) applySearchLink(param);
   if (r === "class" && param) openClassLink(param);
   if (r === "trend" && param) openTrendLink(param);

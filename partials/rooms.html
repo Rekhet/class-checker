@@ -1,0 +1,28 @@
+<!-- 강의실 page: empty-room finder (#rooms) and one room's weekly schedule
+     (#room/<name>, #room/<campus>:<name>). Built in app.js (renderRooms) from the
+     selected term's class file and data/classes/rooms-index.json. -->
+<div class="page" data-page="rooms" data-title="강의실">
+<div class="tt-wrap rooms-wrap">
+  <section id="roomsFinder">
+    <div class="tt-title"><h2>빈 강의실 찾기 <span class="sub">Rooms</span></h2></div>
+    <div class="rooms-form">
+      <label>학기 <select id="roomTerm"></select></label>
+      <label>캠퍼스 <select id="roomCampus">
+        <option>관악</option><option>연건</option><option>평창</option></select></label>
+      <label>건물 <input id="roomBuilding" placeholder="예: 24" size="6" autocomplete="off"></label>
+      <label>요일 <select id="roomDay"></select></label>
+      <span class="rooms-time"><label>시간 <select id="roomFrom"></select></label>~<select id="roomTo" aria-label="끝 시간"></select></span>
+      <button id="roomNow" type="button" class="ghost">지금</button>
+      <label class="rooms-past"><input type="checkbox" id="roomPast" checked> 과거 학기 방 포함(추정)</label>
+    </div>
+    <div id="roomsSummary" class="rooms-summary" role="status" aria-live="polite"></div>
+    <div id="roomsResults"></div>
+  </section>
+  <section id="roomWeek" class="hidden">
+    <a href="#rooms" class="rooms-back">← 빈 강의실 찾기</a>
+    <div id="roomHead" class="room-head"></div>
+    <div id="roomGrid" class="tt-grid room-grid"></div>
+    <div id="roomNote" class="rooms-note"></div>
+  </section>
+</div>
+</div>
