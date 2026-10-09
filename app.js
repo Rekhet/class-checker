@@ -4490,18 +4490,22 @@ function parseHash() {
   if (i === -1) return { route: raw, param: "" };
   return { route: raw.slice(0, i), param: decodeURIComponent(raw.slice(i + 1)) };
 }
+// Keep the active tab inside the (phone) scrolling strip. Sets scrollLeft directly so
+// the page never scrolls vertically. Re-run when fonts load or tab widths change.
+function _revealActiveTab() {
+  const link = $("#topnav .nav-link.active"), strip = $("#topnav");
+  if (!link || !strip) return;
+  const l = link.offsetLeft - strip.offsetLeft, r = l + link.offsetWidth;
+  if (l < strip.scrollLeft) strip.scrollLeft = l;
+  else if (r > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = r - strip.clientWidth;
+}
 function showPage(name) {
   const pages = [...$$(".page")];
   if (!pages.length) return;
   if (!pages.some((p) => p.dataset.page === name)) name = pages[0].dataset.page;
   pages.forEach((p) => p.classList.toggle("active", p.dataset.page === name));
   $$("#topnav .nav-link").forEach((n) => n.classList.toggle("active", n.dataset.page === name));
-  const activeLink = $("#topnav .nav-link.active"), strip = $("#topnav");
-  if (activeLink && strip) {   // keep the active tab visible when the strip scrolls (phone)
-    const l = activeLink.offsetLeft - strip.offsetLeft, r = l + activeLink.offsetWidth;
-    if (l < strip.scrollLeft) strip.scrollLeft = l;
-    else if (r > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = r - strip.clientWidth;
-  }
+  _revealActiveTab();
   if (name === "trend") ensureTrend();   // lazy-init the trend page on first view
   if (name === "grad") renderGrad();     // recompute the audit each view
   window.scrollTo(0, 0);
@@ -4530,6 +4534,11 @@ function setupNav() {
     link.onclick = (e) => { e.preventDefault(); location.hash = p.dataset.page; };
     nav.append(link);
   });
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(_revealActiveTab);
+    ro.observe(nav); nav.querySelectorAll(".nav-link").forEach((n) => ro.observe(n));
+  }
+  document.fonts?.ready.then(_revealActiveTab);
   window.addEventListener("hashchange", route);
   route();
 }

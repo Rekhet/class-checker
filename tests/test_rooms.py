@@ -208,6 +208,7 @@ class RoomsDataTests(unittest.TestCase):
             names = page.eval_on_selector_all("#topnav .nav-link", "ns => ns.map(n => n.textContent.trim())")
             self.assertEqual(names, ["시간표", "강의탐색", "인원 추이", "강의실", "졸업요건 (demo)"])
             page.evaluate("location.hash = 'grad'")
+            page.evaluate("document.fonts.ready.then(() => 0)")   # widths settle after web fonts
             page.wait_for_timeout(300)
             box = page.evaluate("""() => { const a = document.querySelector('#topnav .nav-link.active').getBoundingClientRect();
               const n = document.querySelector('#topnav').getBoundingClientRect();
