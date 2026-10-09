@@ -1966,6 +1966,84 @@ function renderTT() {                         // rAF-coalesced (mirror renderShe
   if (_ttRaf) return;                         // sheet ops rebuild the grid ONCE per frame
   _ttRaf = requestAnimationFrame(() => { _ttRaf = 0; renderTTNow(); });
 }
+// The proportional week grid (time gutter, hour/half-hour lines, packed class
+// blocks). Shared by the timetable and the room schedule; the caller decides
+// the meetings, the time range, and what else a block or column carries.
+function paintWeekGrid(meetings, { dayN, startMin, endMin, conflicts = true,
+                                    decorate = null, column = null } = {}) {
+  const H = (endMin - startMin) / 60 * HOUR_PX;
+  const y = (min) => (min - startMin) / 60 * HOUR_PX;
+  const cols = `44px repeat(${dayN}, minmax(0, 1fr))`;
+  const head = el("div", { className: "ttx-head" });
+  head.style.gridTemplateColumns = cols;
+  head.append(el("div", {}));
+  for (let d = 0; d < dayN; d++)
+    head.append(el("div", { className: "ttx-hd" }, DAYS[d],
+      el("span", { className: "en" }, DAY_EN[d].toUpperCase())));
+  const ttx = el("div", { className: "ttx" });
+  ttx.style.gridTemplateColumns = cols;
+  const gutter = el("div", { className: "ttx-gutter" });
+  gutter.style.height = H + "px";
+  for (let m = startMin; m <= endMin; m += 60) {
+    const lab = el("div", { className: "ttx-hour" }, hhmm(m));
+    lab.style.top = y(m) + "px";
+    gutter.append(lab);
+  }
+  ttx.append(gutter);
+  // Pack each day first and flag every class that has a clashing meeting, so all
+  // of that lecture's boxes get outlined — even the non-overlapping ones on other
+  // days/periods — making the conflicting lecture obvious across the whole grid.
+  const packedByDay = [];
+  const conflictKeys = new Set();
+  for (let d = 0; d < dayN; d++) {
+    const packed = packDay(meetings.filter((x) => x.day === d));
+    packedByDay.push(packed);
+    if (conflicts) for (const m of packed) if (m.lanes > 1) conflictKeys.add(classKey(m.c));
+  }
+  const hourCount = (endMin - startMin) / 60;
+  for (let d = 0; d < dayN; d++) {
+    const col = el("div", { className: "ttx-col" });
+    col.style.height = H + "px";
+    for (let i = 1; i < hourCount; i++) {   // hour gridlines
+      const line = el("div", { className: "ttx-line" });
+      line.style.top = (i * HOUR_PX) + "px";
+      col.append(line);
+    }
+    for (let i = 0; i < hourCount; i++) {   // half-hour gridlines (dashed, fainter)
+      const half = el("div", { className: "ttx-line half" });
+      half.style.top = (i * HOUR_PX + HOUR_PX / 2) + "px";
+      col.append(half);
+    }
+    for (const m of packedByDay[d]) {
+      const c = m.c, conflict = conflictKeys.has(classKey(c));
+      const h = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2);
+      const b = el("div", {
+        className: "ttx-block" + (conflict ? " conflict" : "")
+          + (c.timeChanged ? " changed" : "") + (c.removed ? " removed" : ""),
+        title: `${c.name}\n${c.professor || "미정"} · ${c.sbjt_cd}(${c.lt_no})`
+          + `\n${hhmm(m.a)}~${hhmm(m.b)}`
+          + (c.timeChanged ? "\n⚠ 시간 변경됨" : "")
+          + (c.removed ? "\n⚠ 폐강/삭제됨" : ""),
+      });
+      b.style.background = colorFor(c);
+      b.style.top = (y(m.a) + 1) + "px";
+      b.style.height = h + "px";
+      b.style.left = `calc(${m.lane / m.lanes * 100}% + 1px)`;
+      b.style.width = `calc(${100 / m.lanes}% - 2px)`;
+      b.append(el("div", { className: "b-name" }, c.name));
+      if (h > 34) b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
+      if (h > 52 && c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
+      if (decorate) decorate(b, m, h);
+      b.addEventListener("click", () => openDetail(c));   // open the detail drawer
+      activatable(b, `${c.name} ${DAYS[d]} ${hhmm(m.a)}~${hhmm(m.b)}`);
+      col.append(b);
+    }
+    if (column) column(d, col, y);
+    ttx.append(col);
+  }
+  return { head, ttx };
+}
+
 function renderTTNow() {
   const grid = $("#ttGrid"); grid.replaceChildren();
   // credits are stored as plain numbers, so the total is a direct sum (null = 0)
@@ -2003,88 +2081,19 @@ function renderTTNow() {
   const dayN = maxDay + 1;
   const startMin = hasAny ? Math.min(9 * 60, Math.floor(minS / 60) * 60) : 9 * 60;
   const endMin = hasAny ? Math.max(18 * 60, Math.ceil(maxE / 60) * 60) : 18 * 60;
-  const H = (endMin - startMin) / 60 * HOUR_PX;
-  const cols = `44px repeat(${dayN}, minmax(0, 1fr))`;
-
-  // header row (separate + unbordered, matching the design)
-  const head = el("div", { className: "ttx-head" });
-  head.style.gridTemplateColumns = cols;
-  head.append(el("div", {}));
-  for (let d = 0; d < dayN; d++)
-    head.append(el("div", { className: "ttx-hd" }, DAYS[d],
-      el("span", { className: "en" }, DAY_EN[d].toUpperCase())));
+  const { head, ttx } = paintWeekGrid(meetings, { dayN, startMin, endMin,
+    column: (d, col, y) => {
+      for (const m of preview.filter((x) => x.day === d)) {
+        const pb = el("div", { className: "ttx-block preview",
+          title: `${hoverPreview.name} (미리보기)` }, "미리보기");
+        pb.style.top = (y(m.a) + 1) + "px";
+        pb.style.height = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2) + "px";
+        pb.style.left = "1px"; pb.style.width = "calc(100% - 2px)";
+        col.append(pb);
+      }
+    } });
   grid.append(head);
 
-  // bordered body grid
-  const ttx = el("div", { className: "ttx" });
-  ttx.style.gridTemplateColumns = cols;
-  const gutter = el("div", { className: "ttx-gutter" });
-  gutter.style.height = H + "px";
-  for (let m = startMin; m <= endMin; m += 60) {
-    const lab = el("div", { className: "ttx-hour" }, hhmm(m));
-    lab.style.top = ((m - startMin) / 60 * HOUR_PX) + "px";
-    gutter.append(lab);
-  }
-  ttx.append(gutter);
-
-  // Pack each day first and flag every class that has a clashing meeting, so all
-  // of that lecture's boxes get outlined — even the non-overlapping ones on other
-  // days/periods — making the conflicting lecture obvious across the whole grid.
-  const packedByDay = [];
-  const conflictKeys = new Set();
-  for (let d = 0; d < dayN; d++) {
-    const packed = packDay(meetings.filter((x) => x.day === d));
-    packedByDay.push(packed);
-    for (const m of packed) if (m.lanes > 1) conflictKeys.add(classKey(m.c));
-  }
-
-  const hourCount = (endMin - startMin) / 60;
-  for (let d = 0; d < dayN; d++) {
-    const col = el("div", { className: "ttx-col" });
-    col.style.height = H + "px";
-    for (let i = 1; i < hourCount; i++) {   // hour gridlines
-      const line = el("div", { className: "ttx-line" });
-      line.style.top = (i * HOUR_PX) + "px";
-      col.append(line);
-    }
-    for (let i = 0; i < hourCount; i++) {   // half-hour gridlines (dashed, fainter)
-      const half = el("div", { className: "ttx-line half" });
-      half.style.top = (i * HOUR_PX + HOUR_PX / 2) + "px";
-      col.append(half);
-    }
-    for (const m of packedByDay[d]) {
-      const c = m.c, conflict = conflictKeys.has(classKey(c));
-      const h = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2);
-      const b = el("div", {
-        className: "ttx-block" + (conflict ? " conflict" : "")
-          + (c.timeChanged ? " changed" : "") + (c.removed ? " removed" : ""),
-        title: `${c.name}\n${c.professor || "미정"} · ${c.sbjt_cd}(${c.lt_no})`
-          + `\n${hhmm(m.a)}~${hhmm(m.b)}`
-          + (c.timeChanged ? "\n⚠ 시간 변경됨" : "")
-          + (c.removed ? "\n⚠ 폐강/삭제됨" : ""),
-      });
-      b.style.background = colorFor(c);
-      b.style.top = ((m.a - startMin) / 60 * HOUR_PX + 1) + "px";
-      b.style.height = h + "px";
-      b.style.left = `calc(${m.lane / m.lanes * 100}% + 1px)`;
-      b.style.width = `calc(${100 / m.lanes}% - 2px)`;
-      b.append(el("div", { className: "b-name" }, c.name));
-      if (h > 34) b.append(el("small", {}, `${hhmm(m.a)}~${hhmm(m.b)}`));
-      if (h > 52 && c.professor) b.append(el("small", { className: "ttx-prof" }, c.professor));
-      b.addEventListener("click", () => openDetail(c));   // open the detail drawer
-      activatable(b, `${c.name} ${DAYS[d]} ${hhmm(m.a)}~${hhmm(m.b)}`);
-      col.append(b);
-    }
-    for (const m of preview.filter((x) => x.day === d)) {
-      const pb = el("div", { className: "ttx-block preview",
-        title: `${hoverPreview.name} (미리보기)` }, "미리보기");
-      pb.style.top = ((m.a - startMin) / 60 * HOUR_PX + 1) + "px";
-      pb.style.height = Math.max(20, (m.b - m.a) / 60 * HOUR_PX - 2) + "px";
-      pb.style.left = "1px"; pb.style.width = "calc(100% - 2px)";
-      col.append(pb);
-    }
-    ttx.append(col);
-  }
 
   // body wrapper hosts the empty-state overlay over the grid
   const bodyWrap = el("div", {}); bodyWrap.style.position = "relative";
