@@ -4479,6 +4479,12 @@ function showPage(name) {
   if (!pages.some((p) => p.dataset.page === name)) name = pages[0].dataset.page;
   pages.forEach((p) => p.classList.toggle("active", p.dataset.page === name));
   $$("#topnav .nav-link").forEach((n) => n.classList.toggle("active", n.dataset.page === name));
+  const activeLink = $("#topnav .nav-link.active"), strip = $("#topnav");
+  if (activeLink && strip) {   // keep the active tab visible when the strip scrolls (phone)
+    const l = activeLink.offsetLeft - strip.offsetLeft, r = l + activeLink.offsetWidth;
+    if (l < strip.scrollLeft) strip.scrollLeft = l;
+    else if (r > strip.scrollLeft + strip.clientWidth) strip.scrollLeft = r - strip.clientWidth;
+  }
   if (name === "trend") ensureTrend();   // lazy-init the trend page on first view
   if (name === "grad") renderGrad();     // recompute the audit each view
   window.scrollTo(0, 0);

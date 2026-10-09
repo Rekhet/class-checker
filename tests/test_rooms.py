@@ -197,3 +197,21 @@ class RoomsDataTests(unittest.TestCase):
             h = page.evaluate("document.querySelector('#roomGrid .ttx-window').getBoundingClientRect().height")
             self.assertAlmostEqual(h, 3 * page.evaluate("HOUR_PX"), delta=1)
         self._run(steps)
+
+    def test_phone_nav_is_one_scrollable_row_in_order(self) -> None:
+        def steps(page):
+            page.set_viewport_size({"width": 390, "height": 844})
+            page.wait_for_selector("#topnav .nav-link")
+            tops = page.eval_on_selector_all("#topnav .nav-link", "ns => ns.map(n => n.offsetTop)")
+            self.assertEqual(len(set(tops)), 1)
+            self.assertLessEqual(page.evaluate("document.documentElement.scrollWidth"), 390)
+            names = page.eval_on_selector_all("#topnav .nav-link", "ns => ns.map(n => n.textContent.trim())")
+            self.assertEqual(names, ["시간표", "강의탐색", "인원 추이", "강의실", "졸업요건 (demo)"])
+            page.evaluate("location.hash = 'grad'")
+            page.wait_for_timeout(300)
+            box = page.evaluate("""() => { const a = document.querySelector('#topnav .nav-link.active').getBoundingClientRect();
+              const n = document.querySelector('#topnav').getBoundingClientRect();
+              return [a.left, a.right, n.left, n.right]; }""")
+            self.assertGreaterEqual(box[0], box[2] - 1)
+            self.assertLessEqual(box[1], box[3] + 1)
+        self._run(steps)

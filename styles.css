@@ -539,9 +539,11 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   #scopeInfo + .theme-toggle { margin-left: 0; }
   /* scope drops to its own line so the title + nav never get pushed off-screen */
   #scopeInfo { margin-left: 0; flex-basis: 100%; order: 3; }
-  /* six tabs no longer fit one row at phone width */
-  .topnav { flex-wrap: wrap; }
-  .nav-link { padding: 6px 9px; }
+  /* tabs stay on one row; only the strip scrolls sideways, never the page */
+  .topnav { flex: 1 1 100%; order: 2; min-width: 0; flex-wrap: nowrap; overflow-x: auto;
+    overscroll-behavior-x: contain; scrollbar-width: none; }
+  .topnav::-webkit-scrollbar { display: none; }
+  .nav-link { flex: 0 0 auto; }
   .tt-wrap { padding: 16px; }
   .panel.timetable { padding: 16px 14px; }
   .tt-head { flex-wrap: wrap; }
