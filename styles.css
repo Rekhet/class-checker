@@ -618,6 +618,12 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 /* 전공 구성 (major list) */
 .grad-majorlist { display: flex; flex-direction: column; gap: 7px; }
 .gm-row { display: flex; align-items: center; gap: 7px; }
+.gm-head { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+.gm-row > .gm-major, .gm-row > .gm-year { flex-shrink: 0; }
+.gm-row.gm-stack { flex-wrap: wrap; row-gap: 6px; }
+.gm-row.gm-stack > * { flex: 1 1 100%; }
+.gm-row.gm-stack > .gm-major, .gm-row.gm-stack > .gm-year { min-width: 0; max-width: 100%; }
+.gm-row.gm-stack .gm-del { margin-left: auto; }
 .gm-mark { font-weight: 800; font-size: 13px; width: 14px; text-align: center; }
 .gm-mark.ok { color: #3FA66A; }
 .gm-mark.no { color: var(--cp-conflict); }
@@ -839,5 +845,4 @@ details.room-bld .cnt { font-weight: 500; color: var(--cp-muted); font-size: 12p
 .ttx-block .co { display: block; font-size: 10px; font-weight: 700; }
 @media (max-width: 640px) { .room-list { grid-template-columns: 1fr; padding-left: 14px; } }
 #roomGrid { overflow-x: hidden; }
-@media (max-width: 1040px) { #roomGrid { max-width: 100%; } }
 .room-link { color: inherit; text-decoration: underline dotted; }

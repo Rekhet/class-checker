@@ -3469,17 +3469,34 @@ function _renderGradList(idx, majors, okByIdx) {
     const label = e.type === "union"
       ? (e.major.endsWith("연합전공") ? "연합전공" : "연계전공")    // 슬롯 칩은 실제 분류 표기
       : (GRAD_TYPE_LABEL[e.type] || e.type);
-    const kids = [mark, el("span", { className: "gm-type gm-" + e.type }, label), mSel, ySel];
+    const head = [mark, el("span", { className: "gm-type gm-" + e.type }, label)];
     if (e.type !== "main")
-      kids.push(el("button", { type: "button", className: "gm-del", title: "제외",
+      head.push(el("button", { type: "button", className: "gm-del", title: "제외",
         onclick: () => { _gradState.list.splice(i, 1); save(); } }, "×"));
-    return el("div", { className: "gm-row" }, ...kids);
+    return el("div", { className: "gm-row" }, el("span", { className: "gm-head" }, ...head), mSel, ySel);
   });
   const addBtn = (type, label, pool) => el("button", { type: "button", className: "gm-add",
     onclick: () => { _gradState.list.push({ type, major: pool[0], year: _gradYears(idx, pool[0])[0] }); save(); } }, label);
   box.replaceChildren(...rows, el("div", { className: "gm-adds" },
     addBtn("double", "+ 복수전공", dept), addBtn("minor", "+ 부전공", dept),
     inter.length ? addBtn("union", "+ 연합·연계전공", inter) : document.createTextNode("")));
+  _gradFitRows();
+  if (!_gradFitObs && window.ResizeObserver) {      // one observer; re-fit only when the width changes
+    let lastW = box.clientWidth;
+    _gradFitObs = new ResizeObserver(() => {
+      if (box.clientWidth === lastW) return;
+      lastW = box.clientWidth; _gradFitRows();
+    });
+    _gradFitObs.observe(box);
+  }
+}
+let _gradFitObs = null;
+// a row that cannot hold [type, major, year] on one line stacks into three lines (measured, not a breakpoint)
+function _gradFitRows() {
+  document.querySelectorAll("#gradMajorList .gm-row").forEach((r) => {
+    r.classList.remove("gm-stack");
+    if (r.scrollWidth > r.clientWidth) r.classList.add("gm-stack");
+  });
 }
 // write one pick (semKey → sheetId), persist, re-audit
 function _gradSetPick(sem, id) { _gradState.picks[sem] = id; _gradSave(GRAD_STATE_KEY, _gradState); renderGrad(); }
