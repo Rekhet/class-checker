@@ -177,3 +177,23 @@ class RoomsDataTests(unittest.TestCase):
             page.locator(".d-grid .room-link").first.click()
             page.wait_for_function("() => location.hash.startsWith('#room/')")
         self._run(steps)
+
+    def test_week_grid_shows_the_whole_finder_window(self) -> None:
+        rows = json.loads((WEB_ROOT / f"data/classes/{YEAR}_{TERM}.json").read_text())
+        ends: dict[str, int] = {}
+        for c in rows:
+            for s in c["slots"]:
+                r = s.get("room") or ""
+                if r and "/" not in r and r[0] not in "#*" and s.get("start_time") and s.get("day_index") is not None:
+                    ends[r] = max(ends.get(r, 0), int(s["end_time"][:2]) * 60 + int(s["end_time"][3:]))
+        room = next(r for r, e in sorted(ends.items()) if e <= 18 * 60)
+
+        def steps(page):
+            page.wait_for_function("() => /빈 강의실/.test(document.querySelector('#roomsSummary').textContent)")
+            page.select_option("#roomDay", "1"); page.select_option("#roomFrom", str(18 * 60))
+            page.select_option("#roomTo", str(21 * 60))
+            page.evaluate("(r) => { location.hash = 'room/' + encodeURIComponent(r); }", room)
+            page.wait_for_selector("#roomGrid .ttx-window")
+            h = page.evaluate("document.querySelector('#roomGrid .ttx-window').getBoundingClientRect().height")
+            self.assertAlmostEqual(h, 3 * page.evaluate("HOUR_PX"), delta=1)
+        self._run(steps)

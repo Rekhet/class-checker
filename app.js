@@ -4443,10 +4443,10 @@ async function renderRoomWeek(param) {
     return;
   }
   const ms = hit.meets;
-  const dayN = Math.max(5, ...ms.map((m) => m.day + 1));
-  const startMin = Math.min(9 * 60, Math.floor(Math.min(...ms.map((m) => m.a)) / 60) * 60);
-  const endMin = Math.max(18 * 60, Math.ceil(Math.max(...ms.map((m) => m.b)) / 60) * 60);
-  const q = roomsState;
+  const q = roomsState;   // the finder's window always fits in the grid
+  const dayN = Math.max(5, q.day + 1, ...ms.map((m) => m.day + 1));
+  const startMin = Math.min(9 * 60, Math.floor(Math.min(...ms.map((m) => m.a)) / 60) * 60, Math.floor(q.a / 60) * 60);
+  const endMin = Math.max(18 * 60, Math.ceil(Math.max(...ms.map((m) => m.b)) / 60) * 60, Math.ceil(q.b / 60) * 60);
   const { head: gh, ttx } = paintWeekGrid(ms, { dayN, startMin, endMin, conflicts: false,
     decorate: (node, m) => { if (m.others?.length) node.append(el("span", { className: "co" }, `+${m.others.join(", ")} 동시 사용`)); },
     column: (d, col, yOf) => {
