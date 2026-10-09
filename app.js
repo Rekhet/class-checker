@@ -4194,6 +4194,99 @@ async function openTrendLink(param) {
   else showTrendMsg("이 학기의 인원 추이 데이터에 해당 강좌가 없습니다.");
 }
 
+// ---------- 강의실 (rooms) ----------
+// Room names: twin of scraper/rooms.py (tested against the same fixture).
+const ROOM_CAMPUS = { "#": "연건", "*": "평창" };
+function normRoom(raw) {
+  raw = String(raw ?? "").trim();
+  if (!raw) return null;
+  const campus = ROOM_CAMPUS[raw[0]] || "관악";
+  const body = ROOM_CAMPUS[raw[0]] ? raw.slice(1) : raw;
+  const parts = body.split("-").filter(Boolean)
+    .map((p) => (/^[0-9]+$/.test(p) ? (p.replace(/^0+/, "") || "0") : p));
+  if (!parts.length) return null;
+  const building = parts.length >= 3 && /^[0-9]{1,2}$/.test(parts[1])
+    ? `${parts[0]}-${parts[1]}` : parts[0];
+  const name = parts.join("-");
+  return { campus, building, name, key: `${campus}|${name}` };
+}
+const roomLabel = (r) => (r.campus === "관악" ? r.name : `${r.campus} ${r.name}`);
+const roomParam = (r) => (r.campus === "관악" ? r.name : `${r.campus}:${r.name}`);
+function parseRoomParam(param) {
+  const i = param.indexOf(":");
+  return i === -1 ? `관악|${param}` : `${param.slice(0, i)}|${param.slice(i + 1)}`;
+}
+// 2 < 9-2 < 10 < 10-1 < 100 < non-numeric (scraper/rooms.py building_rank)
+function buildingRank(b) {
+  const nums = b.split("-");
+  return nums.every((n) => /^[0-9]+$/.test(n)) ? [0, ...nums.map(Number)] : [1, b];
+}
+function cmpRank(x, y) {
+  for (let i = 0; i < Math.max(x.length, y.length); i++) {
+    if (x[i] === undefined) return -1;
+    if (y[i] === undefined) return 1;
+    if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1;
+  }
+  return 0;
+}
+function _validateRoomsIndex(raw, source = "rooms index") {
+  _assertJson(_isRecord(raw) && Array.isArray(raw.rooms), source, "rooms must be an array");
+  return raw.rooms
+    .filter((r) => Array.isArray(r) && r.length === 6 && r.slice(0, 5).every(_isString)
+      && _isInteger(r[5]))
+    .map(([campus, building, name, year, term, terms]) =>
+      ({ campus, building, name, key: `${campus}|${name}`, year, term, terms }));
+}
+let _roomsIndex = null;
+async function roomsIndex() {
+  if (!_roomsIndex) {
+    try {
+      const r = await fetch("data/classes/rooms-index.json", { cache: "no-cache" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      _roomsIndex = _validateRoomsIndex(await r.json());
+    } catch (e) {
+      console.warn(`rooms index unavailable — past-term rooms hidden (${e.message})`);
+      _roomsIndex = [];
+    }
+  }
+  return _roomsIndex;
+}
+// key -> {room, meets}: every timed meeting of one term's rows, per room. A
+// meeting held in two rooms at once counts in both and names the other.
+function roomMeetings(rows) {
+  const out = new Map();
+  for (const c of rows) for (const s of c.slots || []) {
+    if (s.day_index == null || !s.start_time || !s.end_time || !s.room) continue;
+    const rs = s.room.split("/").map(normRoom).filter(Boolean);
+    for (const r of rs) {
+      if (!out.has(r.key)) out.set(r.key, { room: r, meets: [] });
+      out.get(r.key).meets.push({ c, day: s.day_index, a: toMin(s.start_time),
+        b: toMin(s.end_time), others: rs.filter((o) => o.key !== r.key).map(roomLabel) });
+    }
+  }
+  return out;
+}
+// Rooms with no meeting overlapping [q.a, q.b) on q.day. `pool` adds rooms
+// seen only in other terms (q.past), which carry `last` and no meetings.
+function freeRooms(meetings, pool, q) {
+  const inScope = (r) => r.campus === q.campus && (!q.building
+    || r.building === q.building || r.building.startsWith(q.building + "-"));
+  const out = [];
+  for (const { room, meets } of meetings.values()) {
+    if (!inScope(room)) continue;
+    const today = meets.filter((m) => m.day === q.day);
+    if (today.some((m) => m.a < q.b && m.b > q.a)) continue;
+    const after = today.filter((m) => m.a >= q.b).sort((x, y) => x.a - y.a)[0];
+    out.push({ room, current: true, next: after ? { a: after.a, c: after.c } : null, last: null });
+  }
+  if (q.past) for (const r of pool) {
+    if (!inScope(r) || meetings.has(r.key)) continue;
+    out.push({ room: r, current: false, next: null, last: { year: r.year, term: r.term } });
+  }
+  return out.sort((x, y) => cmpRank(buildingRank(x.room.building), buildingRank(y.room.building))
+    || (x.room.name < y.room.name ? -1 : x.room.name > y.room.name ? 1 : 0));
+}
+
 // ---------- wire up ----------
 // ---------- pages (top-nav router) ----------
 // Hash routing: a bare "#trend" is route "trend"/no-param; "#code/M3502.019800"
