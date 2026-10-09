@@ -3489,8 +3489,12 @@ function _renderGradList(idx, majors, okByIdx) {
     });
     _gradFitObs.observe(box);
   }
+  if (!_gradFitFonts && document.fonts?.ready) {    // web fonts widen the rows without changing the box width
+    _gradFitFonts = true;
+    document.fonts.ready.then(_gradFitRows);
+  }
 }
-let _gradFitObs = null;
+let _gradFitObs = null, _gradFitFonts = false;
 // a row that cannot hold [type, major, year] on one line stacks into three lines (measured, not a breakpoint)
 function _gradFitRows() {
   document.querySelectorAll("#gradMajorList .gm-row").forEach((r) => {

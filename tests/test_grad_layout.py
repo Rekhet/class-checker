@@ -84,6 +84,15 @@ class GradLayoutTests(unittest.TestCase):
                     self.assertOneLine(r)
         self._run(320, steps)
 
+    def test_rows_fit_after_fonts_are_ready(self) -> None:
+        def steps(page):
+            page.evaluate("document.fonts.ready.then(() => 0)")
+            page.wait_for_timeout(100)
+            self.assertLessEqual(page.evaluate("document.documentElement.scrollWidth"), 320)
+            for r in page.evaluate(ROWS):
+                self.assertStacked(r) if r["stack"] else self.assertOneLine(r)
+        self._run(320, steps)
+
     def test_stack_follows_the_width_both_ways(self) -> None:
         def steps(page):
             self.assertTrue(any(r["stack"] for r in page.evaluate(ROWS)))
