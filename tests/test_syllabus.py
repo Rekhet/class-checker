@@ -205,6 +205,29 @@ class SyllabusDrawerTests(unittest.TestCase):
         self._run(steps, lambda r: r.fulfill(status=200, content_type="application/json",
                                              body=json.dumps(f)))
 
+    def test_settle_keeps_focus_and_scroll(self) -> None:
+        held = []
+
+        def steps(page):
+            page.set_viewport_size({"width": 800, "height": 300})
+            self._open(page, cls("A001"))
+            page.wait_for_function("() => document.querySelector('#detailDrawer .d-syl')")
+            page.wait_for_timeout(200)
+            self.assertEqual(len(held), 1)
+            page.evaluate("() => { const b = document.querySelector('#detailDrawer .d-body');"
+                          " b.scrollTop = 40; }")
+            top = page.evaluate("() => document.querySelector('#detailDrawer .d-body').scrollTop")
+            self.assertGreater(top, 0)
+            self.assertTrue(page.evaluate(
+                "() => document.activeElement === document.querySelector('#detailDrawer .d-close')"))
+            held[0].fulfill(status=200, content_type="application/json", body=json.dumps(FILE))
+            page.wait_for_selector("#detailDrawer .d-syl a")
+            self.assertTrue(page.evaluate(
+                "() => document.activeElement === document.querySelector('#detailDrawer .d-close')"))
+            self.assertEqual(page.evaluate(
+                "() => document.querySelector('#detailDrawer .d-body').scrollTop"), top)
+        self._run(steps, lambda r: held.append(r))
+
     def test_click_downloads_without_navigating(self) -> None:
         def steps(page):
             page.route(SHINE + "*", lambda r: r.fulfill(

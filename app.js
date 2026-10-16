@@ -1888,7 +1888,7 @@ function loadSyllabus(year, term) {
     const settle = (st) => {
       _syllabusState.set(k, st);
       if (st.status === "fail") _syllabusCache.delete(k);   // not cached: the next open fetches again
-      if (detailClass && detailClass.year === year && detailClass.term === term) renderDetail();
+      if (detailClass && detailClass.year === year && detailClass.term === term) refreshSyllabus();
     };
     _syllabusCache.set(k, fetch(`data/syllabus/${k}.json`).then((r) => {
       if (r.status === 404) return null;
@@ -1899,6 +1899,15 @@ function loadSyllabus(year, term) {
     _syllabusCache.get(k).catch(() => {});
   }
   return _syllabusCache.get(k);
+}
+// Swap only the group in place so focus and scroll in the open drawer survive.
+function refreshSyllabus() {
+  try {
+    const old = $("#detailDrawer .d-syl");
+    if (old && detailClass) old.replaceWith(syllabusBlock(detailClass));
+  } catch (e) {
+    console.error("syllabus group refresh failed", e);
+  }
 }
 function syllabusBlock(c) {
   const state = _syllabusState.get(`${c.year}_${c.term}`);
