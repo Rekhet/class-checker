@@ -434,6 +434,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .d-rows { display: flex; flex-direction: column; gap: 6px; }
 .d-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 8px 12px; background: var(--cp-panel); border-radius: 4px; }
 .d-row .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+.d-syl .d-row .v { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; min-width: 0; text-align: right; overflow-wrap: anywhere; }
+.d-syl .d-row a { color: var(--cp-accent); }
 .d-slot { display: flex; align-items: center; gap: 12px; font-size: 13px; padding: 9px 12px; background: var(--cp-panel); border-radius: 4px; }
 .d-slot .day { font-weight: 700; width: 20px; }
 .d-slot .time { font-variant-numeric: tabular-nums; color: var(--cp-muted); }

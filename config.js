@@ -38,3 +38,9 @@ window.SHEET_TAB_LIMIT = 20;
 // Hard cap on total sheets. Blocks creating more (with a message) before localStorage
 // fills up — ~1K full sheets is the safe quota ceiling (~5MB / ~2KB per sheet). Min 1.
 window.MAX_SHEETS = 1000;
+
+// Origin of the deployed syllabus-proxy Worker, no trailing slash, e.g.
+//   window.SYLLABUS_PROXY = "https://syllabus-proxy.example.workers.dev";
+// It backs the drawer's 원본 link (the course page on the sugang site). Empty =
+// that row is hidden; the 국문/영문 file links do not depend on it.
+window.SYLLABUS_PROXY = "";

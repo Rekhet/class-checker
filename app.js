@@ -1854,6 +1854,8 @@ async function openDetail(c) {
     } catch { /* offline: render whatever we have */ }
   }
   detailClass = full;
+  const sylState = _syllabusState.get(`${full.year}_${full.term}`);
+  if (sylState?.status === "fail") _syllabusState.delete(`${full.year}_${full.term}`);   // retry
   renderDetail();
   $("#detailOverlay").classList.remove("hidden");
   const drawer = $("#detailDrawer");
@@ -1874,6 +1876,65 @@ function closeDetail(resetHash = true) {
   if (wasOpen && _detailReturnFocus?.isConnected) _detailReturnFocus.focus();
   _detailReturnFocus = null;
 }
+// ---------- syllabus attachments (drawer group) ----------
+const SYLLABUS_DL = "https://shine.snu.ac.kr/com/download/noflt/downloadWebFile.action";
+const _syllabusCache = new Map();   // "year_term" -> Promise<file|null>, one per term
+const _syllabusState = new Map();   // "year_term" -> {status:"ok", file} | {status:"fail"}, read at render
+// Per-term file written by the scraper; a 404 means the term was never collected (null).
+// Settles into _syllabusState, then re-renders only if the drawer still shows that term.
+function loadSyllabus(year, term) {
+  const k = `${year}_${term}`;
+  if (!_syllabusCache.has(k)) {
+    const settle = (st) => {
+      _syllabusState.set(k, st);
+      if (st.status === "fail") _syllabusCache.delete(k);   // not cached: the next open fetches again
+      if (detailClass && detailClass.year === year && detailClass.term === term) renderDetail();
+    };
+    _syllabusCache.set(k, fetch(`data/syllabus/${k}.json`).then((r) => {
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error(`syllabus HTTP ${r.status}`);
+      return r.json();
+    }).then((file) => { settle({ status: "ok", file }); return file; },
+            (e) => { settle({ status: "fail" }); throw e; }));
+    _syllabusCache.get(k).catch(() => {});
+  }
+  return _syllabusCache.get(k);
+}
+function syllabusBlock(c) {
+  const state = _syllabusState.get(`${c.year}_${c.term}`);
+  if (!state) loadSyllabus(c.year, c.term);
+  const entry = state?.status === "ok" ? state.file?.classes?.[`${c.sbjt_cd}|${c.lt_no}`] : undefined;
+  const cell = (lang) => {
+    if (!state) return "불러오는 중";
+    if (state.status === "fail") return "불러오지 못함";
+    if (!entry) return "미수집";
+    const files = entry[lang] || [];
+    if (!files.length) return "-";
+    const box = el("span", { className: "v" });
+    for (const [name, no, deta] of files) {
+      if (no == null || no === "" || deta == null || deta === "") continue;   // malformed entry
+      box.append(el("a", { href: `${SYLLABUS_DL}?cscLocale=ko_KR&attcFileNo=${encodeURIComponent(no)}`
+        + `&attcFileDetaNo=${encodeURIComponent(deta)}` }, name));
+    }
+    if (!box.firstChild) return "-";
+    return box;
+  };
+  const row = (label, v) => el("div", { className: "d-row" }, el("span", {}, label),
+    v.nodeType ? v : el("span", { className: "v" }, v));
+  const rows = el("div", { className: "d-rows" });
+  const proxy = window.SYLLABUS_PROXY;
+  if (typeof proxy === "string" && proxy) {
+    const q = new URLSearchParams({ openSchyy: c.year, openShtmFg: c.shtm_fg,
+      openDetaShtmFg: c.deta_shtm_fg, sbjtCd: c.sbjt_cd, ltNo: c.lt_no,
+      sbjtSubhCd: c.subh_cd || "000" });
+    rows.append(row("원본", el("span", { className: "v" }, el("a", {
+      href: `${proxy}/sugang/cc/cc103.action?${q.toString().replace(/\+/g, "%20")}`,
+      target: "_blank", rel: "noopener" }, "수강신청 사이트에서 보기 ↗"))));
+  }
+  rows.append(row("국문", cell("ko")), row("영문", cell("en")));
+  return el("div", { className: "d-syl" }, el("div", { className: "d-section" }, "강의계획서"), rows);
+}
+
 function renderDetail() {
   const c = detailClass; if (!c) return;
   const drawer = $("#detailDrawer"); drawer.replaceChildren();
@@ -1933,6 +1994,8 @@ function renderDetail() {
     slotRows.append(el("div", { className: "d-slot" },
       el("span", { className: "day" }, d), el("span", { className: "time" }, t))));
   body.append(slotRows);
+
+  if (c.term !== "MANUAL" && c.sbjt_cd) body.append(syllabusBlock(c));
 
   if (c.term !== "MANUAL" && c.sbjt_cd) {
     const key = `${c.sbjt_cd}(${c.lt_no})`;
