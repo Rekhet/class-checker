@@ -13,7 +13,7 @@ window.GOOGLE_CLIENT_ID = "1357339441-37gp3tq7v7bajmldkicteajonpe6jpk0.apps.goog
 //   term: "1학기" | "2학기" | "여름학기" | "겨울학기"  (or spring/fall/summer/winter,
 //         or the raw 20-char term code). Applied only if that option exists.
 window.SEARCH_DEFAULT_YEAR = "2026";
-window.SEARCH_DEFAULT_TERM = "fall";
+window.SEARCH_DEFAULT_TERM = "winter";
 
 // Default PAGE SEMESTER (timetable toggle) on first load, before the user picks one.
 // Authoritative: used even if that semester isn't in the catalog yet. Same term
@@ -21,11 +21,11 @@ window.SEARCH_DEFAULT_TERM = "fall";
 // / raw 20-char code). Leave both empty to fall back to the newest catalog term.
 //   Note: only applies when there's no saved choice — an existing user's stored toggle wins.
 window.DEFAULT_SEMESTER_YEAR = "2026";
-window.DEFAULT_SEMESTER_TERM = "fall";
+window.DEFAULT_SEMESTER_TERM = "winter";
 
 // Default calendar (.ics) export range. "YYYY-MM-DD" each; empty = today / +16 weeks.
-window.ICS_DEFAULT_START = "2026-09-01";
-window.ICS_DEFAULT_END = "2026-12-21";
+window.ICS_DEFAULT_START = "2026-12-22";
+window.ICS_DEFAULT_END = "2027-01-25";
 
 // How many timetable sheets to keep in memory at once (LRU). Others are flushed to
 // localStorage and loaded on demand — keeps memory bounded with many sheets. Min 2.
